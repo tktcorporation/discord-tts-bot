@@ -12,5 +12,7 @@ serenity = { version = "0.10", default-features = false, features = [
     "gateway",
     "rustls_backend",
     "model",
+    "framework",
+    "standard_framework",
 ] }
 tokio = { version = "1", features = ["full"] }
