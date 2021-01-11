@@ -2,3 +2,5 @@ document:
   - README.md
 ci:
   - .github/**/*
+app:
+  - app
