@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+  app:
+    image: rust:alpine3.12
+    working_dir: /app
+    environment:
+      - USER=$USER
+    volumes:
+      - ./app:/app:cached
+      - /app/target
