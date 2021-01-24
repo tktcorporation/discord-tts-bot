@@ -8,4 +8,6 @@ services:
       - DISCORD_TOKEN=$DISCORD_TOKEN
     volumes:
       - ./app:/app:cached
-      - /app/target
+      - target:/app/target:cached
+volumes:
+  target:
