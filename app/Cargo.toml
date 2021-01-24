@@ -7,12 +7,18 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serenity = { version = "0.10", default-features = false, features = [
-    "client",
-    "gateway",
-    "rustls_backend",
-    "model",
-    "framework",
-    "standard_framework",
-] }
-tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = "0.2"
+tracing-futures = "0.2"
+
+[dependencies.songbird]
+version = "0.1.1"
+features = ["builtin-queue"]
+
+[dependencies.serenity]
+version = "0.10"
+features = ["cache", "standard_framework", "voice", "rustls_backend"]
+
+[dependencies.tokio]
+version = "1.0"
+features = ["macros", "rt-multi-thread"]

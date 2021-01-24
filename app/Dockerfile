@@ -1,7 +1,17 @@
-FROM rust:alpine3.12
+FROM rust:1.49-slim-buster
+
+RUN apt-get update && \
+    apt-get install -y \
+    libopus-dev \
+    build-essential \
+    autoconf \
+    automake \
+    libtool \
+    m4 \
+    ffmpeg \
+    youtube-dl
 
 WORKDIR /app
-RUN apk add --no-cache alpine-sdk git
 
 COPY Cargo.lock Cargo.lock
 COPY Cargo.toml Cargo.toml
