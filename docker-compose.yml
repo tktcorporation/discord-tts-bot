@@ -9,5 +9,6 @@ services:
     volumes:
       - ./app:/app:cached
       - target:/app/target:cached
+    tty: true
 volumes:
   target:
