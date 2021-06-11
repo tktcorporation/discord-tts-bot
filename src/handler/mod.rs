@@ -1,7 +1,7 @@
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
-    model::{gateway::Ready},
+    model::gateway::Ready,
 };
 
 pub struct Handler;
