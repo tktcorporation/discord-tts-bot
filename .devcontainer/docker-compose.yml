@@ -1,0 +1,16 @@
+version: "3.7"
+services:
+  app:
+    # build:
+    #   context: .
+    #   dockerfile: .devcontainer/Dockerfile
+    image: rust
+    environment:
+      - USER=$USER
+      - DISCORD_TOKEN=$DISCORD_TOKEN
+    volumes:
+      - ..:/workspace:cached
+      - target:/workspace/target:cached
+    tty: true
+volumes:
+  target:

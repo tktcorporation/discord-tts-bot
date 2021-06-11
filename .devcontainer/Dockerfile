@@ -11,7 +11,7 @@ RUN apt-get update && \
     ffmpeg \
     youtube-dl
 
-WORKDIR /app
+WORKDIR /workspace
 
 COPY Cargo.lock Cargo.lock
 COPY Cargo.toml Cargo.toml
