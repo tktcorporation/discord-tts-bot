@@ -13,8 +13,7 @@ use serenity::{
     framework::{
         standard::{
             macros::{command, group},
-            Args,
-            CommandResult,
+            Args, CommandResult,
         },
         StandardFramework,
     },
@@ -24,15 +23,8 @@ use serenity::{
 };
 
 use songbird::{
-    input::{
-        self,
-        restartable::Restartable,
-    },
-    Event,
-    EventContext,
-    EventHandler as VoiceEventHandler,
-    SerenityInit,
-    TrackEvent,
+    input::{self, restartable::Restartable},
+    Event, EventContext, EventHandler as VoiceEventHandler, SerenityInit, TrackEvent,
 };
 
 struct Handler;
@@ -90,7 +82,7 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
             check_msg(msg.reply(ctx, "Not in a voice channel").await);
 
             return Ok(());
-        },
+        }
     };
 
     let mut handler = handler_lock.lock().await;
@@ -129,7 +121,7 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
             check_msg(msg.reply(ctx, "Not in a voice channel").await);
 
             return Ok(());
-        },
+        }
     };
 
     let manager = songbird::get(ctx)
@@ -273,7 +265,7 @@ async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
             check_msg(msg.reply(ctx, "Not in a voice channel").await);
 
             return Ok(());
-        },
+        }
     };
 
     let mut handler = handler_lock.lock().await;
@@ -315,7 +307,7 @@ async fn play_fade(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
             );
 
             return Ok(());
-        },
+        }
     };
 
     if !url.starts_with("http") {
@@ -347,7 +339,7 @@ async fn play_fade(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
                 check_msg(msg.channel_id.say(&ctx.http, "Error sourcing ffmpeg").await);
 
                 return Ok(());
-            },
+            }
         };
 
         // This handler object will allow you to, as needed,
@@ -446,7 +438,7 @@ async fn queue(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             );
 
             return Ok(());
-        },
+        }
     };
 
     if !url.starts_with("http") {
@@ -480,7 +472,7 @@ async fn queue(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
                 check_msg(msg.channel_id.say(&ctx.http, "Error sourcing ffmpeg").await);
 
                 return Ok(());
-            },
+            }
         };
 
         handler.enqueue_source(source.into());
