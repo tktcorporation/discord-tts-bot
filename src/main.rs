@@ -27,14 +27,8 @@ use songbird::{
     Event, EventContext, EventHandler as VoiceEventHandler, SerenityInit, TrackEvent,
 };
 
-struct Handler;
-
-#[async_trait]
-impl EventHandler for Handler {
-    async fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
-    }
-}
+mod handler;
+use handler::Handler;
 
 #[group]
 #[commands(
