@@ -1,46 +1,14 @@
-use std::{
-    env,
-    sync::{
-        atomic::{AtomicUsize, Ordering},
-        Arc,
-    },
-    time::Duration,
-};
+use std::env;
 
-use serenity::{
-    async_trait,
-    client::{Client, Context, EventHandler},
-    framework::{
-        standard::{
-            macros::{command, group},
-            Args, CommandResult,
-        },
-        StandardFramework,
-    },
-    http::Http,
-    model::{channel::Message, gateway::Ready, misc::Mentionable, prelude::ChannelId},
-    Result as SerenityResult,
-};
+use serenity::{client::Client, framework::StandardFramework};
 
-use songbird::{
-    input::{self, restartable::Restartable},
-    Event, EventContext, EventHandler as VoiceEventHandler, SerenityInit, TrackEvent,
-};
+use songbird::SerenityInit;
 
 mod handler;
 use handler::Handler;
 
-mod services;
-use services::check_msg;
-
 mod commands;
 use commands::GENERAL_GROUP;
-
-// #[group]
-// #[commands(
-//     deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute
-// )]
-// pub struct General;
 
 #[tokio::main]
 async fn main() {

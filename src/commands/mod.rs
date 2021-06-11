@@ -1,5 +1,4 @@
 use std::{
-    env,
     sync::{
         atomic::{AtomicUsize, Ordering},
         Arc,
@@ -9,27 +8,22 @@ use std::{
 
 use serenity::{
     async_trait,
-    client::{Client, Context, EventHandler},
-    framework::{
-        standard::{
-            macros::{command, group},
-            Args, CommandResult,
-        },
-        StandardFramework,
+    client::Context,
+    framework::standard::{
+        macros::{command, group},
+        Args, CommandResult,
     },
     http::Http,
-    model::{channel::Message, gateway::Ready, misc::Mentionable, prelude::ChannelId},
-    Result as SerenityResult,
+    model::{channel::Message, misc::Mentionable, prelude::ChannelId},
 };
 
 use songbird::{
     input::{self, restartable::Restartable},
-    Event, EventContext, EventHandler as VoiceEventHandler, SerenityInit, TrackEvent,
+    Event, EventContext, EventHandler as VoiceEventHandler, TrackEvent,
 };
 
-use crate::handler::Handler;
-
-use crate::services::check_msg;
+mod services;
+use services::check_msg;
 
 #[group]
 #[commands(
