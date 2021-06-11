@@ -30,6 +30,9 @@ use songbird::{
 mod handler;
 use handler::Handler;
 
+mod services;
+use services::check_msg;
+
 #[group]
 #[commands(
     deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute
@@ -618,9 +621,4 @@ async fn unmute(ctx: &Context, msg: &Message) -> CommandResult {
     Ok(())
 }
 
-/// Checks that a message successfully sent; if not, then logs why to stdout.
-fn check_msg(result: SerenityResult<Message>) {
-    if let Err(why) = result {
-        println!("Error sending message: {:?}", why);
-    }
-}
+
