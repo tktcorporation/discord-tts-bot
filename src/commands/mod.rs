@@ -588,3 +588,14 @@ async fn unmute(ctx: &Context, msg: &Message) -> CommandResult {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn load_url() {
+        let url = "https://www.youtube.com/watch?v=rvkxtVkvawc";
+        let source = input::ytdl(&url).await.unwrap();
+    }
+}

@@ -1,15 +1,15 @@
 version: "3.7"
 services:
   app:
-    # build:
-    #   context: .
-    #   dockerfile: .devcontainer/Dockerfile
-    image: rust
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    working_dir: /workspace
     environment:
       - USER=$USER
       - DISCORD_TOKEN=$DISCORD_TOKEN
     volumes:
-      - ..:/workspace:cached
+      - .:/workspace:cached
       - target:/workspace/target:cached
     tty: true
 volumes:

@@ -9,9 +9,15 @@ RUN apt-get update && \
     libtool \
     m4 \
     ffmpeg \
-    youtube-dl
+    curl \
+    python \
+ && apt-get -y clean \
+ && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /workspace
+RUN curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/bin/youtube-dl && \
+    chmod a+rx /usr/bin/youtube-dl
+
+ENV LC_ALL=C.UTF-8
 
 COPY Cargo.lock Cargo.lock
 COPY Cargo.toml Cargo.toml
