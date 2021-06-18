@@ -167,19 +167,6 @@ struct ChannelDurationNotifier {
 #[async_trait]
 impl VoiceEventHandler for ChannelDurationNotifier {
     async fn act(&self, _ctx: &EventContext<'_>) -> Option<Event> {
-        let count_before = self.count.fetch_add(1, Ordering::Relaxed);
-        check_msg(
-            self.chan_id
-                .say(
-                    &self.http,
-                    &format!(
-                        "I've been in this channel for {} minutes!",
-                        count_before + 1
-                    ),
-                )
-                .await,
-        );
-
         None
     }
 }
@@ -596,6 +583,6 @@ mod tests {
     #[tokio::test]
     async fn load_url() {
         let url = "https://www.youtube.com/watch?v=rvkxtVkvawc";
-        let source = input::ytdl(&url).await.unwrap();
+        input::ytdl(&url).await.unwrap();
     }
 }
