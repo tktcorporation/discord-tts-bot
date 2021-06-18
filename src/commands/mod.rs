@@ -25,6 +25,12 @@ use songbird::{
 mod services;
 use services::check_msg;
 
+use crate::handler::services::play_input;
+use songbird::{
+    ffmpeg,
+};
+use std::path::Path;
+
 #[group]
 #[commands(
     deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute
@@ -127,6 +133,14 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
                 http: send_http,
             },
         );
+
+        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+        let path = Path::new(root);
+        let file_path = path.join("binaries").join("shabeko_dayo.wav");
+        let input = ffmpeg(file_path)
+            .await
+            .expect("This might fail: handle this error!");
+        handle.enqueue_source(input)
     } else {
         check_msg(
             msg.channel_id

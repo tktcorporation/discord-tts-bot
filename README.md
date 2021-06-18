@@ -8,3 +8,10 @@
 
 ## To invite bot
 https://discord.com/api/oauth2/authorize?client_id=798137406946934784&permissions=2184261184&scope=bot
+
+## LICENCE
+MIT
+
+### file
+
+binaries/shabeko_dayo.wav is generayted by CoeFontStudio.
