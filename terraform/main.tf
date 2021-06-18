@@ -1,5 +1,5 @@
 variable "gcp_project" {
-  default = "shabeko"
+  default = "discord-tts-bot-individual"
 }
 variable "billing_id" {}
 
