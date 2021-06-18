@@ -13,5 +13,23 @@ services:
       - .:/workspace:cached
       - target:/workspace/target:cached
     tty: true
+  tf:
+    image: hashicorp/terraform:1.0.0
+    container_name: "terraform"
+    working_dir: /workspace
+    environment:
+      - TF_VAR_billing_id=$TF_VAR_billing_id
+    volumes:
+      - ./terraform:/workspace:cached
+      - gcloud-config:/root/.config
+  gcloud:
+    entrypoint: "gcloud"
+    image: google/cloud-sdk:alpine
+    container_name: "gcloud"
+    working_dir: /workspace
+    volumes:
+      - ./terraform:/workspace:cached
+      - gcloud-config:/root/.config
 volumes:
   target:
+  gcloud-config:
