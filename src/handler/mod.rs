@@ -3,18 +3,13 @@ use serenity::{
     client::{Context, EventHandler},
     model::{channel::Message, gateway::Ready},
 };
-use songbird::input::{
-    restartable::Restartable,
-    error::{Error, Result},
-    Codec, Container, Input, Metadata,
+use songbird::{
+    ffmpeg,
+    input::{error::Result, restartable::Restartable, Input},
+    tracks::Track,
 };
-use songbird::{driver::Driver, ffmpeg, tracks::create_player, tracks::Track};
+use std::path::Path;
 use std::sync::Arc;
-use std::{
-    io::{BufRead, BufReader, Read},
-    process::{Command, Stdio},
-};
-use tokio::{process::Command as TokioCommand, task};
 
 pub struct Handler;
 
@@ -45,25 +40,18 @@ impl EventHandler for Handler {
         eprintln!("channel_name = {:?}", channel_name);
         // メッセージの送信
         let content = msg.content.clone();
-        if let Err(why) = msg.channel_id.say(&ctx.http, content).await {
-            println!("Error sending message: {:?}", why);
-        }
+        println!("message received: {:?}", content);
 
         let handler_lock = get_handler_when_in_voice_channel(&ctx, &msg).await.unwrap();
 
         let ma = msg.content.clone();
         match ma.as_str() {
             "BGM" => {
-                let input = get_bgm_input().await.unwrap();
+                let input = get_input_from_local().await;
                 play_input(&handler_lock, input).await;
-            },
-            _ => {},
+            }
+            _ => {}
         };
-
-        let mut handler = handler_lock.lock().await;
-        let track = get_track_from_local(0.7).await;
-        // handler.play_only(track);
-        handler.play(track);
     }
 }
 
@@ -78,7 +66,10 @@ async fn get_handler_when_in_voice_channel(
     return manager.get(msg.guild(&ctx.cache).await.unwrap().id);
 }
 
-async fn play_input(handler_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>, input: Input) {
+async fn play_input(
+    handler_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>,
+    input: Input,
+) {
     let mut handler = handler_lock.lock().await;
     // if let Some(handler_lock) = manager.get(guild_id) {
     //     let mut handler = handler_lock.lock().await;
@@ -88,7 +79,7 @@ async fn play_input(handler_lock: &std::sync::Arc<serenity::prelude::Mutex<songb
 
 async fn get_bgm_input() -> Result<Input> {
     let url = "https://youtu.be/16Bj6aPi1A8";
-    let source = match Restartable::ytdl(url, true).await {
+    match Restartable::ytdl(url, true).await {
         Ok(source) => return Ok(source.into()),
         Err(why) => {
             println!("Err get input source: {:?}", why);
@@ -106,13 +97,26 @@ async fn play_track(handler_lock: &Arc<serenity::prelude::Mutex<songbird::Call>>
     handler.play_only(track)
 }
 
-async fn get_track_from_local(volume: f32) -> Track {
-    let source = ffmpeg("./2_23_AM_2.mp3")
+async fn get_input_from_local() -> Input {
+    let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+    let path = Path::new(root);
+    let file_path = path.join("binaries").join("2_23_AM_2.mp3");
+    return ffmpeg(file_path)
         .await
         .expect("This might fail: handle this error!");
+}
 
-    let (mut audio, _) = create_player(source);
-    audio.set_volume(volume);
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    audio
+    #[test]
+    fn path_exists() {
+        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+        println!("{}", root);
+        let path = Path::new(root);
+        let file_path = path.join("binaries").join("2_23_AM_2.mp3");
+        println!("{}", file_path.display());
+        assert_eq!(true, file_path.exists());
+    }
 }
