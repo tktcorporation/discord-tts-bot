@@ -10,6 +10,8 @@ use handler::Handler;
 mod commands;
 use commands::GENERAL_GROUP;
 
+mod tts;
+
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
