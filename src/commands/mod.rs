@@ -26,9 +26,7 @@ mod services;
 use services::check_msg;
 
 use crate::handler::services::play_input;
-use songbird::{
-    ffmpeg,
-};
+use songbird::ffmpeg;
 use std::path::Path;
 
 #[group]

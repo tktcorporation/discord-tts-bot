@@ -11,10 +11,7 @@ use songbird::{
 use std::path::Path;
 use std::sync::Arc;
 pub mod services;
-use services::{
-    get_handler_when_in_voice_channel,
-    play_input,
-};
+use services::{get_handler_when_in_voice_channel, play_input};
 
 pub struct Handler;
 

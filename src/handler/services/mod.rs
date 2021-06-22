@@ -1,8 +1,8 @@
 use serenity::{
-    Result as SerenityResult,
     async_trait,
     client::{Context, EventHandler},
     model::{channel::Message, gateway::Ready},
+    Result as SerenityResult,
 };
 use songbird::{
     ffmpeg,
@@ -46,7 +46,10 @@ pub async fn get_bgm_input() -> Result<Input> {
     };
 }
 
-pub async fn play_track(handler_lock: &Arc<serenity::prelude::Mutex<songbird::Call>>, track: Track) {
+pub async fn play_track(
+    handler_lock: &Arc<serenity::prelude::Mutex<songbird::Call>>,
+    track: Track,
+) {
     let mut handler = handler_lock.lock().await;
     // if let Some(handler_lock) = manager.get(guild_id) {
     //     let mut handler = handler_lock.lock().await;
