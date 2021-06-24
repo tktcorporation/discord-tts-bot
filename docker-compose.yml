@@ -5,7 +5,6 @@ services:
       context: .
       dockerfile: ./Dockerfile
     working_dir: /workspace
-    command: "/bin/bash"
     environment:
       - USER=$USER
       - DISCORD_TOKEN=$DISCORD_TOKEN
