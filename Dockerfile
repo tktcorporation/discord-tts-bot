@@ -4,6 +4,7 @@ RUN apt-get update && \
     apt-get install -y \
     libopus-dev \
     build-essential \
+    libssl-dev \
     autoconf \
     automake \
     libtool \

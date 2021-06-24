@@ -10,15 +10,6 @@ edition = "2018"
 tracing = "0.1"
 tracing-subscriber = "0.2"
 tracing-futures = "0.2"
-
-google-texttospeech1 = "^2.0"
-hyper = "^0.14"
-hyper-tls = "^0.5"
-hyper-rustls = "^0.22"
-serde = "^1.0"
-serde_json = "^1.0"
-yup-oauth2 = "^5.0"
-
 reqwest = "^0.11.4"
 
 [dependencies.songbird]
