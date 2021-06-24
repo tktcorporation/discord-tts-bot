@@ -1,10 +1,11 @@
-FROM rust:1.49-slim-buster
+FROM rust:1.53-slim-buster
 
 RUN apt-get update && \
     apt-get install -y \
     libopus-dev \
     build-essential \
     libssl-dev \
+    pkg-config \
     autoconf \
     automake \
     libtool \
