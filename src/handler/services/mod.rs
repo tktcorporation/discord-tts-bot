@@ -38,14 +38,3 @@ pub async fn get_bgm_input() -> Result<Input> {
         }
     };
 }
-
-pub async fn play_track(
-    handler_lock: &Arc<serenity::prelude::Mutex<songbird::Call>>,
-    track: Track,
-) {
-    let mut handler = handler_lock.lock().await;
-    // if let Some(handler_lock) = manager.get(guild_id) {
-    //     let mut handler = handler_lock.lock().await;
-
-    handler.play_only(track)
-}
