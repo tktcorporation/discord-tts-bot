@@ -1,7 +1,6 @@
 use std::env;
 
-use std::process;
-use std::error::Error;
+use std::ffi::OsStr;
 use std::path::Path;
 
 use polly::model::{OutputFormat, VoiceId};
@@ -9,30 +8,14 @@ use polly::{Client, Config, Region};
 
 use aws_types::region::{EnvironmentProvider, ProvideRegion};
 
-use structopt::StructOpt;
 use tokio::io::AsyncWriteExt;
 use tracing_subscriber::fmt::format::FmtSpan;
 use tracing_subscriber::fmt::SubscriberBuilder;
 
-#[derive(Debug, StructOpt)]
-struct Opt {
-    /// The region
-    #[structopt(short, long)]
-    region: Option<String>,
-
-    /// The file containing the text to synthesize
-    #[structopt(short, long)]
-    filename: String,
-
-    /// Whether to show additional output
-    #[structopt(short, long)]
-    verbose: bool,
-}
-
 /// Generate a mp3 file and return the file path str
-/// 
+///
 /// ## Examples
-/// 
+///
 /// ```no_run
 /// let result = generate_speech_file(
 /// String::from("おはようございます"),
@@ -43,10 +26,10 @@ struct Opt {
 /// .await;
 /// Path::new(result.unwrap()).exists(); // true or false
 /// ```
-async fn generate_speech_file(
+pub async fn generate_speech_file<P: AsRef<OsStr>>(
     content: String,
     voice_id: VoiceId,
-    filename: &str,
+    file_path: P,
     verbose: bool,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let region = EnvironmentProvider::new().region().unwrap_or_else(|| {
@@ -56,12 +39,12 @@ async fn generate_speech_file(
     if verbose {
         println!("polly client version: {}\n", polly::PKG_VERSION);
         println!("Region:   {:?}", &region);
-        println!("Filename: {}", filename);
+        println!("Filename: {}", file_path.as_ref().to_str().unwrap());
 
-        SubscriberBuilder::default()
-            .with_env_filter("info")
-            .with_span_events(FmtSpan::CLOSE)
-            .init();
+        // SubscriberBuilder::default()
+        //     .with_env_filter("info")
+        //     .with_span_events(FmtSpan::CLOSE)
+        //     .init();
     }
 
     let config = Config::builder().region(region).build();
@@ -83,7 +66,7 @@ async fn generate_speech_file(
         .await
         .expect("failed to read data");
 
-    let parts: Vec<&str> = filename.split('.').collect();
+    let parts: Vec<&str> = file_path.as_ref().to_str().unwrap().split('.').collect();
     let mut file_name_builder = String::from(parts[0]);
     file_name_builder.push_str(".mp3");
     let file_name = file_name_builder.clone().to_string();

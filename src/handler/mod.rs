@@ -4,8 +4,11 @@ use serenity::{
     model::{channel::Message, gateway::Ready},
 };
 use songbird::{ffmpeg, input::Input};
+use std::ffi::OsStr;
 use std::path::Path;
 pub mod services;
+use crate::tts::generate_speech_file;
+use polly::model::VoiceId;
 use services::{get_handler_when_in_voice_channel, play_input};
 
 pub struct Handler;
@@ -41,21 +44,28 @@ impl EventHandler for Handler {
 
         let handler_lock = get_handler_when_in_voice_channel(&ctx, &msg).await.unwrap();
 
-        let ma = msg.content.clone();
-        match ma.as_str() {
+        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+        let path = Path::new(root);
+
+        let text_for_speech = msg.content.clone();
+        let input = match text_for_speech.as_str() {
             "BGM" => {
-                let input = get_input_from_local().await;
-                play_input(&handler_lock, input).await;
+                services::get_bgm_input().await.unwrap()
             }
-            _ => {}
+            _ => {
+                let file_path = path.join("binaries").join("tts");
+                let speech_file =
+                    generate_speech_file(text_for_speech, VoiceId::Mizuki, file_path, false)
+                        .await
+                        .unwrap();
+                get_input_from_local(speech_file).await
+            }
         };
+        play_input(&handler_lock, input).await;
     }
 }
 
-async fn get_input_from_local() -> Input {
-    let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
-    let path = Path::new(root);
-    let file_path = path.join("binaries").join("2_23_AM_2.mp3");
+async fn get_input_from_local<P: AsRef<OsStr>>(file_path: P) -> Input {
     return ffmpeg(file_path)
         .await
         .expect("This might fail: handle this error!");
@@ -73,5 +83,35 @@ mod tests {
         let file_path = path.join("binaries").join("2_23_AM_2.mp3");
         println!("{}", file_path.display());
         assert_eq!(true, file_path.exists());
+    }
+
+    #[tokio::test]
+    async fn create_tts_file() {
+        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+        let path = Path::new(root);
+        let file_path = path.join("binaries").join("tts");
+        let speech_file = generate_speech_file(
+            "おはようございます".to_string(),
+            VoiceId::Mizuki,
+            file_path,
+            false,
+        )
+        .await
+        .unwrap();
+        get_input_from_local(speech_file).await;
+    }
+
+    #[tokio::test]
+    async fn create_tts_file_by_name() {
+        let file_name = "tts";
+        let speech_file = generate_speech_file(
+            String::from("おはようございます"),
+            VoiceId::Mizuki,
+            file_name,
+            false,
+        )
+        .await
+        .unwrap();
+        get_input_from_local(speech_file).await;
     }
 }
