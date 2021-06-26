@@ -9,32 +9,16 @@ defaults:
     working-directory: ./
 
 jobs:
-  test:
-    name: Rust ${{ matrix.os }} ${{ matrix.rust }}
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        rust:
-          - stable
-        os: [ubuntu-latest]
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout sources
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: default
-          toolchain: ${{ matrix.rust }}
-          override: true
+      - name: Build containers
+        run: docker-compose build
 
-      - name: fmt
-        run: cargo fmt --all -- --check
-
-      - name: clippy
-        run: cargo clippy --all -- -D warnings
-
-      - name: test
-        run: RUST_BACKTRACE=1 cargo test --verbose --all -- --nocapture
+      - name: Lint
+        run: docker-compose run app /bin/bash -c "RUST_BACKTRACE=1 cargo test --verbose --all -- --nocapture"
