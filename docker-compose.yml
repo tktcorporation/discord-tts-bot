@@ -26,23 +26,6 @@ services:
       - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
       - AWS_REGION=$AWS_REGION
-  tf:
-    image: hashicorp/terraform:1.0.0
-    container_name: "terraform"
-    working_dir: /workspace
-    environment:
-      - TF_VAR_billing_id=$TF_VAR_billing_id
-    volumes:
-      - ./terraform:/workspace:cached
-      - gcloud-config:/root/.config
-  gcloud:
-    entrypoint: "gcloud"
-    image: google/cloud-sdk:alpine
-    container_name: "gcloud"
-    working_dir: /workspace
-    volumes:
-      - ./terraform:/workspace:cached
-      - gcloud-config:/root/.config
   heroku:
     # run `apk add docker` before running heroku commands
     image: sue445/heroku-cli
