@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+      target: build-env
     working_dir: /workspace
     environment:
       - USER=$USER
@@ -32,6 +33,12 @@ services:
     volumes:
       - ./terraform:/workspace:cached
       - gcloud-config:/root/.config
+  heroku:
+    # run `apk add docker` before running heroku commands
+    image: sue445/heroku-cli
+    volumes:
+      - .:/workspace:cached
+      - /var/run/docker.sock:/var/run/docker.sock:rw
 volumes:
   target:
   gcloud-config:
