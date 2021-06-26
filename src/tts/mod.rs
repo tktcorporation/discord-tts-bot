@@ -9,8 +9,6 @@ use polly::{Client, Config, Region};
 use aws_types::region::{EnvironmentProvider, ProvideRegion};
 
 use tokio::io::AsyncWriteExt;
-use tracing_subscriber::fmt::format::FmtSpan;
-use tracing_subscriber::fmt::SubscriberBuilder;
 
 /// Generate a mp3 file and return the file path str
 ///

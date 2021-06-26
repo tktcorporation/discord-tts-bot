@@ -1,5 +1,5 @@
 use std::{
-    sync::{atomic::AtomicUsize, Arc},
+    sync::Arc,
     time::Duration,
 };
 
@@ -103,30 +103,7 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
                 .await,
         );
 
-        let chan_id = msg.channel_id;
-
-        let send_http = ctx.http.clone();
-
         let mut handle = handle_lock.lock().await;
-
-        handle.add_global_event(
-            Event::Track(TrackEvent::End),
-            TrackEndNotifier {
-                chan_id,
-                http: send_http,
-            },
-        );
-
-        let send_http = ctx.http.clone();
-
-        handle.add_global_event(
-            Event::Periodic(Duration::from_secs(60), None),
-            ChannelDurationNotifier {
-                chan_id,
-                count: Default::default(),
-                http: send_http,
-            },
-        );
 
         let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
         let path = Path::new(root);
@@ -144,39 +121,6 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
     }
 
     Ok(())
-}
-
-struct TrackEndNotifier {
-    chan_id: ChannelId,
-    http: Arc<Http>,
-}
-
-#[async_trait]
-impl VoiceEventHandler for TrackEndNotifier {
-    async fn act(&self, _: &EventContext<'_>) -> Option<Event> {
-        // if let EventContext::Track(track_list) = ctx {
-        //     check_msg(
-        //         self.chan_id
-        //             .say(&self.http, &format!("Tracks ended: {}.", track_list.len()))
-        //             .await,
-        //     );
-        // }
-
-        None
-    }
-}
-
-struct ChannelDurationNotifier {
-    chan_id: ChannelId,
-    count: Arc<AtomicUsize>,
-    http: Arc<Http>,
-}
-
-#[async_trait]
-impl VoiceEventHandler for ChannelDurationNotifier {
-    async fn act(&self, _ctx: &EventContext<'_>) -> Option<Event> {
-        None
-    }
 }
 
 #[command]
