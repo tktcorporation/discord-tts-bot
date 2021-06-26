@@ -33,6 +33,8 @@ COPY  . .
 
 RUN cargo build --release
 
+CMD [ "/bin/sh",  "-c", "cargo run" ]
+
 FROM debian:buster-20210621-slim
 
 RUN apt-get update && \
