@@ -1,7 +1,5 @@
 use serenity::{client::Context, model::channel::Message};
-use songbird::{
-    input::{error::Result, restartable::Restartable, Input},
-};
+use songbird::input::{error::Result, restartable::Restartable, Input};
 use std::sync::Arc;
 
 pub async fn get_handler_when_in_voice_channel(

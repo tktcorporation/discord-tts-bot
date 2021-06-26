@@ -52,9 +52,7 @@ impl EventHandler for Handler {
 
         let text_for_speech = msg.content.clone();
         let input = match text_for_speech.as_str() {
-            "BGM" => {
-                services::get_bgm_input().await.unwrap()
-            }
+            "BGM" => services::get_bgm_input().await.unwrap(),
             _ => {
                 let file_path = path.join("binaries").join("tts");
                 let speech_file =
