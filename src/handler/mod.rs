@@ -33,14 +33,17 @@ impl EventHandler for Handler {
             return;
         }
 
-        // サーバーのID
-        eprintln!("guild_id = {:?}", msg.guild_id);
-        // チャンネル名
-        let channel_name = msg.channel_id.name(&ctx.cache).await;
-        eprintln!("channel_name = {:?}", channel_name);
-        // メッセージの送信
-        let content = msg.content.clone();
-        println!("message received: {:?}", content);
+        let is_debug = false;
+        if is_debug {
+            // サーバーのID
+            eprintln!("guild_id = {:?}", msg.guild_id);
+            // チャンネル名
+            let channel_name = msg.channel_id.name(&ctx.cache).await;
+            eprintln!("channel_name = {:?}", channel_name);
+            // メッセージの送信
+            let content = msg.content.clone();
+            println!("message received: {:?}", content);
+        }
 
         let handler_lock = get_handler_when_in_voice_channel(&ctx, &msg).await.unwrap();
 

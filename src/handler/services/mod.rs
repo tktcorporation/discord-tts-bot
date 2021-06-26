@@ -1,7 +1,6 @@
 use serenity::{client::Context, model::channel::Message};
 use songbird::{
     input::{error::Result, restartable::Restartable, Input},
-    tracks::Track,
 };
 use std::sync::Arc;
 
