@@ -70,6 +70,7 @@ pub async fn generate_speech_file<P: AsRef<OsStr>>(
     let file_name = file_name_builder.clone().to_string();
     let out_file = Path::new(&file_name);
 
+    // create the dir before running this line.
     let mut file = tokio::fs::File::create(&out_file)
         .await
         .expect("failed to create file");

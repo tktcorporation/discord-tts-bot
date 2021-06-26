@@ -54,6 +54,7 @@ impl EventHandler for Handler {
         let input = match text_for_speech.as_str() {
             "BGM" => services::get_bgm_input().await.unwrap(),
             _ => {
+                // 同じファイル名だと複数サーバーで利用した場合に競合しそう
                 let file_path = path.join("binaries").join("tts");
                 let speech_file =
                     generate_speech_file(text_for_speech, VoiceId::Mizuki, file_path, false)
