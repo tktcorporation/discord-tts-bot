@@ -9,8 +9,8 @@ defaults:
     working-directory: ./
 
 jobs:
-  lint:
-    name: Lint
+  test:
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
@@ -20,5 +20,5 @@ jobs:
       - name: Build containers
         run: docker-compose build
 
-      - name: Lint
+      - name: Test
         run: docker-compose run app /bin/bash -c "RUST_BACKTRACE=1 cargo test --verbose --all -- --nocapture"

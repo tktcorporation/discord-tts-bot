@@ -1,4 +1,4 @@
-name: Test
+name: Lint
 
 on:
   push:
@@ -9,7 +9,7 @@ defaults:
     working-directory: ./
 
 jobs:
-  test:
+  lint:
     name: Rust ${{ matrix.os }} ${{ matrix.rust }}
     runs-on: ${{ matrix.os }}
 
