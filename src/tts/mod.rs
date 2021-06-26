@@ -1,6 +1,8 @@
 use std::env;
 
 use std::process;
+use std::error::Error;
+use std::path::Path;
 
 use polly::model::{OutputFormat, VoiceId};
 use polly::{Client, Config, Region};
@@ -27,7 +29,26 @@ struct Opt {
     verbose: bool,
 }
 
-async fn generate_sound(content: String, voice_id: VoiceId, filename: &str, verbose: bool) {
+/// Generate a mp3 file and return the file path str
+/// 
+/// ## Examples
+/// 
+/// ```no_run
+/// let result = generate_speech_file(
+/// String::from("おはようございます"),
+/// VoiceId::Mizuki,
+/// "sample",
+/// true,
+/// )
+/// .await;
+/// Path::new(result.unwrap()).exists(); // true or false
+/// ```
+async fn generate_speech_file(
+    content: String,
+    voice_id: VoiceId,
+    filename: &str,
+    verbose: bool,
+) -> Result<String, Box<dyn std::error::Error>> {
     let region = EnvironmentProvider::new().region().unwrap_or_else(|| {
         Region::new(env::var("AWS_REGION").expect("Expected a region string in the environment"))
     });
@@ -47,21 +68,13 @@ async fn generate_sound(content: String, voice_id: VoiceId, filename: &str, verb
 
     let client = Client::from_conf(config);
 
-    let resp = match client
+    let resp = client
         .synthesize_speech()
         .output_format(OutputFormat::Mp3)
         .text(content)
         .voice_id(voice_id)
         .send()
-        .await
-    {
-        Ok(output) => output,
-        Err(e) => {
-            println!("Got an error synthesizing speech:");
-            println!("{}", e);
-            process::exit(1);
-        }
-    };
+        .await?;
 
     // Get MP3 data from response and save it
     let mut blob = resp
@@ -71,15 +84,20 @@ async fn generate_sound(content: String, voice_id: VoiceId, filename: &str, verb
         .expect("failed to read data");
 
     let parts: Vec<&str> = filename.split('.').collect();
-    let out_file = format!("{}{}", String::from(parts[0]), ".mp3");
+    let mut file_name_builder = String::from(parts[0]);
+    file_name_builder.push_str(".mp3");
+    let file_name = file_name_builder.clone().to_string();
+    let out_file = Path::new(&file_name);
 
-    let mut file = tokio::fs::File::create(out_file)
+    let mut file = tokio::fs::File::create(&out_file)
         .await
         .expect("failed to create file");
 
     file.write_all_buf(&mut blob)
         .await
         .expect("failed to write to file");
+
+    Ok(file_name)
 }
 
 #[cfg(test)]
@@ -98,13 +116,16 @@ mod tests {
 
     #[tokio::test]
     async fn test_generate_sound() {
-        generate_sound(
+        let result = generate_speech_file(
             String::from("おはようございます"),
             VoiceId::Mizuki,
             "sample",
             true,
         )
         .await;
-        assert_eq!(true, true);
+        assert_eq!(result.is_ok(), true);
+        let path = result.unwrap();
+        assert_eq!(Path::new(&path).exists(), true);
+        assert_eq!(path, "sample.mp3".to_string());
     }
 }
