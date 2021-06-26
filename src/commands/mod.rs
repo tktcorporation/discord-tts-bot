@@ -102,7 +102,7 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 
         let mut handle = handle_lock.lock().await;
 
-        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+        let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
         let file_path = path.join("binaries").join("shabeko_dayo.wav");
         let input = ffmpeg(file_path)

@@ -27,11 +27,11 @@ pub async fn play_input(
 pub async fn get_bgm_input() -> Result<Input> {
     let url = "https://youtu.be/16Bj6aPi1A8";
     match Restartable::ytdl(url, true).await {
-        Ok(source) => return Ok(source.into()),
+        Ok(source) => Ok(source.into()),
         Err(why) => {
             println!("Err get input source: {:?}", why);
 
-            return Err(why);
+            Err(why)
         }
-    };
+    }
 }

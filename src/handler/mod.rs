@@ -47,7 +47,7 @@ impl EventHandler for Handler {
 
         let handler_lock = get_handler_when_in_voice_channel(&ctx, &msg).await.unwrap();
 
-        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+        let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
 
         let text_for_speech = msg.content.clone();
