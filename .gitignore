@@ -9,3 +9,7 @@ target/
 # custom
 .DS_Store
 .envrc
+
+# Sound data
+/binaries/
+!/binaries/shabeko_dayo.wav
