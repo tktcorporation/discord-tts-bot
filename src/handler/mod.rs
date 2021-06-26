@@ -103,18 +103,4 @@ mod tests {
         .unwrap();
         get_input_from_local(speech_file).await;
     }
-
-    #[tokio::test]
-    async fn create_tts_file_by_name() {
-        let file_name = "tts";
-        let speech_file = generate_speech_file(
-            String::from("おはようございます"),
-            VoiceId::Mizuki,
-            file_name,
-            false,
-        )
-        .await
-        .unwrap();
-        get_input_from_local(speech_file).await;
-    }
 }

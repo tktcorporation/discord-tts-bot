@@ -97,16 +97,21 @@ mod tests {
 
     #[tokio::test]
     async fn test_generate_sound() {
+        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+        let path = Path::new(root);
+        let file_path = path.join("binaries").join("sample");
         let result = generate_speech_file(
             String::from("おはようございます"),
             VoiceId::Mizuki,
-            "sample",
+            file_path.clone(),
             true,
         )
         .await;
         assert_eq!(result.is_ok(), true);
         let path = result.unwrap();
         assert_eq!(Path::new(&path).exists(), true);
-        assert_eq!(path, "sample.mp3".to_string());
+        let mut right = String::from(file_path.clone().to_str().unwrap());
+        right.push_str(".mp3");
+        assert_eq!(path, right);
     }
 }
