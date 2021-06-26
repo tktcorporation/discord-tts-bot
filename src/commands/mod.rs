@@ -1,8 +1,5 @@
 use std::{
-    sync::{
-        atomic::{AtomicUsize, Ordering},
-        Arc,
-    },
+    sync::{atomic::AtomicUsize, Arc},
     time::Duration,
 };
 
@@ -25,7 +22,6 @@ use songbird::{
 mod services;
 use services::check_msg;
 
-use crate::handler::services::play_input;
 use songbird::ffmpeg;
 use std::path::Path;
 

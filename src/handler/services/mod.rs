@@ -1,15 +1,8 @@
-use serenity::{
-    async_trait,
-    client::{Context, EventHandler},
-    model::{channel::Message, gateway::Ready},
-    Result as SerenityResult,
-};
+use serenity::{client::Context, model::channel::Message};
 use songbird::{
-    ffmpeg,
     input::{error::Result, restartable::Restartable, Input},
     tracks::Track,
 };
-use std::path::Path;
 use std::sync::Arc;
 
 pub async fn get_handler_when_in_voice_channel(

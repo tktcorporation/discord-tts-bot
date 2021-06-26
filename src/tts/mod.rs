@@ -1,6 +1,4 @@
-use polly::model::{Engine, Voice};
 use std::env;
-use std::error::Error;
 
 use std::process;
 

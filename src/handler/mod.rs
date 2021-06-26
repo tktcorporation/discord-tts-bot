@@ -3,13 +3,8 @@ use serenity::{
     client::{Context, EventHandler},
     model::{channel::Message, gateway::Ready},
 };
-use songbird::{
-    ffmpeg,
-    input::{error::Result, restartable::Restartable, Input},
-    tracks::Track,
-};
+use songbird::{ffmpeg, input::Input};
 use std::path::Path;
-use std::sync::Arc;
 pub mod services;
 use services::{get_handler_when_in_voice_channel, play_input};
 
