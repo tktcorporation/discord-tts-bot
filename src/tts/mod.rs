@@ -3,7 +3,7 @@ use std::env;
 use std::ffi::OsStr;
 use std::path::Path;
 
-use polly::model::{OutputFormat, VoiceId};
+use polly::model::{OutputFormat, VoiceId, TextType};
 use polly::{Client, Config, Region};
 
 use aws_types::region::{EnvironmentProvider, ProvideRegion};
@@ -49,10 +49,18 @@ pub async fn generate_speech_file<P: AsRef<OsStr>>(
 
     let client = Client::from_conf(config);
 
+    let mut ssml_text = String::new();
+    // 声質の変更と最大再生秒数の設定
+    // https://docs.aws.amazon.com/ja_jp/polly/latest/dg/supportedtags.html
+    ssml_text.push_str("<speak><prosody pitch=\"+200%\"><amazon:effect phonation=\"soft\"><amazon:effect vocal-tract-length=\"-15%\"><prosody amazon:max-duration=\"5s\">");
+    ssml_text.push_str(&content);
+    ssml_text.push_str("</prosody></amazon:effect></amazon:effect></prosody></speak>");
+
     let resp = client
         .synthesize_speech()
+        .set_text_type(Option::Some(TextType::Ssml))
         .output_format(OutputFormat::Mp3)
-        .text(content)
+        .text(ssml_text)
         .voice_id(voice_id)
         .send()
         .await?;
