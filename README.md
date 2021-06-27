@@ -11,6 +11,7 @@
 ### Env Vars
 
 1. `cp -p .envrc.sample .envrc` and set variables.
+1. Install [direnv](https://github.com/direnv/direnv).
 1. `direnv allow`
 
 ### Run
