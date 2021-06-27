@@ -3,7 +3,7 @@ use std::env;
 use std::ffi::OsStr;
 use std::path::Path;
 
-use polly::model::{OutputFormat, VoiceId, TextType};
+use polly::model::{OutputFormat, TextType, VoiceId};
 use polly::{Client, Config, Region};
 
 use aws_types::region::{EnvironmentProvider, ProvideRegion};
