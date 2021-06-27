@@ -12,6 +12,8 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    environment:
+      name: heroku_production
 
     steps:
       - name: Checkout
