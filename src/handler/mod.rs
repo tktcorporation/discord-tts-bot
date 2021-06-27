@@ -10,6 +10,8 @@ pub mod services;
 use crate::tts::generate_speech_file;
 use polly::model::VoiceId;
 use services::{get_handler_when_in_voice_channel, play_input};
+use tiger::digest::Digest;
+use tiger::Tiger;
 
 pub struct Handler;
 
@@ -55,7 +57,11 @@ impl EventHandler for Handler {
             "BGM" => services::get_bgm_input().await.unwrap(),
             _ => {
                 // 同じファイル名だと複数サーバーで利用した場合に競合しそう
-                let file_path = path.join("binaries").join("tts");
+                let id = msg.guild_id.unwrap().clone().0.to_string();
+                let digest = Tiger::digest(id.as_bytes());
+                let digest_str = format!("{:X}", digest);
+
+                let file_path = path.join("binaries").join(digest_str);
                 let speech_file =
                     generate_speech_file(text_for_speech, VoiceId::Mizuki, file_path, false)
                         .await
@@ -101,5 +107,16 @@ mod tests {
         .await
         .unwrap();
         get_input_from_local(speech_file).await;
+    }
+
+    #[test]
+    fn digest_str() {
+        let id = "99999999999999999999999999";
+        let digest = Tiger::digest(id.as_bytes());
+        let digest_str = format!("{:X}", digest);
+        assert_eq!(
+            digest_str,
+            "7EABF4E47410D6A9FCF10B802CE754E5357120F7081B840B"
+        );
     }
 }
