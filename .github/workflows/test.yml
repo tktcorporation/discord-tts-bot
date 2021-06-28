@@ -35,5 +35,5 @@ jobs:
 
       - name: Test
         run: |
-          docker-compose run app /bin/bash -c "ls -a && cd / && ls -a && RUST_BACKTRACE=1 cargo test"
+          docker-compose run app /bin/bash -c "RUST_BACKTRACE=1 cargo test"
 
