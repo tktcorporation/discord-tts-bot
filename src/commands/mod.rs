@@ -104,7 +104,7 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 
         let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
-        let file_path = path.join("binaries").join("shabeko_dayo.wav");
+        let file_path = path.join("sounds").join("shabeko_dayo.wav");
         let input = ffmpeg(file_path)
             .await
             .expect("This might fail: handle this error!");

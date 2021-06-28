@@ -98,7 +98,7 @@ mod tests {
     async fn test_generate_sound() {
         let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
         let path = Path::new(root);
-        let file_path = path.join("binaries").join("sample");
+        let file_path = path.join("sounds").join("sample");
         let result = generate_speech_file(
             String::from("おはようございます"),
             VoiceId::Mizuki,

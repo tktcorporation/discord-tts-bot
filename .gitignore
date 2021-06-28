@@ -11,5 +11,6 @@ target/
 .envrc
 
 # Sound data
-/binaries/
-!/binaries/shabeko_dayo.wav
+/sounds/*
+!/sounds/shabeko_dayo.wav
+!/sounds/2_23_AM_2.mp3

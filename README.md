@@ -55,4 +55,4 @@ MIT
 
 ### file
 
-binaries/shabeko_dayo.wav is generayted by CoeFontStudio.
+sounds/shabeko_dayo.wav is generayted by CoeFontStudio.

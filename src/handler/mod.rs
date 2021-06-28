@@ -61,7 +61,7 @@ impl EventHandler for Handler {
                 let digest = Tiger::digest(id.as_bytes());
                 let digest_str = format!("{:X}", digest);
 
-                let file_path = path.join("binaries").join(digest_str);
+                let file_path = path.join("sounds").join(digest_str);
                 let speech_file =
                     generate_speech_file(text_for_speech, VoiceId::Mizuki, file_path, false)
                         .await
@@ -88,7 +88,7 @@ mod tests {
         let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
         println!("{}", root);
         let path = Path::new(root);
-        let file_path = path.join("binaries").join("2_23_AM_2.mp3");
+        let file_path = path.join("sounds").join("2_23_AM_2.mp3");
         println!("{}", file_path.display());
         assert_eq!(true, file_path.exists());
     }
@@ -97,7 +97,7 @@ mod tests {
     async fn create_tts_file() {
         let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
         let path = Path::new(root);
-        let file_path = path.join("binaries").join("tts");
+        let file_path = path.join("sounds").join("tts");
         let speech_file = generate_speech_file(
             "おはようございます".to_string(),
             VoiceId::Mizuki,
