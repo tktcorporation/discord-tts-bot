@@ -32,7 +32,7 @@
 	// Uncomment the next line if you want to keep your containers running after VS Code shuts down.
 	// "shutdownAction": "none",
 
-	"postCreateCommand": "apt-get update && apt-get install -y git",
+	// "postCreateCommand": "apt-get update && apt-get install -y git",
 
 	// Uncomment the next line to run commands after the container is created - for example installing curl.
 	"onCreateCommand": "rustup component add clippy rustfmt rust-analysis rust-src rls",

@@ -15,17 +15,18 @@ services:
     volumes:
       - .:/workspace:cached
       - target:/workspace/target:cached
+      - /var/run/docker.sock:/var/run/docker.sock:rw
     tty: true
-  executer:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    environment:
-      - USER=$USER
-      - DISCORD_TOKEN=$DISCORD_TOKEN
-      - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-      - AWS_REGION=$AWS_REGION
+  # executer:
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+  #   environment:
+  #     - USER=$USER
+  #     - DISCORD_TOKEN=$DISCORD_TOKEN
+  #     - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+  #     - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+  #     - AWS_REGION=$AWS_REGION
   heroku:
     # run `apk add docker` before running heroku commands
     image: sue445/heroku-cli

@@ -13,8 +13,9 @@ RUN apt-get update && \
     ffmpeg \
     curl \
     python \
- && apt-get -y clean \
- && rm -rf /var/lib/apt/lists/*
+    git
+
+RUN curl https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
 
 RUN curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/bin/youtube-dl && \
     chmod a+rx /usr/bin/youtube-dl
@@ -59,6 +60,6 @@ RUN curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/bin/youtube-dl
 ENV LC_ALL=C.UTF-8
 
 COPY --from=build-env /target/release/app /bin/app
-COPY --from=build-env /binaries /binaries
+COPY --from=build-env /sounds /sounds
 
 CMD [ "/bin/sh",  "-c", "app" ]
