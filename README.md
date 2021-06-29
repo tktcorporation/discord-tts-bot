@@ -25,6 +25,41 @@
 
 1. `docker-compose run app /bin/bash`
 
+#### Test
+
+```bash
+RUST_BACKTRACE=1 cargo test
+```
+
+#### Linter, Formatter
+
+- Lint
+
+```bash
+cargo clippy --all
+```
+
+- Format
+
+```bash
+cargo fmt --all
+```
+
+##### Task Runner
+
+[act](https://github.com/nektos/act) can use as a task runner in this project.  
+But, it takes longer than `cargo` commands.
+
+```bash
+# lint, format(check), test
+act
+```
+
+```bash
+# deploy to heroku
+act release
+```
+
 ## Deploying to Heroku
 
 ### Prerequirements
