@@ -21,7 +21,10 @@ async fn main() {
 
     let framework = StandardFramework::new()
         .configure(|c| {
-            c.prefix(&env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment"))
+            c.prefix(
+                &env::var("DISCORD_CMD_PREFIX")
+                    .expect("Expected a command prefix in the environment"),
+            )
         })
         .group(&GENERAL_GROUP);
 
