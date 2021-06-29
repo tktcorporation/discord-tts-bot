@@ -21,7 +21,7 @@ async fn main() {
 
     let framework = StandardFramework::new()
         .configure(|c| {
-            c.prefix(&env::var("CMD_PREFIX").expect("Expected a command prefix in the environment"))
+            c.prefix(&env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment"))
         })
         .group(&GENERAL_GROUP);
 
@@ -36,4 +36,16 @@ async fn main() {
         .start()
         .await
         .map_err(|why| println!("Client ended: {:?}", why));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn check_env_exists() {
+        env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+        env::var("DISCORD_CMD_PREFIX").expect("Expected a prefix in the environment");
+        assert!(true);
+    }
 }

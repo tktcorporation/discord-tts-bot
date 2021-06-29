@@ -12,7 +12,7 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+  DISCORD_CMD_PREFIX: ${{ secrets.DISCORD_CMD_PREFIX }}
 
 jobs:
   test:
@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: heroku_production
+    env:
+      DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
 
     steps:
       - name: Checkout
@@ -27,11 +29,6 @@ jobs:
 
       - name: Install Heroku CLI
         run: npm install -g heroku  
-
-      # - name: Install Docker
-      #   if: ${{ env.ACT }}
-      #   run: |
-      #     apt-get update && apt-get install -y docker
 
       - name: Login to Heroku Container registry
         env: 
