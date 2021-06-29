@@ -1,0 +1,169 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  # Publish discord-speech-bot to Crates.io
+  # cargo_publish:
+  #   name: Publish Cargo Package
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Setup | Checkout
+  #       uses: actions/checkout@v2
+
+  #     - name: Setup | Rust
+  #       uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         profile: minimal
+  #         override: true
+
+  #     - name: Build | Publish
+  #       run: cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
+
+  github_build:
+    name: Build release binaries
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            name: discord-speech-bot-x86_64-unknown-linux-gnu.tar.gz
+
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            name: discord-speech-bot-x86_64-unknown-linux-musl.tar.gz
+
+          - target: i686-unknown-linux-musl
+            os: ubuntu-latest
+            name: discord-speech-bot-i686-unknown-linux-musl.tar.gz
+
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            name: discord-speech-bot-aarch64-unknown-linux-musl.tar.gz
+
+          - target: arm-unknown-linux-musleabihf
+            os: ubuntu-latest
+            name: discord-speech-bot-arm-unknown-linux-musleabihf.tar.gz
+
+          - target: x86_64-apple-darwin
+            os: macOS-latest
+            name: discord-speech-bot-x86_64-apple-darwin.tar.gz
+
+          - target: aarch64-apple-darwin
+            os: macOS-latest
+            name: discord-speech-bot-aarch64-apple-darwin.tar.gz
+
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            name: discord-speech-bot-x86_64-pc-windows-msvc.zip
+
+          - target: i686-pc-windows-msvc
+            os: windows-latest
+            name: discord-speech-bot-i686-pc-windows-msvc.zip
+
+          - target: aarch64-pc-windows-msvc
+            os: windows-latest
+            name: discord-speech-bot-aarch64-pc-windows-msvc.zip
+
+          - target: x86_64-unknown-freebsd
+            os: ubuntu-latest
+            name: discord-speech-bot-x86_64-unknown-freebsd.tar.gz
+
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v2
+
+      # Cache files between builds
+      - name: Setup | Cache Cargo
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Setup | Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+          target: ${{ matrix.target }}
+
+      - name: Install musl tools
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        # Install libssl-dev for openssl-sys
+        run: sudo apt-get install -y musl-tools libssl-dev 
+
+      - name: Build | Build
+        uses: actions-rs/cargo@v1
+        # TODO: Remove this once it's the default
+        env:
+          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
+        with:
+          command: build
+          args: --features --features tls-vendored --release --target ${{ matrix.target }}
+          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
+
+      - name: Post Build | Prepare artifacts [Windows]
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          strip discord-speech-bot.exe
+          7z a ../../../${{ matrix.name }} discord-speech-bot.exe
+          cd -
+      - name: Post Build | Prepare artifacts [-nix]
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          # TODO: investigate better cross platform stripping
+          strip discord-speech-bot || true
+          tar czvf ../../../${{ matrix.name }} discord-speech-bot
+          cd -
+      - name: Deploy | Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ matrix.name }}
+
+  # Create GitHub release with Rust build targets and release notes
+  github_release:
+    name: Create GitHub Release
+    needs: github_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup | Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.15.7"
+
+      - name: Setup | Artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Setup | Checksums
+        run: for file in discord-speech-bot-*/discord-speech-bot-*; do openssl dgst -sha256 -r "$file" | awk '{print $1}' > "${file}.sha256"; done
+
+      - name: Setup | Release notes
+        run: |
+          GO111MODULE=on go get github.com/git-chglog/git-chglog/cmd/git-chglog@0.9.1
+          git-chglog -c .github/chglog/release.yml $(git describe --tags) > RELEASE.md
+      - name: Build | Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          files: discord-speech-bot-*/discord-speech-bot-*
+          body_path: RELEASE.md
+        env:
+          # Use personal token for hook other workflows
+          # ref: https://docs.github.com/ja/actions/reference/events-that-trigger-workflows#status
+          GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}
