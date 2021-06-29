@@ -1,0 +1,49 @@
+name: "HerokuDeploy"
+
+on:
+  release:
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    environment:
+      name: heroku_production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Heroku CLI
+        run: npm install -g heroku  
+
+      # - name: Install Docker
+      #   if: ${{ env.ACT }}
+      #   run: |
+      #     apt-get update && apt-get install -y docker
+
+      - name: Login to Heroku Container registry
+        env: 
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:login
+
+      - name: Build and push
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:push -a ${{ secrets.HEROKU_APP_NAME }} app
+
+      - name: Release
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:release -a ${{ secrets.HEROKU_APP_NAME }} app

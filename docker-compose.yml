@@ -13,6 +13,8 @@ services:
       - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
       - AWS_REGION=$AWS_REGION
       - CMD_PREFIX=$CMD_PREFIX
+      - HEROKU_API_KEY=$HEROKU_API_KEY
+      - HEROKU_APP_NAME=$HEROKU_APP_NAME
     volumes:
       - .:/workspace:cached
       - target:/workspace/target:cached
