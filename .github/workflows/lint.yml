@@ -23,6 +23,15 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
+      # Cache files between builds
+      - name: Setup | Cache Cargo
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
         with:

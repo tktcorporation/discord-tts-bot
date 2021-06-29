@@ -1,0 +1,45 @@
+name: Push Tag
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  create_git_tag:
+    runs-on: ubuntu-latest
+    name: Push Tag
+    outputs:
+      is_new_release: ${{ steps.check_push.outputs.is_push }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2.2.0
+        with:
+          fetch-depth: 0
+          # NOTE @v2 uses the token as an auth http header. Set it to
+          # a Personal Access Token instead of secrets.GITHUB_TOKEN
+          # so that tag pushes trigger repo push events.
+          token: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}
+
+      - name: set tagname
+        id: tag_name
+        run: echo ::set-output name=tag_name::v$(cat Cargo.toml | grep -m1 "version" | cut -d " " -f 3 | tr -d '"')
+
+      - name: "Get Previous tag"
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - name: Check push
+        id: check_push
+        run: |
+          if [ ${{ steps.previoustag.outputs.tag }} != ${{ steps.tag_name.outputs.tag_name }} ] ; then
+            echo ::set-output name=is_push::true
+          else
+            echo ::set-output name=is_push::false
+          fi
+
+      - name: Push Tag
+        if: steps.check_push.outputs.is_push == 'true'
+        run: |
+          git tag ${{ steps.tag_name.outputs.tag_name }}
+          git push origin ${{ steps.tag_name.outputs.tag_name }}
