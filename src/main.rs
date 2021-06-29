@@ -20,7 +20,9 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
     let framework = StandardFramework::new()
-        .configure(|c| c.prefix("~"))
+        .configure(|c| {
+            c.prefix(&env::var("CMD_PREFIX").expect("Expected a command prefix in the environment"))
+        })
         .group(&GENERAL_GROUP);
 
     let mut client = Client::builder(&token)
