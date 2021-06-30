@@ -28,7 +28,7 @@ COPY Cargo.toml Cargo.toml
 RUN mkdir src/
 RUN echo "fn main() {println!(\"if you see this, the build broke\")}" > src/main.rs
 RUN cargo build --release
-RUN rm -f target/release/deps/app*
+RUN rm -f target/release/deps/discord*
 
 COPY  . .
 

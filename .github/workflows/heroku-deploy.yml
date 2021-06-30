@@ -9,8 +9,8 @@ defaults:
     working-directory: ./
 
 jobs:
-  test:
-    name: Test
+  deploy:
+    name: deploy
     runs-on: ubuntu-latest
     environment:
       name: heroku_production
@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install Heroku CLI
-        run: npm install -g heroku  
+        run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
 
       - name: Login to Heroku Container registry
         env: 
