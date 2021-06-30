@@ -59,7 +59,7 @@ RUN curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/bin/youtube-dl
 
 ENV LC_ALL=C.UTF-8
 
-COPY --from=build-env /target/release/app /bin/app
+COPY --from=build-env /target/release/discord-speech-bot /bin/discord-speech-bot
 COPY --from=build-env /sounds /sounds
 
-CMD [ "/bin/sh",  "-c", "app" ]
+CMD [ "/bin/sh",  "-c", "discord-speech-bot" ]

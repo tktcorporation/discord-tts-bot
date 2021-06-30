@@ -1,5 +1,5 @@
 [package]
-name = "app"
+name = "discord-speech-bot"
 version = "0.1.2"
 authors = ["tktcorporation"]
 edition = "2018"

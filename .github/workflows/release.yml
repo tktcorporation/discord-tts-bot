@@ -104,20 +104,20 @@ jobs:
       - name: Build | Build
         uses: actions-rs/cargo@v1
         # TODO: Remove this once it's the default
-        env:
-          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
+        # env:
+        #   SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
         with:
           command: build
           args: --release --target ${{ matrix.target }}
-          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
+          # use-cross: ${{ matrix.os == 'ubuntu-latest' }}
 
-      - name: Post Build | Prepare artifacts [Windows]
-        if: matrix.os == 'windows-latest'
-        run: |
-          cd target/${{ matrix.target }}/release
-          strip discord-speech-bot.exe
-          7z a ../../../${{ matrix.name }} discord-speech-bot.exe
-          cd -
+      # - name: Post Build | Prepare artifacts [Windows]
+      #   if: matrix.os == 'windows-latest'
+      #   run: |
+      #     cd target/${{ matrix.target }}/release
+      #     strip discord-speech-bot.exe
+      #     7z a ../../../${{ matrix.name }} discord-speech-bot.exe
+      #     cd -
       - name: Post Build | Prepare artifacts [-nix]
         if: matrix.os != 'windows-latest'
         run: |
