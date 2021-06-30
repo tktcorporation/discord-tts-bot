@@ -1,5 +1,7 @@
 # discord-speech-bot
 
+[![Test](https://github.com/tktcorporation/discord-speech-bot/actions/workflows/test.yml/badge.svg)](https://github.com/tktcorporation/discord-speech-bot/actions/workflows/test.yml)
+
 ## Prerequirements
 
 - Docker, docker-compose
