@@ -52,7 +52,13 @@ impl EventHandler for Handler {
         let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
 
-        let text_for_speech = msg.content.clone();
+        // url に反応しないようにする
+        let text_for_speech = if msg.content.starts_with("http") {
+            "url".to_string()
+        } else {
+            msg.content.clone()
+        };
+
         let input = match text_for_speech.as_str() {
             "BGM" => services::get_bgm_input().await.unwrap(),
             _ => {
