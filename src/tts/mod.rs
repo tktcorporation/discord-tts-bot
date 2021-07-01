@@ -52,7 +52,7 @@ pub async fn generate_speech_file<P: AsRef<OsStr>>(
     let mut ssml_text = String::new();
     // 声質の変更と最大再生秒数の設定
     // https://docs.aws.amazon.com/ja_jp/polly/latest/dg/supportedtags.html
-    ssml_text.push_str("<speak><prosody pitch=\"+200%\"><amazon:effect phonation=\"soft\"><amazon:effect vocal-tract-length=\"-15%\"><prosody amazon:max-duration=\"5s\">");
+    ssml_text.push_str("<speak><prosody pitch=\"+200%\"><amazon:effect phonation=\"soft\"><amazon:effect vocal-tract-length=\"-15%\"><prosody amazon:max-duration=\"30s\">");
     ssml_text.push_str(&content);
     ssml_text.push_str("</prosody></amazon:effect></amazon:effect></prosody></speak>");
 
