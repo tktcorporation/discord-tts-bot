@@ -24,9 +24,19 @@ use std::path::Path;
 
 #[group]
 #[commands(
-    deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute
+    deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute, help
 )]
 pub(crate) struct General;
+
+#[command]
+async fn help(ctx: &Context, msg: &Message) -> CommandResult {
+    check_msg(
+        msg.channel_id
+            .say(&ctx.http, "`~join` でボイスチャットに入るよ")
+            .await,
+    );
+    Ok(())
+}
 
 #[command]
 async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
