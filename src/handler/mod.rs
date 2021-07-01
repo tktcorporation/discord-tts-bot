@@ -1,3 +1,5 @@
+use std::env;
+
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
@@ -24,6 +26,13 @@ impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         // botに反応しないようにする
         if msg.author.bot {
+            return;
+        }
+
+        // コマンドに反応しないようにする
+        if msg.content.starts_with(
+            &env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment"),
+        ) {
             return;
         }
 
