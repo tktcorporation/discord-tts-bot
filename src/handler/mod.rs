@@ -3,7 +3,10 @@ use std::env;
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
-    model::{channel::Message, gateway::Ready},
+    model::{
+        channel::Message,
+        gateway::{Activity, Ready},
+    },
 };
 use songbird::{ffmpeg, input::Input};
 use std::ffi::OsStr;
@@ -19,8 +22,9 @@ pub struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
+        &ctx.set_activity(Activity::playing("~join で呼んでね"));
     }
 
     async fn message(&self, ctx: Context, msg: Message) {
