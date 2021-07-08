@@ -62,7 +62,7 @@ impl EventHandler for Handler {
         let path = Path::new(root);
 
         // url に反応しないようにする
-        let text_for_speech = if msg.content.starts_with("http") {
+        let text_for_speech = if msg.content.contains("http") {
             "url".to_string()
         } else {
             msg.content.clone()
