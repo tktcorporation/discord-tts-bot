@@ -24,7 +24,11 @@ pub struct Handler;
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
-        &ctx.set_activity(Activity::playing("~join で呼んでね"));
+        ctx.set_activity(Activity::playing(
+            env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment")
+                + "join で呼んでね",
+        ))
+        .await;
     }
 
     async fn message(&self, ctx: Context, msg: Message) {
