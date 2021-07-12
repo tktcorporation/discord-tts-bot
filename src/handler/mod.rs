@@ -38,15 +38,8 @@ impl EventHandler for Handler {
 
         let is_debug = false;
         if is_debug {
-            // サーバーのID
-            eprintln!("guild_id = {:?}", msg.guild_id);
-            // チャンネル名
-            let channel_name = msg.channel_id.name(&ctx.cache).await;
-            eprintln!("channel_name = {:?}", channel_name);
-            // メッセージの送信
-            let content = msg.content.clone();
-            println!("message received: {:?}", content);
-        }
+            debug_print(&msg, &ctx).await;
+        };
 
         let handler_lock = get_handler_when_in_voice_channel(&ctx, &msg).await.unwrap();
 
@@ -108,6 +101,17 @@ async fn is_ignore_msg(ctx: &Context, msg: &Message) -> bool {
     };
 
     false
+}
+
+async fn debug_print(msg: &Message, ctx: &Context) {
+    // サーバーのID
+    eprintln!("guild_id = {:?}", msg.guild_id);
+    // チャンネル名
+    let channel_name = msg.channel_id.name(&ctx.cache).await;
+    eprintln!("channel_name = {:?}", channel_name);
+    // メッセージの送信
+    let content = msg.content.clone();
+    println!("message received: {:?}", content);
 }
 
 #[cfg(test)]
