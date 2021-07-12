@@ -63,7 +63,7 @@ impl EventHandler for Handler {
         let input = match text_for_speech.as_str() {
             "BGM" => services::get_bgm_input().await.unwrap(),
             _ => {
-                // 同じファイル名だと複数サーバーで利用した場合に競合しそう
+                // 同じファイル名だと複数サーバーで利用した場合に競合しそうなので、ユニークなファイル名を割り当てる
                 let id = msg.guild_id.unwrap().0.to_string();
                 let digest = Tiger::digest(id.as_bytes());
                 let digest_str = format!("{:X}", digest);
