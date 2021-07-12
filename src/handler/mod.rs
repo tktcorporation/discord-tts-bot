@@ -90,14 +90,14 @@ async fn is_ignore_msg(ctx: &Context, msg: &Message) -> bool {
     // botに反応しないようにする
     if msg.author.bot {
         return true;
-    }
+    };
 
     // コマンドに反応しないようにする
     if msg.content.starts_with(
         &env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment"),
     ) {
         return true;
-    }
+    };
 
     // voice channel にいない場合は動かさない
     if get_handler_when_in_voice_channel(&ctx, &msg)
@@ -105,9 +105,9 @@ async fn is_ignore_msg(ctx: &Context, msg: &Message) -> bool {
         .is_none()
     {
         return true;
-    }
+    };
 
-    return false;
+    false
 }
 
 #[cfg(test)]
