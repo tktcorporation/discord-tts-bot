@@ -93,10 +93,7 @@ async fn is_ignore_msg(ctx: &Context, msg: &Message) -> bool {
     };
 
     // voice channel にいない場合は動かさない
-    if get_handler_when_in_voice_channel(&ctx, &msg)
-        .await
-        .is_none()
-    {
+    if get_handler_when_in_voice_channel(ctx, msg).await.is_none() {
         return true;
     };
 

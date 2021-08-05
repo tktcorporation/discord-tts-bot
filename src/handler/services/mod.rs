@@ -6,7 +6,7 @@ pub async fn get_handler_when_in_voice_channel(
     ctx: &Context,
     msg: &Message,
 ) -> Option<Arc<serenity::prelude::Mutex<songbird::Call>>> {
-    let manager = songbird::get(&ctx)
+    let manager = songbird::get(ctx)
         .await
         .expect("Songbird Voice client placed in at initialisation.")
         .clone();
