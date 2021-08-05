@@ -27,6 +27,8 @@
 
 1. `docker-compose run app /bin/bash`
 
+<!-- 1. `docker-compose run app bash -c "RUST_BACKTRACE=1 cargo run"` docker for windows only? -->
+
 #### Test
 
 ```bash

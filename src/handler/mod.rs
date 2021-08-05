@@ -57,7 +57,7 @@ impl EventHandler for Handler {
             "BGM" => services::get_bgm_input().await.unwrap(),
             _ => {
                 // 同じファイル名だと複数サーバーで利用した場合に競合しそうなので、ユニークなファイル名を割り当てる
-                let id = msg.guild_id.unwrap().0.to_string();
+                let id = msg.id.to_string();
                 let digest = Tiger::digest(id.as_bytes());
                 let digest_str = format!("{:X}", digest);
 
