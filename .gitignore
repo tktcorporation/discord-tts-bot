@@ -9,6 +9,7 @@ target/
 # custom
 .DS_Store
 .envrc
+.env
 
 # Sound data
 /sounds/*
