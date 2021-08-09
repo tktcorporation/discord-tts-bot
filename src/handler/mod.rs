@@ -62,10 +62,15 @@ impl EventHandler for Handler {
                     let handler_lock = get_handler_when_in_voice_channel(&ctx, guild_id)
                         .await
                         .unwrap();
-                    let message = format!(
-                        "{:?} さんいらっしゃい",
-                        new_voice_state.member.unwrap().user.name
-                    );
+                    let current_user_id = ctx.cache.current_user_id().await;
+                    let user = new_voice_state.member.unwrap().user;
+
+                    if current_user_id == user.id {
+                        return;
+                    }
+
+                    let message = format!("{:?} さんいらっしゃい", user.name);
+
                     speech(message, guild_id, handler_lock).await;
                 }
             }
