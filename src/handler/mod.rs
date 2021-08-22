@@ -11,6 +11,8 @@ use serenity::{
 };
 pub mod services;
 use services::{get_handler_when_in_voice_channel, speech};
+mod model;
+use model::CurrentVoiceState;
 
 pub struct Handler;
 
@@ -54,26 +56,20 @@ impl EventHandler for Handler {
         old_voice_state: Option<voice::VoiceState>,
         new_voice_state: voice::VoiceState,
     ) {
-        match old_voice_state {
-            // 他サーバーに反応しないように
-            Some(_) => {}
-            None => {
-                if let Some(guild_id) = new_voice_state.guild_id {
-                    let handler_lock = get_handler_when_in_voice_channel(&ctx, guild_id)
-                        .await
-                        .unwrap();
-                    let current_user_id = ctx.cache.current_user_id().await;
-                    let user = new_voice_state.member.unwrap().user;
+        let state = CurrentVoiceState::new(
+            new_voice_state,
+        );
+        match state.new_speaker(&ctx, old_voice_state).await {
+            Ok(speaker) => {
+                let handler_lock = get_handler_when_in_voice_channel(&ctx, speaker.guild_id)
+                    .await
+                    .unwrap();
 
-                    if current_user_id == user.id {
-                        return;
-                    }
+                let message = format!("{:?} さんいらっしゃい", speaker.user.name);
 
-                    let message = format!("{:?} さんいらっしゃい", user.name);
-
-                    speech(message, guild_id, handler_lock).await;
-                }
-            }
+                speech(message, speaker.guild_id, handler_lock).await;
+            },
+            Err(str) => { println!("{:?}", str) },
         }
     }
 }
