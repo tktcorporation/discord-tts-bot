@@ -108,4 +108,3 @@ async fn debug_print(msg: &Message, ctx: &Context) {
     let content = msg.content.clone();
     eprintln!("message received: {:?}", content);
 }
-}
