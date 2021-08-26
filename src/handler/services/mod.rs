@@ -62,7 +62,7 @@ pub async fn speech(
             let id = guild_id.0.to_string();
             let digest = Tiger::digest(id.as_bytes());
             let guild_id_digest_str = format!("{:X}", digest);
-            fs::create_dir(path.join("sounds").join(guild_id_digest_str.clone()))
+            fs::create_dir_all(path.join("sounds").join(guild_id_digest_str.clone()))
                 .expect("fail to create a dir of guild path");
 
             // guild ごとに最大5ファイル持つ
