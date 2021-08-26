@@ -11,6 +11,7 @@ polly = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.7-alpha",
 aws-types = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.7-alpha", package = "aws-types" }
 tracing-subscriber = { version = "0.2.16", features = ["fmt"] }
 tiger = "^0.1"
+rand = "^0.8"
 
 [dependencies.songbird]
 version = "0.1.1"

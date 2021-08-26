@@ -455,6 +455,7 @@ version = "0.3.2"
 dependencies = [
  "aws-sdk-polly",
  "aws-types",
+ "rand 0.8.4",
  "serenity",
  "songbird",
  "tiger",
