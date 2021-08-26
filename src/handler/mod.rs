@@ -14,6 +14,10 @@ use services::{get_handler_when_in_voice_channel, speech};
 mod model;
 use model::CurrentVoiceState;
 
+use songbird::{
+    Event, EventContext, EventHandler as VoiceEventHandler,
+};
+
 pub struct Handler;
 
 #[async_trait]
@@ -108,4 +112,19 @@ async fn debug_print(msg: &Message, ctx: &Context) {
     let content = msg.content.clone();
     eprintln!("message received: {:?}", content);
 }
+
+pub struct TrackEndNotifier {}
+
+#[async_trait]
+impl VoiceEventHandler for TrackEndNotifier {
+    async fn act(&self, ctx: &EventContext<'_>) -> Option<Event> {
+        if let EventContext::Track(track_list) = ctx {
+            for track in track_list.iter() {
+                println!("{:?}", track.0);
+                println!("{:?}", track.1);
+            }
+        }
+
+        None
+    }
 }

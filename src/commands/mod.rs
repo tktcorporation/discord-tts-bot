@@ -22,6 +22,8 @@ use services::check_msg;
 use songbird::ffmpeg;
 use std::path::Path;
 
+use crate::handler::TrackEndNotifier;
+
 #[group]
 #[commands(
     deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute, help
@@ -111,6 +113,8 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
         );
 
         let mut handle = handle_lock.lock().await;
+
+        handle.add_global_event(Event::Track(TrackEvent::End), TrackEndNotifier {});
 
         let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
