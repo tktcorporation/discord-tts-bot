@@ -14,10 +14,8 @@ pub struct NewSpeaker {
 }
 
 impl CurrentVoiceState {
-    pub fn new(state: voice::VoiceState) -> Self{
-        CurrentVoiceState {
-            state,
-        }
+    pub fn new(state: voice::VoiceState) -> Self {
+        CurrentVoiceState { state }
     }
     /// [`previous_voice_state`] が空で、現在の [`voice::VoiceState`] も Seaker として動いている場合に [`NewSpeaker`] を返す
     pub async fn new_speaker(
@@ -37,10 +35,7 @@ impl CurrentVoiceState {
                         return Err("This is me(bot). My entering is ignored.");
                     }
 
-                    Ok(NewSpeaker {
-                        guild_id,
-                        user,
-                    })
+                    Ok(NewSpeaker { guild_id, user })
                 } else {
                     Err("The guild_id is None")
                 }
