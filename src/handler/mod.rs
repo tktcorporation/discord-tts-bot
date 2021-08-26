@@ -56,20 +56,20 @@ impl EventHandler for Handler {
         old_voice_state: Option<voice::VoiceState>,
         new_voice_state: voice::VoiceState,
     ) {
-        let state = CurrentVoiceState::new(
-            new_voice_state,
-        );
+        let state = CurrentVoiceState::new(new_voice_state);
         match state.new_speaker(&ctx, old_voice_state).await {
             Ok(speaker) => {
-                let handler_lock = get_handler_when_in_voice_channel(&ctx, speaker.guild_id)
-                    .await
-                    .unwrap();
+                if let Some(handler_lock) =
+                    get_handler_when_in_voice_channel(&ctx, speaker.guild_id).await
+                {
+                    let message = format!("{:?} さんいらっしゃい", speaker.user.name);
 
-                let message = format!("{:?} さんいらっしゃい", speaker.user.name);
-
-                speech(message, speaker.guild_id, handler_lock).await;
-            },
-            Err(str) => { println!("{:?}", str) },
+                    speech(message, speaker.guild_id, handler_lock).await;
+                };
+            }
+            Err(str) => {
+                println!("[DEBUG] {:?}", str)
+            }
         }
     }
 }
@@ -106,5 +106,6 @@ async fn debug_print(msg: &Message, ctx: &Context) {
     eprintln!("channel_name = {:?}", channel_name);
     // メッセージの送信
     let content = msg.content.clone();
-    println!("message received: {:?}", content);
+    eprintln!("message received: {:?}", content);
+}
 }
