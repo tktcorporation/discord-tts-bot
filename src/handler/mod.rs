@@ -62,7 +62,11 @@ impl EventHandler for Handler {
                 if let Some(handler_lock) =
                     get_handler_when_in_voice_channel(&ctx, speaker.guild_id).await
                 {
-                    let message = format!("{:?} さんいらっしゃい", speaker.user.name);
+                    let message = if speaker.is_new {
+                        format!("{:?} さんいらっしゃい", speaker.user.name)
+                    } else {
+                        format!("{:?} さんいってらっしゃい", speaker.user.name)
+                    };
 
                     speech(message, speaker.guild_id, handler_lock).await;
                 };
