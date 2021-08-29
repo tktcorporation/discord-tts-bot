@@ -9,7 +9,6 @@ use polly::{Client, Config, Region};
 use aws_types::region::{EnvironmentProvider, ProvideRegion};
 
 use tokio::io::AsyncWriteExt;
-use html_escape;
 
 /// Generate a mp3 file and return the file path str
 ///
@@ -17,10 +16,10 @@ use html_escape;
 ///
 /// ```no_run
 /// let result = generate_speech_file(
-/// String::from("おはようございます"),
-/// VoiceId::Mizuki,
-/// "sample",
-/// true,
+///   String::from("おはようございます"),
+///   VoiceId::Mizuki,
+///   "sample",
+///   true,
 /// )
 /// .await;
 /// Path::new(result.unwrap()).exists(); // true or false
