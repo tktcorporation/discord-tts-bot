@@ -136,7 +136,8 @@ mod tests {
 
     #[test]
     fn test_is_ignore_msg_cmd_pref() {
-        let content = &(env::var("DISCORD_CMD_PREFIX").unwrap() + "hogehoge")[..];
+        // prefix が ~ 以外だと落ちる
+        let content = &("~".to_string() + "hogehoge")[..];
         let message = message_factory(content);
         assert_eq!(true, is_ignore_msg(&message));
     }
