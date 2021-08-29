@@ -69,6 +69,20 @@ async fn get_input_from_local<P: AsRef<OsStr>>(file_path: P) -> Input {
         .expect("This might fail: handle this error!");
 }
 
+pub async fn members(
+    ctx: &Context,
+    guild_id: &songbird::id::GuildId,
+    channel_id: &songbird::id::ChannelId,
+) -> std::result::Result<std::vec::Vec<serenity::model::guild::Member>, String> {
+    let guild_id = id::GuildId::from(guild_id.0);
+    let channel_id = id::ChannelId::from(channel_id.0);
+    let channels = guild_id.channels(&ctx.http.as_ref()).await.unwrap();
+    match channels.get(&channel_id) {
+        Some(guild_channel) => Ok(guild_channel.members(&ctx.cache).await.unwrap()),
+        _ => Err("can't get a channel id".to_string()),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

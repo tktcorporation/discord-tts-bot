@@ -10,7 +10,7 @@ use serenity::{
     },
 };
 pub mod services;
-use services::{get_handler_when_in_voice_channel, speech};
+use services::{get_handler_when_in_voice_channel, members, speech};
 mod model;
 use model::CurrentVoiceState;
 
@@ -67,19 +67,28 @@ impl EventHandler for Handler {
             .expect("Songbird Voice client placed in at initialisation.");
         match state.new_speaker(&ctx, old_voice_state).await {
             Ok(speaker) => {
-                if let Some(handler_lock) = manager.get(speaker.guild_id) {
+                if let Some(handler) = manager.get(speaker.guild_id) {
                     let message = if speaker.is_new {
                         format!("{:?} さんいらっしゃい", speaker.user.name)
                     } else {
                         format!("{:?} さんいってらっしゃい", speaker.user.name)
                     };
 
+                    println!("{}", "767777777777");
+                    let ids = get_channel_id_and_guild_id(&handler).await;
                     // botしかいなかったら
-                    if speaker.member_count <= 1 {
-                        return manager.remove(speaker.guild_id).await.unwrap();
+                    if members(&ctx, &ids.0, &ids.1)
+                        .await
+                        .unwrap()
+                        .len()
+                        <= 1
+                    {
+                        manager.leave(ids.0).await.unwrap();
+                        return;
                     };
 
-                    speech(message, speaker.guild_id, handler_lock).await;
+                    println!("{}", "c");
+                    speech(message, speaker.guild_id, handler).await;
                 };
             }
             Err(str) => {
@@ -87,6 +96,12 @@ impl EventHandler for Handler {
             }
         }
     }
+}
+
+async fn get_channel_id_and_guild_id(handler: &std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>) -> (songbird::id::GuildId, songbird::id::ChannelId,) {
+    let handler_lock = handler.lock().await;
+    let connection = handler_lock.current_connection().unwrap();
+    (connection.guild_id.clone(), connection.channel_id.unwrap())
 }
 
 fn is_ignore_msg(msg: &Message) -> bool {
