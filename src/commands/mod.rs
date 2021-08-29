@@ -1,3 +1,4 @@
+use std::env;
 use std::{sync::Arc, time::Duration};
 
 use serenity::{
@@ -32,7 +33,13 @@ pub(crate) struct General;
 async fn help(ctx: &Context, msg: &Message) -> CommandResult {
     check_msg(
         msg.channel_id
-            .say(&ctx.http, "`~join` でボイスチャットに入るよ")
+            .say(
+                &ctx.http,
+                "`".to_string()
+                    + &env::var("DISCORD_CMD_PREFIX")
+                        .expect("Expected a command prefix in the environment")
+                    + "join` でボイスチャットに入るよ",
+            )
             .await,
     );
     Ok(())
