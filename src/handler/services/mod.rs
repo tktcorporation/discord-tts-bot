@@ -1,7 +1,7 @@
 use rand::Rng;
 use serenity::{client::Context, model::id};
 use songbird::id::GuildId;
-use songbird::input::{error::Result, restartable::Restartable, Input};
+use songbird::input::Input;
 use std::env;
 use std::fs;
 use std::path::Path;
@@ -35,18 +35,6 @@ pub async fn play_input(
     handler.enqueue_source(input);
 }
 
-pub async fn get_bgm_input() -> Result<Input> {
-    let url = "https://youtu.be/16Bj6aPi1A8";
-    match Restartable::ytdl(url, true).await {
-        Ok(source) => Ok(source.into()),
-        Err(why) => {
-            println!("Err get input source: {:?}", why);
-
-            Err(why)
-        }
-    }
-}
-
 pub async fn speech(
     text_for_speech: String,
     guild_id: id::GuildId,
@@ -54,31 +42,23 @@ pub async fn speech(
 ) {
     let root = env!("CARGO_MANIFEST_DIR");
     let path = Path::new(root);
-    let input = match text_for_speech.as_str() {
-        "BGM" => get_bgm_input().await.unwrap(),
-        _ => {
-            // 同じファイル名だと複数サーバーで利用した場合に競合しそうなので、ユニークなファイル名を割り当てる
-            // guild_id でフォルダ分け
-            let id = guild_id.0.to_string();
-            let digest = Tiger::digest(id.as_bytes());
-            let guild_id_digest_str = format!("{:X}", digest);
-            fs::create_dir_all(path.join("sounds").join(guild_id_digest_str.clone()))
-                .expect("fail to create a dir of guild path");
-
-            // guild ごとに最大5ファイル持つ
-            let rand_num: i32 = rand::thread_rng().gen_range(0..10);
-
-            let file_path = path
-                .join("sounds")
-                .join(guild_id_digest_str)
-                .join(rand_num.to_string());
-            let speech_file =
-                generate_speech_file(text_for_speech, VoiceId::Mizuki, file_path, false)
-                    .await
-                    .unwrap();
-            get_input_from_local(speech_file).await
-        }
-    };
+    // 同じファイル名だと複数サーバーで利用した場合に競合しそうなので、ユニークなファイル名を割り当てる
+    // guild_id でフォルダ分け
+    let id = guild_id.0.to_string();
+    let digest = Tiger::digest(id.as_bytes());
+    let guild_id_digest_str = format!("{:X}", digest);
+    fs::create_dir_all(path.join("sounds").join(guild_id_digest_str.clone()))
+        .expect("fail to create a dir of guild path");
+    // guild ごとに最大5ファイル持つ
+    let rand_num: i32 = rand::thread_rng().gen_range(0..10);
+    let file_path = path
+        .join("sounds")
+        .join(guild_id_digest_str)
+        .join(rand_num.to_string());
+    let speech_file = generate_speech_file(text_for_speech, VoiceId::Mizuki, file_path, false)
+        .await
+        .unwrap();
+    let input = get_input_from_local(speech_file).await;
     play_input(&handler_lock, input).await;
 }
 
