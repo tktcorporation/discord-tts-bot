@@ -112,3 +112,33 @@ async fn debug_print(msg: &Message, ctx: &Context) {
     let content = msg.content.clone();
     eprintln!("message received: {:?}", content);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serenity::model::channel::Message;
+
+    #[tokio::test]
+    async fn test_is_ignore_msg() {
+        let message = Message {
+            pub id: MessageId,
+            pub attachments: Vec<Attachment>,
+            pub author: User,
+            pub channel_id: ChannelId,
+            pub content: String,
+            pub edited_timestamp: Option<DateTime<FixedOffset>>,
+            pub embeds: Vec<Embed>,
+            pub kind: MessageType,
+            pub mention_everyone: bool,
+            pub mention_roles: Vec<RoleId>,
+            pub mentions: Vec<User>,
+            pub nonce: Value,
+            pub pinned: bool,
+            pub reactions: Vec<MessageReaction>,
+            pub timestamp: DateTime<FixedOffset>,
+            pub tts: bool,
+            pub webhook_id: Option<WebhookId>,
+        }
+        assert_eq!(true, right);
+    }
+}
