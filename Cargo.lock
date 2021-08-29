@@ -463,6 +463,7 @@ dependencies = [
  "aws-sdk-polly",
  "aws-types",
  "rand 0.8.4",
+ "regex",
  "serde_json",
  "serenity",
  "songbird",
