@@ -30,7 +30,12 @@ impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         let guild_id = msg.guild(&ctx.cache).await.unwrap().id;
         let handler_lock = get_handler_when_in_voice_channel(&ctx, guild_id).await;
-        if is_ignore_msg(&msg, &handler_lock).await {
+        if is_ignore_msg(&msg) {
+            return;
+        };
+
+        // voice channel にいない場合は動かさない
+        if handler_lock.is_none() {
             return;
         };
 
@@ -78,9 +83,8 @@ impl EventHandler for Handler {
     }
 }
 
-async fn is_ignore_msg(
+fn is_ignore_msg(
     msg: &Message,
-    handler_lock: &Option<std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>>,
 ) -> bool {
     // botに反応しないようにする
     if msg.author.bot {
@@ -91,11 +95,6 @@ async fn is_ignore_msg(
     if msg.content.starts_with(
         &env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment"),
     ) {
-        return true;
-    };
-
-    // voice channel にいない場合は動かさない
-    if handler_lock.is_none() {
         return true;
     };
 
@@ -116,29 +115,158 @@ async fn debug_print(msg: &Message, ctx: &Context) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serenity::model::channel::Message;
+    use serenity::model::channel::{Message};
 
-    #[tokio::test]
-    async fn test_is_ignore_msg() {
-        let message = Message {
-            pub id: MessageId,
-            pub attachments: Vec<Attachment>,
-            pub author: User,
-            pub channel_id: ChannelId,
-            pub content: String,
-            pub edited_timestamp: Option<DateTime<FixedOffset>>,
-            pub embeds: Vec<Embed>,
-            pub kind: MessageType,
-            pub mention_everyone: bool,
-            pub mention_roles: Vec<RoleId>,
-            pub mentions: Vec<User>,
-            pub nonce: Value,
-            pub pinned: bool,
-            pub reactions: Vec<MessageReaction>,
-            pub timestamp: DateTime<FixedOffset>,
-            pub tts: bool,
-            pub webhook_id: Option<WebhookId>,
-        }
-        assert_eq!(true, right);
+    #[test]
+    fn test_is_ignore_msg() {
+        let message_json = r#"{
+            "id":881482961801842698,
+            "attachments":[],
+            "author": {
+                "id":502486808211357707,
+                "avatar":"bfdafa09852e451e32f7ac1919bab46f",
+                "bot":false,
+                "discriminator":6539,
+                "username":"tkt",
+                "public_flags":0
+            },
+            "channel_id":713052877911752724,
+            "content":"a",
+            "edited_timestamp":null,
+            "embeds":[],
+            "guild_id":713052821850816604,
+            "type":0,
+            "member": {
+                "deaf":false,
+                "joined_at":"2020-05-21T15:37:20.702Z",
+                "mute":false,
+                "nick":null,
+                "roles":[],
+                "pending":false,
+                "premium_since":null,
+                "guild_id":null,
+                "user":null
+            },
+            "mention_everyone":false,
+            "mention_roles":[],
+            "mention_channels":[],
+            "mentions":[],
+            "nonce":"881482961130618880",
+            "pinned":false,
+            "reactions":[],
+            "timestamp":"2021-08-29T10:18:35.255Z",
+            "tts":false,
+            "webhook_id":null,
+            "activity":null,
+            "application":null,
+            "message_reference":null,
+            "flags":0,
+            "stickers":[],
+            "referenced_message":null
+        }"#;
+        let message: Message = serde_json::from_str(message_json).unwrap();
+        assert_eq!(false, is_ignore_msg(&message));
+    }
+
+    #[test]
+    fn test_is_ignore_msg_and() {
+        let message_json = r#"{
+            "id":881482961801842698,
+            "attachments":[],
+            "author": {
+                "id":502486808211357707,
+                "avatar":"bfdafa09852e451e32f7ac1919bab46f",
+                "bot":false,
+                "discriminator":6539,
+                "username":"tkt",
+                "public_flags":0
+            },
+            "channel_id":713052877911752724,
+            "content":"hogehoge&hogehoge",
+            "edited_timestamp":null,
+            "embeds":[],
+            "guild_id":713052821850816604,
+            "type":0,
+            "member": {
+                "deaf":false,
+                "joined_at":"2020-05-21T15:37:20.702Z",
+                "mute":false,
+                "nick":null,
+                "roles":[],
+                "pending":false,
+                "premium_since":null,
+                "guild_id":null,
+                "user":null
+            },
+            "mention_everyone":false,
+            "mention_roles":[],
+            "mention_channels":[],
+            "mentions":[],
+            "nonce":"881482961130618880",
+            "pinned":false,
+            "reactions":[],
+            "timestamp":"2021-08-29T10:18:35.255Z",
+            "tts":false,
+            "webhook_id":null,
+            "activity":null,
+            "application":null,
+            "message_reference":null,
+            "flags":0,
+            "stickers":[],
+            "referenced_message":null
+        }"#;
+        let message: Message = serde_json::from_str(message_json).unwrap();
+        assert_eq!(false, is_ignore_msg(&message));
+    }
+
+    #[test]
+    fn test_is_ignore_msg_cmd_pref() {
+        let message_json = r#"{
+            "id":881482961801842698,
+            "attachments":[],
+            "author": {
+                "id":502486808211357707,
+                "avatar":"bfdafa09852e451e32f7ac1919bab46f",
+                "bot":false,
+                "discriminator":6539,
+                "username":"tkt",
+                "public_flags":0
+            },
+            "channel_id":713052877911752724,
+            "content":"=hogehoge&hogehoge",
+            "edited_timestamp":null,
+            "embeds":[],
+            "guild_id":713052821850816604,
+            "type":0,
+            "member": {
+                "deaf":false,
+                "joined_at":"2020-05-21T15:37:20.702Z",
+                "mute":false,
+                "nick":null,
+                "roles":[],
+                "pending":false,
+                "premium_since":null,
+                "guild_id":null,
+                "user":null
+            },
+            "mention_everyone":false,
+            "mention_roles":[],
+            "mention_channels":[],
+            "mentions":[],
+            "nonce":"881482961130618880",
+            "pinned":false,
+            "reactions":[],
+            "timestamp":"2021-08-29T10:18:35.255Z",
+            "tts":false,
+            "webhook_id":null,
+            "activity":null,
+            "application":null,
+            "message_reference":null,
+            "flags":0,
+            "stickers":[],
+            "referenced_message":null
+        }"#;
+        let message: Message = serde_json::from_str(message_json).unwrap();
+        assert_eq!(true, is_ignore_msg(&message));
     }
 }

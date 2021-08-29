@@ -12,13 +12,14 @@ aws-types = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.7-alp
 tracing-subscriber = { version = "0.2.16", features = ["fmt"] }
 tiger = "^0.1"
 rand = "^0.8"
+serde_json = "^1.0"
 
 [dependencies.songbird]
-version = "0.1.1"
+version = "0.2.0"
 features = ["builtin-queue"]
 
 [dependencies.serenity]
-version = "0.10"
+version = "0.10.9"
 features = ["cache", "standard_framework", "voice", "rustls_backend"]
 
 [dependencies.tokio]
