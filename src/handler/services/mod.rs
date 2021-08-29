@@ -14,6 +14,7 @@ use songbird::ffmpeg;
 use std::ffi::OsStr;
 use tiger::digest::Digest;
 
+// これ使うのはそんなにきれいじゃなさそう？
 pub async fn get_handler_when_in_voice_channel<G: Into<GuildId>>(
     ctx: &Context,
     guild_id: G,

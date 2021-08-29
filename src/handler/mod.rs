@@ -62,15 +62,21 @@ impl EventHandler for Handler {
         new_voice_state: voice::VoiceState,
     ) {
         let state = CurrentVoiceState::new(new_voice_state);
+        let manager = songbird::get(&ctx)
+            .await
+            .expect("Songbird Voice client placed in at initialisation.");
         match state.new_speaker(&ctx, old_voice_state).await {
             Ok(speaker) => {
-                if let Some(handler_lock) =
-                    get_handler_when_in_voice_channel(&ctx, speaker.guild_id).await
-                {
+                if let Some(handler_lock) = manager.get(speaker.guild_id) {
                     let message = if speaker.is_new {
                         format!("{:?} さんいらっしゃい", speaker.user.name)
                     } else {
                         format!("{:?} さんいってらっしゃい", speaker.user.name)
+                    };
+
+                    // botしかいなかったら
+                    if speaker.member_count <= 1 {
+                        return manager.remove(speaker.guild_id).await.unwrap();
                     };
 
                     speech(message, speaker.guild_id, handler_lock).await;
