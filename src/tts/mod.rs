@@ -16,10 +16,10 @@ use tokio::io::AsyncWriteExt;
 ///
 /// ```no_run
 /// let result = generate_speech_file(
-/// String::from("おはようございます"),
-/// VoiceId::Mizuki,
-/// "sample",
-/// true,
+///   String::from("おはようございます"),
+///   VoiceId::Mizuki,
+///   "sample",
+///   true,
 /// )
 /// .await;
 /// Path::new(result.unwrap()).exists(); // true or false
@@ -53,7 +53,7 @@ pub async fn generate_speech_file<P: AsRef<OsStr>>(
     // 声質の変更と最大再生秒数の設定
     // https://docs.aws.amazon.com/ja_jp/polly/latest/dg/supportedtags.html
     ssml_text.push_str("<speak><prosody pitch=\"+200%\"><amazon:effect phonation=\"soft\"><amazon:effect vocal-tract-length=\"-15%\"><prosody amazon:max-duration=\"30s\">");
-    ssml_text.push_str(&content);
+    ssml_text.push_str(&html_escape::encode_text(&content));
     ssml_text.push_str("</prosody></amazon:effect></amazon:effect></prosody></speak>");
 
     let resp = client
