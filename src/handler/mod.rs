@@ -189,6 +189,7 @@ mod tests {
         }"#;
         let re = Regex::new(r"\[CONTENT\]").unwrap();
         let result = re.replace(message_json, content).to_string();
-        serde_json::from_str(&result[..]).unwrap()
+        let m: Message = serde_json::from_str(&result[..]).unwrap();
+        m
     }
 }
