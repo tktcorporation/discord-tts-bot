@@ -10,7 +10,6 @@ use serenity::{
     },
 };
 mod model;
-pub mod services;
 use model::speaker::CurrentVoiceState;
 use model::voice::Voice;
 
