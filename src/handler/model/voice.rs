@@ -36,9 +36,14 @@ impl Voice {
         match self.handler().await {
             Ok(handler) => {
                 let file_path = _speech_file_path(&self.guild_id).await;
-                let speech_file = generate_speech_file(text, VoiceId::Mizuki, file_path, false)
-                    .await
-                    .unwrap();
+                let speech_file = generate_speech_file(
+                    remove_mention_string(&text),
+                    VoiceId::Mizuki,
+                    file_path,
+                    false,
+                )
+                .await
+                .unwrap();
                 let input = get_input_from_local(speech_file).await;
                 play_input(&handler, input).await;
             }
@@ -104,6 +109,12 @@ async fn get_channel_id_and_guild_id(
     } else {
         Err("connection not found")
     }
+}
+
+fn remove_mention_string(content: &str) -> String {
+    use regex::Regex;
+    let re = Regex::new(r"<@![0-9]+>").unwrap();
+    re.replace_all(content, "").to_string()
 }
 
 async fn play_input(
