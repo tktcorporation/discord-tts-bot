@@ -9,10 +9,10 @@ use serenity::{
         voice,
     },
 };
-pub mod services;
-use services::{get_handler_when_in_voice_channel, speech};
 mod model;
-use model::CurrentVoiceState;
+pub mod services;
+use model::speaker::CurrentVoiceState;
+use model::voice::Voice;
 
 pub struct Handler;
 
@@ -28,17 +28,12 @@ impl EventHandler for Handler {
     }
 
     async fn message(&self, ctx: Context, msg: Message) {
-        let guild_id = msg.guild(&ctx.cache).await.unwrap().id;
-        let handler_lock = get_handler_when_in_voice_channel(&ctx, guild_id).await;
         if is_ignore_msg(&msg) {
             return;
         };
 
-        // voice channel にいない場合は動かさない
-        if handler_lock.is_none() {
-            return;
-        };
-
+        let guild_id = msg.guild(&ctx.cache).await.unwrap().id;
+        let voice = Voice::from(&ctx, guild_id).await;
         let is_debug = false;
         if is_debug {
             debug_print(&msg, &ctx).await;
@@ -51,7 +46,7 @@ impl EventHandler for Handler {
             msg.content.clone()
         };
 
-        speech(text_for_speech, guild_id, handler_lock.unwrap()).await;
+        voice.speech(text_for_speech).await;
     }
 
     async fn voice_state_update(
@@ -62,25 +57,28 @@ impl EventHandler for Handler {
         new_voice_state: voice::VoiceState,
     ) {
         let state = CurrentVoiceState::new(new_voice_state);
-        let manager = songbird::get(&ctx)
-            .await
-            .expect("Songbird Voice client placed in at initialisation.");
         match state.new_speaker(&ctx, old_voice_state).await {
             Ok(speaker) => {
-                if let Some(handler_lock) = manager.get(speaker.guild_id) {
-                    let message = if speaker.is_new {
-                        format!("{:?} さんいらっしゃい", speaker.user.name)
-                    } else {
-                        format!("{:?} さんいってらっしゃい", speaker.user.name)
-                    };
-
-                    // botしかいなかったら
-                    if speaker.member_count <= 1 {
-                        return manager.remove(speaker.guild_id).await.unwrap();
-                    };
-
-                    speech(message, speaker.guild_id, handler_lock).await;
+                let voice = Voice::from(&ctx, speaker.guild_id).await;
+                let message = if speaker.is_new {
+                    format!("{:?} さんいらっしゃい", speaker.user.name)
+                } else {
+                    format!("{:?} さんいってらっしゃい", speaker.user.name)
                 };
+
+                // botしかいなかったら
+                match voice.members(&ctx).await {
+                    Ok(members) => {
+                        if members.len() <= 1 {
+                            voice.leave().await.unwrap();
+                        } else {
+                            voice.speech(message).await;
+                        }
+                    }
+                    Err(str) => {
+                        println!("[DEBUG] {:?}", str)
+                    }
+                }
             }
             Err(str) => {
                 println!("[DEBUG] {:?}", str)
