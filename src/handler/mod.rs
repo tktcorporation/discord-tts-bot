@@ -67,10 +67,15 @@ impl EventHandler for Handler {
                 };
 
                 // botしかいなかったら
-                if voice.members(&ctx).await.unwrap().len() <= 1 {
-                    voice.leave().await.unwrap();
-                } else {
-                    voice.speech(message).await;
+                match voice.members(&ctx).await {
+                    Ok(members) => {
+                        if members.len() <= 1 {
+                            voice.leave().await.unwrap();
+                        } else {
+                            voice.speech(message).await;
+                        }
+                    },
+                    Err(str) => {println!("[DEBUG] {:?}", str)},
                 }
             }
             Err(str) => {

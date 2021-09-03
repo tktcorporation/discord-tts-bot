@@ -23,56 +23,65 @@ impl Voice {
         Voice { manager, guild_id }
     }
 
-    async fn handler(&self) -> std::sync::Arc<serenity::prelude::Mutex<songbird::Call>> {
-        self.manager
-            .get(self.guild_id)
-            .expect("not in voice channel")
+    async fn handler(&self) -> Result<std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>, &str> {
+        match self.manager.get(self.guild_id) {
+            Some(handler) => Ok(handler),
+            None => Err("not in voice channel"),
+        }
     }
 
-    pub async fn speech(self, text: String) {
-        use rand::Rng;
-
-        let root = env!("CARGO_MANIFEST_DIR");
-        let path = Path::new(root);
-        // 同じファイル名だと複数サーバーで利用した場合に競合しそうなので、ユニークなファイル名を割り当てる
-        // guild_id でフォルダ分け
-        let handler = self.handler().await;
-        let id = get_channel_id_and_guild_id(&handler)
-            .await
-            .unwrap()
-            .0
-            .to_string();
-        let digest = Tiger::digest(id.as_bytes());
-        let guild_id_digest_str = format!("{:X}", digest);
-        std::fs::create_dir_all(path.join("sounds").join(guild_id_digest_str.clone()))
-            .expect("fail to create a dir of guild path");
-        // guild ごとに最大5ファイル持つ
-        let rand_num: i32 = rand::thread_rng().gen_range(0..10);
-        let file_path = path
-            .join("sounds")
-            .join(guild_id_digest_str)
-            .join(rand_num.to_string());
-        let speech_file = generate_speech_file(text, VoiceId::Mizuki, file_path, false)
-            .await
-            .unwrap();
-        let input = get_input_from_local(speech_file).await;
-        play_input(&handler, input).await;
+    pub async fn speech(&self, text: String) {
+        match self.handler().await {
+            Ok(handler) => {
+                let file_path = _speech_file_path(&self.guild_id).await;
+                let speech_file = generate_speech_file(text, VoiceId::Mizuki, file_path, false)
+                    .await
+                    .unwrap();
+                let input = get_input_from_local(speech_file).await;
+                play_input(&handler, input).await;
+            },
+            Err(str) => println!("{}", str),
+        }
     }
 
     pub async fn members(
         &self,
         ctx: &Context,
     ) -> std::result::Result<std::vec::Vec<serenity::model::guild::Member>, String> {
-        // TODO: connection がなかったときのエラーを作ってハンドリング
-        let ids = get_channel_id_and_guild_id(&self.handler().await)
-            .await
-            .unwrap();
-        _members(ctx, &ids.0, &ids.1.unwrap()).await
+        // TODO: nestが深いのを直したい
+        match self.handler().await {
+            Ok(handler) => {
+                match get_channel_id_and_guild_id(&handler).await {
+                    Ok(ids) => {
+                        _members(ctx, &ids.0, &ids.1.unwrap()).await
+                    },
+                    Err(str) => Err(str.to_string()),
+                }
+            },
+            Err(str) => Err(str.to_string()),
+        }
     }
 
     pub async fn leave(self) -> std::result::Result<(), songbird::error::JoinError> {
         self.manager.leave(self.guild_id).await
     }
+}
+
+async fn _speech_file_path(guild_id: &id::GuildId) -> std::path::PathBuf {
+    use rand::Rng;
+
+    let root = env!("CARGO_MANIFEST_DIR");
+    let path = Path::new(root);
+    let digest = Tiger::digest(guild_id.to_string().as_bytes());
+    let guild_id_digest_str = format!("{:X}", digest);
+    std::fs::create_dir_all(path.join("sounds").join(guild_id_digest_str.clone()))
+        .expect("fail to create a dir of guild path");
+    // guild ごとに最大5ファイル持つ
+    let rand_num: i32 = rand::thread_rng().gen_range(0..4);
+    path
+        .join("sounds")
+        .join(guild_id_digest_str)
+        .join(rand_num.to_string())
 }
 
 async fn _members(
@@ -105,9 +114,6 @@ async fn play_input(
     input: Input,
 ) {
     let mut handler = handler_lock.lock().await;
-    // if let Some(handler_lock) = manager.get(guild_id) {
-    //     let mut handler = handler_lock.lock().await;
-
     handler.enqueue_source(input);
 }
 
