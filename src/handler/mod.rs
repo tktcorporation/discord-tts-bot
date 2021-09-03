@@ -9,10 +9,10 @@ use serenity::{
         voice,
     },
 };
-pub mod services;
-use services::{get_handler_when_in_voice_channel, members, speech};
 mod model;
-use model::CurrentVoiceState;
+pub mod services;
+use model::speaker::CurrentVoiceState;
+use model::voice::Voice;
 
 pub struct Handler;
 
@@ -28,17 +28,12 @@ impl EventHandler for Handler {
     }
 
     async fn message(&self, ctx: Context, msg: Message) {
-        let guild_id = msg.guild(&ctx.cache).await.unwrap().id;
-        let handler_lock = get_handler_when_in_voice_channel(&ctx, guild_id).await;
         if is_ignore_msg(&msg) {
             return;
         };
 
-        // voice channel にいない場合は動かさない
-        if handler_lock.is_none() {
-            return;
-        };
-
+        let guild_id = msg.guild(&ctx.cache).await.unwrap().id;
+        let voice = Voice::from(&ctx, guild_id).await;
         let is_debug = false;
         if is_debug {
             debug_print(&msg, &ctx).await;
@@ -51,7 +46,7 @@ impl EventHandler for Handler {
             msg.content.clone()
         };
 
-        speech(text_for_speech, guild_id, handler_lock.unwrap()).await;
+        voice.speech(text_for_speech).await;
     }
 
     async fn voice_state_update(
@@ -62,46 +57,27 @@ impl EventHandler for Handler {
         new_voice_state: voice::VoiceState,
     ) {
         let state = CurrentVoiceState::new(new_voice_state);
-        let manager = songbird::get(&ctx)
-            .await
-            .expect("Songbird Voice client placed in at initialisation.");
         match state.new_speaker(&ctx, old_voice_state).await {
             Ok(speaker) => {
-                if let Some(handler) = manager.get(speaker.guild_id) {
-                    let message = if speaker.is_new {
-                        format!("{:?} さんいらっしゃい", speaker.user.name)
-                    } else {
-                        format!("{:?} さんいってらっしゃい", speaker.user.name)
-                    };
-
-                    println!("{}", "767777777777");
-                    let ids = get_channel_id_and_guild_id(&handler).await;
-                    // botしかいなかったら
-                    if members(&ctx, &ids.0, &ids.1)
-                        .await
-                        .unwrap()
-                        .len()
-                        <= 1
-                    {
-                        manager.leave(ids.0).await.unwrap();
-                        return;
-                    };
-
-                    println!("{}", "c");
-                    speech(message, speaker.guild_id, handler).await;
+                let voice = Voice::from(&ctx, speaker.guild_id).await;
+                let message = if speaker.is_new {
+                    format!("{:?} さんいらっしゃい", speaker.user.name)
+                } else {
+                    format!("{:?} さんいってらっしゃい", speaker.user.name)
                 };
+
+                // botしかいなかったら
+                if voice.members(&ctx).await.unwrap().len() <= 1 {
+                    voice.leave().await.unwrap();
+                } else {
+                    voice.speech(message).await;
+                }
             }
             Err(str) => {
                 println!("[DEBUG] {:?}", str)
             }
         }
     }
-}
-
-async fn get_channel_id_and_guild_id(handler: &std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>) -> (songbird::id::GuildId, songbird::id::ChannelId,) {
-    let handler_lock = handler.lock().await;
-    let connection = handler_lock.current_connection().unwrap();
-    (connection.guild_id.clone(), connection.channel_id.unwrap())
 }
 
 fn is_ignore_msg(msg: &Message) -> bool {
