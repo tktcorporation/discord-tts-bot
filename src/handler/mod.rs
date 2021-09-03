@@ -74,8 +74,10 @@ impl EventHandler for Handler {
                         } else {
                             voice.speech(message).await;
                         }
-                    },
-                    Err(str) => {println!("[DEBUG] {:?}", str)},
+                    }
+                    Err(str) => {
+                        println!("[DEBUG] {:?}", str)
+                    }
                 }
             }
             Err(str) => {

@@ -23,7 +23,9 @@ impl Voice {
         Voice { manager, guild_id }
     }
 
-    async fn handler(&self) -> Result<std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>, &str> {
+    async fn handler(
+        &self,
+    ) -> Result<std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>, &str> {
         match self.manager.get(self.guild_id) {
             Some(handler) => Ok(handler),
             None => Err("not in voice channel"),
@@ -39,7 +41,7 @@ impl Voice {
                     .unwrap();
                 let input = get_input_from_local(speech_file).await;
                 play_input(&handler, input).await;
-            },
+            }
             Err(str) => println!("{}", str),
         }
     }
@@ -50,13 +52,9 @@ impl Voice {
     ) -> std::result::Result<std::vec::Vec<serenity::model::guild::Member>, String> {
         // TODO: nestが深いのを直したい
         match self.handler().await {
-            Ok(handler) => {
-                match get_channel_id_and_guild_id(&handler).await {
-                    Ok(ids) => {
-                        _members(ctx, &ids.0, &ids.1.unwrap()).await
-                    },
-                    Err(str) => Err(str.to_string()),
-                }
+            Ok(handler) => match get_channel_id_and_guild_id(&handler).await {
+                Ok(ids) => _members(ctx, &ids.0, &ids.1.unwrap()).await,
+                Err(str) => Err(str.to_string()),
             },
             Err(str) => Err(str.to_string()),
         }
@@ -78,8 +76,7 @@ async fn _speech_file_path(guild_id: &id::GuildId) -> std::path::PathBuf {
         .expect("fail to create a dir of guild path");
     // guild ごとに最大5ファイル持つ
     let rand_num: i32 = rand::thread_rng().gen_range(0..4);
-    path
-        .join("sounds")
+    path.join("sounds")
         .join(guild_id_digest_str)
         .join(rand_num.to_string())
 }
