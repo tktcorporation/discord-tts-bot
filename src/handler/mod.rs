@@ -1,31 +1,26 @@
-use std::env;
-
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
-    model::{
-        channel::Message,
-        gateway::{Activity, Ready},
-        voice,
-    },
+    model::{channel::Message, gateway::Ready, voice},
 };
+
 mod model;
+use model::context::Context as Ctx;
 use model::speaker::CurrentVoiceState;
 use model::voice::Voice;
 mod message;
 use message::is_ignore_msg;
+mod usecase;
 
 pub struct Handler;
 
 #[async_trait]
+#[cfg_attr(feature = "mock", mockall::automock)]
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
-        ctx.set_activity(Activity::playing(
-            env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment")
-                + "join で呼んでね",
-        ))
-        .await;
+        let cont = Ctx::new(ctx);
+        usecase::set_help_message_to_activity(Box::new(cont)).await
     }
 
     async fn message(&self, ctx: Context, msg: Message) {
