@@ -62,14 +62,10 @@ impl Speaker for Voice {
         match self.handler().await {
             Ok(handler) => {
                 let file_path = _speech_file_path(&self.guild_id).await;
-                let speech_file = generate_speech_file(
-                    msg.value,
-                    VoiceId::Mizuki,
-                    file_path,
-                    false,
-                )
-                .await
-                .unwrap();
+                let speech_file =
+                    generate_speech_file(msg.value, VoiceId::Mizuki, file_path, false)
+                        .await
+                        .unwrap();
                 let input = get_input_from_local(speech_file).await;
                 play_input(&handler, input).await;
             }

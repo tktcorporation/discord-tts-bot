@@ -37,7 +37,9 @@ impl Message {
             self.msg.content.clone()
         };
         let mension_removed_str = remove_mention_string(&str[..]);
-        SpeechMessage { value: mension_removed_str }
+        SpeechMessage {
+            value: mension_removed_str,
+        }
     }
 }
 
