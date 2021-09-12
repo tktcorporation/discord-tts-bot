@@ -1,6 +1,7 @@
+mod path;
+mod tts;
 use super::super::usecase::text_to_speech::Speaker;
 use super::text_to_speech_message::SpeechMessage;
-use crate::tts::generate_speech_file;
 use polly::model::VoiceId;
 use serenity::{async_trait, client::Context, model::id};
 use songbird::ffmpeg;
@@ -9,6 +10,7 @@ use std::ffi::OsStr;
 use std::path::Path;
 use tiger::digest::Digest;
 use tiger::Tiger;
+use tts::generate_speech_file;
 
 use songbird::{self, Songbird};
 
@@ -61,7 +63,7 @@ impl Speaker for Voice {
             Ok(handler) => {
                 let file_path = _speech_file_path(&self.guild_id).await;
                 let speech_file = generate_speech_file(
-                    remove_mention_string(&msg.value),
+                    msg.value,
                     VoiceId::Mizuki,
                     file_path,
                     false,
@@ -117,12 +119,6 @@ async fn get_channel_id_and_guild_id(
     }
 }
 
-fn remove_mention_string(content: &str) -> String {
-    use regex::Regex;
-    let re = Regex::new(r"<@![0-9]+>").unwrap();
-    re.replace_all(content, "").to_string()
-}
-
 async fn play_input(
     handler_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>,
     input: Input,
@@ -141,16 +137,6 @@ async fn get_input_from_local<P: AsRef<OsStr>>(file_path: P) -> Input {
 mod tests {
     use super::*;
 
-    #[test]
-    fn path_exists() {
-        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
-        println!("{}", root);
-        let path = Path::new(root);
-        let file_path = path.join("sounds").join("2_23_AM_2.mp3");
-        println!("{}", file_path.display());
-        assert_eq!(true, file_path.exists());
-    }
-
     #[tokio::test]
     async fn create_tts_file() {
         let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
@@ -165,16 +151,5 @@ mod tests {
         .await
         .unwrap();
         get_input_from_local(speech_file).await;
-    }
-
-    #[test]
-    fn digest_str() {
-        let id = "99999999999999999999999999";
-        let digest = Tiger::digest(id.as_bytes());
-        let digest_str = format!("{:X}", digest);
-        assert_eq!(
-            digest_str,
-            "7EABF4E47410D6A9FCF10B802CE754E5357120F7081B840B"
-        );
     }
 }

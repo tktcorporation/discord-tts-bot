@@ -36,13 +36,32 @@ impl Message {
         } else {
             self.msg.content.clone()
         };
-        SpeechMessage { value: str }
+        let mension_removed_str = remove_mention_string(&str[..]);
+        SpeechMessage { value: mension_removed_str }
     }
+}
+
+fn remove_mention_string(content: &str) -> String {
+    use regex::Regex;
+    let re = Regex::new(r"<@![0-9]+>").unwrap();
+    re.replace_all(content, "").to_string()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(test)]
+    mod remove_mention_string_test {
+        use super::*;
+
+        #[test]
+        fn test_remove_mention_string() {
+            let str = "aaa<@!8379454856049>eeee";
+            let result = remove_mention_string(str);
+            assert_eq!("aaaeeee", result);
+        }
+    }
 
     #[cfg(test)]
     mod to_speech_text_tests {
