@@ -1,16 +1,20 @@
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
-    model::{channel::Message, gateway::Ready, voice},
+    model::{channel::Message as SerenityMessage, gateway::Ready, voice},
 };
 
 mod model;
-use model::context::Context as Ctx;
-use model::speaker::CurrentVoiceState;
-use model::voice::Voice;
-mod message;
-use message::is_ignore_msg;
+use model::{
+    context::Context as Ctx,
+    speaker::CurrentVoiceState,
+    text_to_speech_message::{Message, SpeechMessage},
+    voice::Voice,
+};
 mod usecase;
+use usecase::{
+    set_help_message_to_activity::set_help_message_to_activity, text_to_speech::text_to_speech,
+};
 
 pub struct Handler;
 
@@ -20,29 +24,14 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
         let cont = Ctx::new(ctx);
-        usecase::set_help_message_to_activity(Box::new(cont)).await
+        set_help_message_to_activity(Box::new(cont)).await
     }
 
-    async fn message(&self, ctx: Context, msg: Message) {
-        if is_ignore_msg(&msg) {
-            return;
-        };
-
+    async fn message(&self, ctx: Context, msg: SerenityMessage) {
         let guild_id = msg.guild(&ctx.cache).await.unwrap().id;
         let voice = Voice::from(&ctx, guild_id).await;
-        let is_debug = false;
-        if is_debug {
-            debug_print(&msg, &ctx).await;
-        };
-
-        // url に反応しないようにする
-        let text_for_speech = if msg.content.contains("http") {
-            "url".to_string()
-        } else {
-            msg.content.clone()
-        };
-
-        voice.speech(text_for_speech).await;
+        let tts_msg = Message::new(msg);
+        text_to_speech(voice, tts_msg).await
     }
 
     async fn voice_state_update(
@@ -68,7 +57,7 @@ impl EventHandler for Handler {
                         if members.len() <= 1 {
                             voice.leave().await.unwrap();
                         } else {
-                            voice.speech(message).await;
+                            voice.speech(SpeechMessage { value: message }).await;
                         }
                     }
                     Err(str) => {
@@ -83,13 +72,13 @@ impl EventHandler for Handler {
     }
 }
 
-async fn debug_print(msg: &Message, ctx: &Context) {
-    // サーバーのID
-    eprintln!("guild_id = {:?}", msg.guild_id);
-    // チャンネル名
-    let channel_name = msg.channel_id.name(&ctx.cache).await;
-    eprintln!("channel_name = {:?}", channel_name);
-    // メッセージの送信
-    let content = msg.content.clone();
-    eprintln!("message received: {:?}", content);
-}
+// async fn debug_print(msg: &SerenityMessage, ctx: &Context) {
+//     // サーバーのID
+//     eprintln!("guild_id = {:?}", msg.guild_id);
+//     // チャンネル名
+//     let channel_name = msg.channel_id.name(&ctx.cache).await;
+//     eprintln!("channel_name = {:?}", channel_name);
+//     // メッセージの送信
+//     let content = msg.content.clone();
+//     eprintln!("message received: {:?}", content);
+// }

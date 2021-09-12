@@ -1,3 +1,4 @@
+use super::text_to_speech_message::SpeechMessage;
 use crate::tts::generate_speech_file;
 use polly::model::VoiceId;
 use serenity::{client::Context, model::id};
@@ -32,12 +33,12 @@ impl Voice {
         }
     }
 
-    pub async fn speech(&self, text: String) {
+    pub async fn speech(&self, msg: SpeechMessage) {
         match self.handler().await {
             Ok(handler) => {
                 let file_path = _speech_file_path(&self.guild_id).await;
                 let speech_file = generate_speech_file(
-                    remove_mention_string(&text),
+                    remove_mention_string(&msg.value),
                     VoiceId::Mizuki,
                     file_path,
                     false,

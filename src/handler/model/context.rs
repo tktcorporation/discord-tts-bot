@@ -1,6 +1,6 @@
 use serenity::{async_trait, client::Context as SerenityContext, model::gateway::Activity};
 
-use super::super::usecase::ActivityController;
+use super::super::usecase::set_help_message_to_activity::ActivityController;
 
 pub struct Context {
     ctx: SerenityContext,
