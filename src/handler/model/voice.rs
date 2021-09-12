@@ -1,7 +1,8 @@
+use super::super::usecase::text_to_speech::Speaker;
 use super::text_to_speech_message::SpeechMessage;
 use crate::tts::generate_speech_file;
 use polly::model::VoiceId;
-use serenity::{client::Context, model::id};
+use serenity::{async_trait, client::Context, model::id};
 use songbird::ffmpeg;
 use songbird::input::Input;
 use std::ffi::OsStr;
@@ -33,25 +34,6 @@ impl Voice {
         }
     }
 
-    pub async fn speech(&self, msg: SpeechMessage) {
-        match self.handler().await {
-            Ok(handler) => {
-                let file_path = _speech_file_path(&self.guild_id).await;
-                let speech_file = generate_speech_file(
-                    remove_mention_string(&msg.value),
-                    VoiceId::Mizuki,
-                    file_path,
-                    false,
-                )
-                .await
-                .unwrap();
-                let input = get_input_from_local(speech_file).await;
-                play_input(&handler, input).await;
-            }
-            Err(str) => println!("{}", str),
-        }
-    }
-
     pub async fn members(
         &self,
         ctx: &Context,
@@ -68,6 +50,29 @@ impl Voice {
 
     pub async fn leave(self) -> std::result::Result<(), songbird::error::JoinError> {
         self.manager.leave(self.guild_id).await
+    }
+}
+
+#[async_trait]
+#[cfg_attr(feature = "mock", mockall::automock)]
+impl Speaker for Voice {
+    async fn speech(&self, msg: SpeechMessage) {
+        match self.handler().await {
+            Ok(handler) => {
+                let file_path = _speech_file_path(&self.guild_id).await;
+                let speech_file = generate_speech_file(
+                    remove_mention_string(&msg.value),
+                    VoiceId::Mizuki,
+                    file_path,
+                    false,
+                )
+                .await
+                .unwrap();
+                let input = get_input_from_local(speech_file).await;
+                play_input(&handler, input).await;
+            }
+            Err(str) => println!("{}", str),
+        }
     }
 }
 

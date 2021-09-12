@@ -13,7 +13,8 @@ use model::{
 };
 mod usecase;
 use usecase::{
-    set_help_message_to_activity::set_help_message_to_activity, text_to_speech::text_to_speech,
+    set_help_message_to_activity::set_help_message_to_activity,
+    text_to_speech::{text_to_speech, Speaker},
 };
 
 pub struct Handler;
@@ -31,7 +32,7 @@ impl EventHandler for Handler {
         let guild_id = msg.guild(&ctx.cache).await.unwrap().id;
         let voice = Voice::from(&ctx, guild_id).await;
         let tts_msg = Message::new(msg);
-        text_to_speech(voice, tts_msg).await
+        text_to_speech(Box::new(voice), tts_msg).await
     }
 
     async fn voice_state_update(
