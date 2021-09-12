@@ -39,3 +39,115 @@ impl Message {
         SpeechMessage { value: str }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[cfg(test)]
+    mod to_speech_text_tests {
+        use super::*;
+
+        #[test]
+        fn test_to_speech_text() {
+            let message = message_factory("https://example.com");
+            assert_eq!("url", &message.to_speech_text().value);
+        }
+
+        #[test]
+        fn test_to_speech_text_not_ssl() {
+            let message = message_factory("http://example.com");
+            assert_eq!("url", &message.to_speech_text().value);
+        }
+
+        #[test]
+        fn test_to_speech_text_mix() {
+            let message = message_factory("おはようhttps://example.comこんにちは");
+            assert_eq!("url", &message.to_speech_text().value);
+        }
+    }
+
+    #[cfg(test)]
+    mod is_ignore_tests {
+        use super::*;
+
+        #[test]
+        fn test_is_ignore_msg() {
+            let message = message_factory("a");
+            assert_eq!(false, message.is_ignore());
+        }
+
+        #[test]
+        fn test_is_ignore_msg_and() {
+            let message = message_factory("hogehoege&sa");
+            assert_eq!(false, message.is_ignore());
+        }
+
+        #[test]
+        fn test_is_ignore_msg_cmd_pref() {
+            let content = &(env::var("DISCORD_CMD_PREFIX").unwrap() + "hogehoge")[..];
+            let message = message_factory(content);
+            assert_eq!(true, message.is_ignore());
+        }
+    }
+
+    use regex::Regex;
+
+    #[test]
+    fn test_factory() {
+        let m = message_factory("message");
+        assert_eq!("message", m.msg.content);
+    }
+
+    fn message_factory(content: &str) -> Message {
+        let message_json = r#"{
+        "id":881482961801842698,
+        "attachments":[],
+        "author": {
+            "id":502486808211357707,
+            "avatar":"bfdafa09852e451e32f7ac1919bab46f",
+            "bot":false,
+            "discriminator":6539,
+            "username":"tkt",
+            "public_flags":0
+        },
+        "channel_id":713052877911752724,
+        "content":"[CONTENT]",
+        "edited_timestamp":null,
+        "embeds":[],
+        "guild_id":713052821850816604,
+        "type":0,
+        "member": {
+            "deaf":false,
+            "joined_at":"2020-05-21T15:37:20.702Z",
+            "mute":false,
+            "nick":null,
+            "roles":[],
+            "pending":false,
+            "premium_since":null,
+            "guild_id":null,
+            "user":null
+        },
+        "mention_everyone":false,
+        "mention_roles":[],
+        "mention_channels":[],
+        "mentions":[],
+        "nonce":"881482961130618880",
+        "pinned":false,
+        "reactions":[],
+        "timestamp":"2021-08-29T10:18:35.255Z",
+        "tts":false,
+        "webhook_id":null,
+        "activity":null,
+        "application":null,
+        "message_reference":null,
+        "flags":0,
+        "stickers":[],
+        "referenced_message":null
+    }"#;
+        let re = Regex::new(r"\[CONTENT\]").unwrap();
+        let result = re.replace(message_json, content).to_string();
+        let m: SerenityMessage = serde_json::from_str(&result[..]).unwrap();
+        Message::new(m)
+    }
+}
