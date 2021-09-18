@@ -26,10 +26,7 @@ async fn main() {
         })
         .group(&GENERAL_GROUP);
 
-    let mut client = Client::builder(&token)
-        .event_handler(Handler)
-        .framework(framework)
-        .register_songbird()
+    let mut client = build_client(&token, framework)
         .await
         .expect("Err creating client");
 
@@ -37,6 +34,17 @@ async fn main() {
         .start()
         .await
         .map_err(|why| println!("Client ended: {:?}", why));
+}
+
+async fn build_client(
+    token: &str,
+    framework: serenity::framework::StandardFramework,
+) -> Result<serenity::Client, serenity::Error> {
+    Client::builder(token)
+        .event_handler(Handler)
+        .framework(framework)
+        .register_songbird()
+        .await
 }
 
 #[cfg(test)]

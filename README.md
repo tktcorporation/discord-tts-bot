@@ -32,7 +32,7 @@
 #### Test
 
 ```bash
-RUST_BACKTRACE=1 cargo test
+RUST_BACKTRACE=1 cargo test --all-features
 ```
 
 #### Linter, Formatter

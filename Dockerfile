@@ -32,7 +32,7 @@ RUN rm -f target/release/deps/discord*
 
 COPY  . .
 
-RUN cargo build --release
+RUN cargo build --release --features "tts"
 
 CMD [ "/bin/sh",  "-c", "cargo run" ]
 

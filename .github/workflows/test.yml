@@ -37,5 +37,5 @@ jobs:
 
       - name: Test
         run: |
-          docker-compose run app /bin/bash -c "RUST_BACKTRACE=1 cargo test"
+          docker-compose run app /bin/bash -c "RUST_BACKTRACE=1 cargo test --all-features"
 
