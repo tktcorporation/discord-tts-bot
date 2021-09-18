@@ -1,21 +1,25 @@
+#[cfg(feature = "tts")]
+use serenity::model::{channel::Message as SerenityMessage, voice};
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
-    model::{channel::Message as SerenityMessage, gateway::Ready, voice},
+    model::gateway::Ready,
 };
 
 mod model;
+use model::context::Context as Ctx;
+
+#[cfg(feature = "tts")]
 use model::{
-    context::Context as Ctx,
     speaker::CurrentVoiceState,
     text_to_speech_message::{Message, SpeechMessage},
     voice::Voice,
 };
 mod usecase;
-use usecase::{
-    set_help_message_to_activity::set_help_message_to_activity,
-    text_to_speech::{text_to_speech, Speaker},
-};
+use usecase::set_help_message_to_activity::set_help_message_to_activity;
+
+#[cfg(feature = "tts")]
+use usecase::text_to_speech::{text_to_speech, Speaker};
 
 pub struct Handler;
 
@@ -28,6 +32,7 @@ impl EventHandler for Handler {
         set_help_message_to_activity(Box::new(cont)).await
     }
 
+    #[cfg(feature = "tts")]
     async fn message(&self, ctx: Context, msg: SerenityMessage) {
         let guild_id = msg.guild(&ctx.cache).await.unwrap().id;
         let voice = Voice::from(&ctx, guild_id).await;
@@ -35,6 +40,7 @@ impl EventHandler for Handler {
         text_to_speech(Box::new(voice), tts_msg).await
     }
 
+    #[cfg(feature = "tts")]
     async fn voice_state_update(
         &self,
         ctx: Context,

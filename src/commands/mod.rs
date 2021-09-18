@@ -23,10 +23,16 @@ use services::check_msg;
 use songbird::ffmpeg;
 use std::path::Path;
 
+#[cfg(any(feature = "tts", feature = "music"))]
 #[group]
 #[commands(
     deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute, help, bgm
 )]
+pub(crate) struct General;
+
+#[cfg(not(any(feature = "tts", feature = "music")))]
+#[group]
+#[commands(join, leave, ping)]
 pub(crate) struct General;
 
 #[command]
