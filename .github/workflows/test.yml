@@ -3,7 +3,7 @@ name: Test
 on:
   push:
     branches:
-    - master
+      - master
   pull_request:
 
 defaults:
@@ -38,4 +38,3 @@ jobs:
       - name: Test
         run: |
           docker-compose run app /bin/bash -c "RUST_BACKTRACE=1 cargo test"
-
