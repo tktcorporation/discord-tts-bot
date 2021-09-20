@@ -1,6 +1,6 @@
 mod path;
 mod tts;
-use super::super::usecase::text_to_speech::Speaker;
+use super::super::usecase::interface::Speaker;
 use super::text_to_speech_message::SpeechMessage;
 use polly::model::VoiceId;
 use serenity::{async_trait, client::Context, model::id};
@@ -18,6 +18,13 @@ pub struct Voice {
     manager: std::sync::Arc<Songbird>,
     guild_id: id::GuildId,
 }
+
+// pub struct Leaved(bool);
+// impl Into<bool> for Leaved {
+//     fn into(self) -> bool {
+//         self.0
+//     }
+// }
 
 impl Voice {
     pub async fn from(ctx: &Context, guild_id: id::GuildId) -> Voice {
@@ -50,7 +57,30 @@ impl Voice {
         }
     }
 
-    pub async fn leave(self) -> std::result::Result<(), songbird::error::JoinError> {
+    /// 
+    // pub async fn leave_if_bot_is_alone(&self, ctx: &Context) -> Result<Leaved, String> {
+    //     match self.is_alone(ctx).await {
+    //         Ok(is_alone) => {
+    //             if is_alone {
+    //                 self.leave().await.unwrap();
+    //             } else {
+    //             };
+    //             Ok(Leaved(is_alone))
+    //         }
+    //         Err(str) => Err(str),
+    //     }
+    // }
+
+    pub async fn is_alone(&self, ctx: &Context) -> Result<bool, String> {
+        match self.members(ctx).await {
+            Ok(members) => {
+                Ok(members.len() <= 1)
+            }
+            Err(str) => Err(str),
+        }
+    }
+
+    pub async fn leave(&self) -> std::result::Result<(), songbird::error::JoinError> {
         self.manager.leave(self.guild_id).await
     }
 }

@@ -1,11 +1,5 @@
-use super::super::model::text_to_speech_message::{Message, SpeechMessage};
-use serenity::async_trait;
-
-#[cfg_attr(test, mockall::automock)]
-#[async_trait]
-pub trait Speaker {
-    async fn speech(&self, msg: SpeechMessage);
-}
+use super::super::model::text_to_speech_message::Message;
+use super::interface::Speaker;
 
 pub async fn text_to_speech(speaker: Box<dyn Speaker + Sync + Send>, msg: Message) {
     if msg.is_ignore() {
@@ -16,6 +10,8 @@ pub async fn text_to_speech(speaker: Box<dyn Speaker + Sync + Send>, msg: Messag
 
 #[cfg(test)]
 mod tests {
+    #[cfg(test)]
+    use super::super::interface::MockSpeaker;
     use super::*;
     use regex::Regex;
     use serenity::model::channel::Message as SerenityMessage;
