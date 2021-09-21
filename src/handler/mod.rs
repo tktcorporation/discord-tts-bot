@@ -15,7 +15,7 @@ mod usecase;
 use usecase::set_help_message_to_activity::set_help_message_to_activity;
 
 #[cfg(feature = "tts")]
-use usecase::{speech_welcome_see_you::speech_welcome_see_you, text_to_speech::text_to_speech};
+use usecase::{speech_welcome_see_you::change_check, text_to_speech::text_to_speech};
 
 pub struct Handler;
 
@@ -45,7 +45,7 @@ impl EventHandler for Handler {
         new_voice_state: voice::VoiceState,
     ) {
         let state = CurrentVoiceState::new(new_voice_state);
-        speech_welcome_see_you(&ctx, state, old_voice_state).await;
+        change_check(&ctx, state, old_voice_state).await;
     }
 }
 

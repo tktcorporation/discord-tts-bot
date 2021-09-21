@@ -1,7 +1,7 @@
 use super::interface::Speaker;
 
 use super::super::model::{
-    speaker::{self, CurrentVoiceState, VoiceMember},
+    speaker::{self, ChangeOfStates, CurrentVoiceState},
     text_to_speech_message::SpeechMessage,
     voice::Voice,
 };
@@ -15,52 +15,24 @@ pub async fn change_check(
     state: CurrentVoiceState,
     old_voice_state: Option<voice::VoiceState>,
 ) {
-    match state.role(ctx).await {
-        speaker::Role::Bot => return println!("This is me(bot). My entering is ignored."),
-        _ => {},
+    let message_prefix = match state.change_of_states(old_voice_state) {
+        ChangeOfStates::Stay => None,
+        ChangeOfStates::Leave => Some("いってらっしゃい"),
+        ChangeOfStates::Join => Some("いらっしゃい"),
     };
-    match state.change_of_states(old_voice_state) {
-        Join => {},
-        Leave => {},
-        Stay =>{},
+    let member = state.voice_member().await.expect("member is not received");
+    let voice = Voice::from(ctx, member.guild_id).await;
+    if voice.is_alone(&ctx).await.unwrap() {
+        return voice.leave().await.unwrap();
     }
-}
-
-pub async fn speech_welcome_see_you(
-    ctx: &Context,
-    state: CurrentVoiceState,
-    old_voice_state: Option<voice::VoiceState>,
-) {
-    match state.voice_member(ctx, old_voice_state).await {
-        Ok(voice_member) => {
-            let voice = Voice::from(ctx, voice_member.guild_id).await;
-
-            // botしかいなかったら
-            match voice.is_alone(ctx).await {
-                Ok(is_alone) => {
-                    if is_alone {
-                        voice.leave().await.unwrap();
-                    } else {
-                        voice.speech(welcome_or_see_you_messsage(&voice_member)).await;
-                    }
-                }
-                Err(str) => {
-                    println!("[DEBUG] {:?}", str)
-                }
-            }
-        }
-        Err(str) => {
-            println!("[DEBUG] {:?}", str)
-        }
+    if let speaker::Role::Bot = member.role(ctx).await {
+        return println!("This is me(bot). My entering is ignored.");
     }
-}
-
-fn welcome_or_see_you_messsage(voice_member: &VoiceMember) -> SpeechMessage {
-    SpeechMessage {
-        value: if voice_member.is_new {
-            format!("{:?} さんいらっしゃい", voice_member.user.name)
-        } else {
-            format!("{:?} さんいってらっしゃい", voice_member.user.name)
-        },
+    if let Some(message_prefix) = message_prefix {
+        voice
+            .speech(SpeechMessage {
+                value: format!("{:?} {:?}", message_prefix, member.user.name),
+            })
+            .await
     }
 }

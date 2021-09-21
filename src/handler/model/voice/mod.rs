@@ -57,25 +57,9 @@ impl Voice {
         }
     }
 
-    /// 
-    // pub async fn leave_if_bot_is_alone(&self, ctx: &Context) -> Result<Leaved, String> {
-    //     match self.is_alone(ctx).await {
-    //         Ok(is_alone) => {
-    //             if is_alone {
-    //                 self.leave().await.unwrap();
-    //             } else {
-    //             };
-    //             Ok(Leaved(is_alone))
-    //         }
-    //         Err(str) => Err(str),
-    //     }
-    // }
-
     pub async fn is_alone(&self, ctx: &Context) -> Result<bool, String> {
         match self.members(ctx).await {
-            Ok(members) => {
-                Ok(members.len() <= 1)
-            }
+            Ok(members) => Ok(members.len() <= 1),
             Err(str) => Err(str),
         }
     }
