@@ -10,16 +10,12 @@ mod model;
 use model::context::Context as Ctx;
 
 #[cfg(feature = "tts")]
-use model::{
-    speaker::CurrentVoiceState,
-    text_to_speech_message::{Message, SpeechMessage},
-    voice::Voice,
-};
+use model::{speaker::CurrentVoiceState, text_to_speech_message::Message, voice::Voice};
 mod usecase;
 use usecase::set_help_message_to_activity::set_help_message_to_activity;
 
 #[cfg(feature = "tts")]
-use usecase::text_to_speech::{text_to_speech, Speaker};
+use usecase::{speech_welcome_see_you::change_check, text_to_speech::text_to_speech};
 
 pub struct Handler;
 
@@ -49,33 +45,7 @@ impl EventHandler for Handler {
         new_voice_state: voice::VoiceState,
     ) {
         let state = CurrentVoiceState::new(new_voice_state);
-        match state.new_speaker(&ctx, old_voice_state).await {
-            Ok(speaker) => {
-                let voice = Voice::from(&ctx, speaker.guild_id).await;
-                let message = if speaker.is_new {
-                    format!("{:?} さんいらっしゃい", speaker.user.name)
-                } else {
-                    format!("{:?} さんいってらっしゃい", speaker.user.name)
-                };
-
-                // botしかいなかったら
-                match voice.members(&ctx).await {
-                    Ok(members) => {
-                        if members.len() <= 1 {
-                            voice.leave().await.unwrap();
-                        } else {
-                            voice.speech(SpeechMessage { value: message }).await;
-                        }
-                    }
-                    Err(str) => {
-                        println!("[DEBUG] {:?}", str)
-                    }
-                }
-            }
-            Err(str) => {
-                println!("[DEBUG] {:?}", str)
-            }
-        }
+        change_check(&ctx, state, old_voice_state).await;
     }
 }
 
