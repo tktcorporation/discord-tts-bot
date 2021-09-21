@@ -18,7 +18,7 @@ pub async fn change_check(
     let change = state.change_of_states(old_voice_state);
     let member = state.voice_member().await.expect("member is not received");
     let voice = Voice::from(ctx, member.guild_id).await;
-    if voice.is_alone(&ctx).await.unwrap() {
+    if voice.is_alone(ctx).await.unwrap() {
         return voice.leave().await.unwrap();
     }
     if let speaker::Role::Bot = member.role(ctx).await {
