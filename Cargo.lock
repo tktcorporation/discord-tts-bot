@@ -458,7 +458,6 @@ version = "0.5.2"
 dependencies = [
  "aws-sdk-polly",
  "aws-types",
- "cfg-if 1.0.0",
  "html-escape",
  "hyper",
  "mockall",

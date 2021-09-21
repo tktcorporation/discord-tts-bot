@@ -24,7 +24,6 @@ regex = "^1.5"
 html-escape = "^0.2"
 mockall = "^0.10.2"
 mockall_double = "0.1.0"
-cfg-if = "^1.0.0"
 
 [dependencies.songbird]
 version = "0.2.0"
