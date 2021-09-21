@@ -63,8 +63,6 @@ jobs:
             python \
             git
 
-          curl https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
-
           curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/bin/youtube-dl && \
               chmod a+rx /usr/bin/youtube-dl
 
