@@ -96,7 +96,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_generate_sound() {
-        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+        let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
         let file_path = path.join("sounds").join("sample");
         let result = generate_speech_file(

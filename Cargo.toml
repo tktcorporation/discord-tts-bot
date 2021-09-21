@@ -3,6 +3,8 @@ name = "discord-speech-bot"
 version = "0.5.2"
 authors = ["tktcorporation"]
 edition = "2018"
+license-file = "LICENSE"
+readme = "README.md"
 
 [features]
 tts = []

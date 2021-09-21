@@ -109,7 +109,7 @@ mod tests {
         fn test_is_ignore_msg_cmd_pref() {
             let content = &(env::var("DISCORD_CMD_PREFIX").unwrap() + "hogehoge")[..];
             let message = message_factory(content);
-            assert_eq!(message.is_ignore());
+            assert!(message.is_ignore());
         }
     }
 
