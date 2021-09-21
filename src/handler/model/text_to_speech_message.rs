@@ -5,6 +5,7 @@ pub struct Message {
     msg: SerenityMessage,
 }
 
+#[derive(Debug,PartialEq)]
 pub struct SpeechMessage {
     pub value: String,
 }
