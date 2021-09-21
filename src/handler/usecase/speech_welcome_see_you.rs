@@ -48,7 +48,7 @@ mod tests {
     fn test_greeting_word() {
         let message = greeting_word(&ChangeOfStates::Join, "hoge").unwrap();
         let result = SpeechMessage {
-            value: "hogeさんいらっしゃい".to_string()
+            value: "hogeさんいらっしゃい".to_string(),
         };
         assert_eq!(result, message);
     }
