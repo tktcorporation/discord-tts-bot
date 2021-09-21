@@ -96,7 +96,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_generate_sound() {
-        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+        let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
         let file_path = path.join("sounds").join("sample");
         let result = generate_speech_file(
@@ -106,9 +106,9 @@ mod tests {
             true,
         )
         .await;
-        assert_eq!(result.is_ok(), true);
+        assert!(result.is_ok());
         let path = result.unwrap();
-        assert_eq!(Path::new(&path).exists(), true);
+        assert!(Path::new(&path).exists());
         let mut right = String::from(file_path.clone().to_str().unwrap());
         right.push_str(".mp3");
         assert_eq!(path, right);
