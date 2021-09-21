@@ -6,12 +6,6 @@ edition = "2018"
 license = "MIT"
 readme = "README.md"
 
-[licenses]
-allow = [
-    "Apache-2.0",
-    "MIT",
-]
-
 [features]
 tts = []
 music = []
