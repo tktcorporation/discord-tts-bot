@@ -149,7 +149,7 @@ mod tests {
 
     #[tokio::test]
     async fn create_tts_file() {
-        let root = option_env!("CARGO_MANIFEST_DIR").unwrap();
+        let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
         let file_path = path.join("sounds").join("tts");
         let speech_file = generate_speech_file(

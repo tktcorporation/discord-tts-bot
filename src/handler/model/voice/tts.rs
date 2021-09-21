@@ -106,9 +106,9 @@ mod tests {
             true,
         )
         .await;
-        assert_eq!(result.is_ok(), true);
+        assert!(result.is_ok());
         let path = result.unwrap();
-        assert_eq!(Path::new(&path).exists(), true);
+        assert!(Path::new(&path).exists());
         let mut right = String::from(file_path.clone().to_str().unwrap());
         right.push_str(".mp3");
         assert_eq!(path, right);

@@ -96,20 +96,20 @@ mod tests {
         #[test]
         fn test_is_ignore_msg() {
             let message = message_factory("a");
-            assert_eq!(false, message.is_ignore());
+            assert!(!message.is_ignore());
         }
 
         #[test]
         fn test_is_ignore_msg_and() {
             let message = message_factory("hogehoege&sa");
-            assert_eq!(false, message.is_ignore());
+            assert!(!message.is_ignore());
         }
 
         #[test]
         fn test_is_ignore_msg_cmd_pref() {
             let content = &(env::var("DISCORD_CMD_PREFIX").unwrap() + "hogehoge")[..];
             let message = message_factory(content);
-            assert_eq!(true, message.is_ignore());
+            assert_eq!(message.is_ignore());
         }
     }
 
