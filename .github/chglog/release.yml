@@ -6,8 +6,8 @@ options:
   commits:
     filters:
       Type:
-        - :sparkles # :sparkles: update hoge!
-        - :bug
+        - sparkles
+        - bug
         - perf
         - refactor
   commit_groups:
@@ -17,8 +17,11 @@ options:
       perf: Performance Improvements
       refactor: Code Refactoring
       ci: Continuous Integration
+  issues:
+    prefix:
+      - /
   header:
-    pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:\\s(.*)$"
+    pattern: "^:?(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:\\s(.*)$"
     pattern_maps:
       - Type
       - Scope
