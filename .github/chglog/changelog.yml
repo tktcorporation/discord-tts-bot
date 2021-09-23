@@ -19,6 +19,10 @@ options:
       perf: Performance Improvements
       refactor: Code Refactoring
       ci: Continuous Integration
+  merges:
+    pattern: "(#\\w+)"
+    pattern_maps:
+      - Source
   issues:
     prefix:
       - /
