@@ -37,9 +37,10 @@ impl Message {
         } else {
             self.msg.content.clone()
         };
-        let mension_removed_str = remove_mention_string(&str[..]);
         SpeechMessage {
-            value: mension_removed_str,
+            value: replace_channel_string(
+                &remove_emoji_string(&remove_mention_string(&str[..])[..])[..],
+            ),
         }
     }
 }
@@ -48,6 +49,25 @@ fn remove_mention_string(content: &str) -> String {
     use regex::Regex;
     let re = Regex::new(r"<@![0-9]+>").unwrap();
     re.replace_all(content, "").to_string()
+}
+fn remove_emoji_string(content: &str) -> String {
+    use regex::Regex;
+    let re = Regex::new(r"<:(.+):[0-9]+>").unwrap();
+    if let Some(caps) = re.captures(content) {
+        re.replace_all(content, caps.get(1).unwrap().as_str())
+            .to_string()
+    } else {
+        content.to_string()
+    }
+}
+fn replace_channel_string(content: &str) -> String {
+    use regex::Regex;
+    let re = Regex::new(r"<#[0-9]+>").unwrap();
+    if re.captures(content).is_some() {
+        "channel".to_string()
+    } else {
+        content.to_string()
+    }
 }
 
 #[cfg(test)]
@@ -63,6 +83,20 @@ mod tests {
             let str = "aaa<@!8379454856049>eeee";
             let result = remove_mention_string(str);
             assert_eq!("aaaeeee", result);
+        }
+
+        #[test]
+        fn test_remove_emoji_string() {
+            let str = "<:butter:872873394570424340>";
+            let result = remove_emoji_string(str);
+            assert_eq!("butter", result);
+        }
+
+        #[test]
+        fn test_replace_channel_string() {
+            let str = "<#795680552845443113>";
+            let result = replace_channel_string(str);
+            assert_eq!("channel", result);
         }
     }
 
