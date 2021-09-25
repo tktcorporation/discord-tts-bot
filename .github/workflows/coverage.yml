@@ -1,23 +1,25 @@
-name: Coverage
+name: coverage
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
-  build:
+  test:
+    name: coverage
     runs-on: ubuntu-latest
 
     container:
       image: xd009642/tarpaulin
-      volumes:
-        - $GITHUB_WORKSPACE:/volume
       options: --security-opt seccomp=unconfined
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Run tests
-      run: cargo tarpaulin -v --out Xml
-    - name: Upload coverage
-      uses: codecov/codecov-action@v1.0.3
-      with:
-        token: ${{secrets.CODECOV_TOKEN}}
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Generate code coverage
+        run: cargo tarpaulin --verbose --all-features --workspace --timeout 120 --out Xml
+
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          fail_ci_if_error: true
