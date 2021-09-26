@@ -57,6 +57,5 @@ mod tests {
     async fn check_env_exists() {
         env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
         env::var("DISCORD_CMD_PREFIX").expect("Expected a prefix in the environment");
-        assert!(true);
     }
 }

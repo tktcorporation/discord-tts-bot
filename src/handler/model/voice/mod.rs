@@ -130,12 +130,13 @@ async fn get_input_from_local<P: AsRef<OsStr>>(file_path: P) -> Input {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::Path;
 
     #[tokio::test]
     async fn create_tts_file() {
         let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
-        let file_path = path.join("sounds").join("tts");
+        let file_path: infrastructure::SpeechFilePath = path.join("sounds").join("tts").into();
         let speech_file = generate_speech_file(
             "おはようございます".to_string(),
             VoiceId::Mizuki,

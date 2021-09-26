@@ -20,10 +20,7 @@ pub struct SpeechFilePath {
 
 impl SpeechFilePath {
     pub async fn file(self) -> SpeechFile {
-        let parts: Vec<&str> = self.value.to_str().unwrap().split('.').collect();
-        let mut file_name_builder = String::from(parts[0]);
-        file_name_builder.push_str(".mp3");
-        let file_name = file_name_builder.clone().to_string();
+        let file_name = self.file_name();
 
         SpeechFile {
             value: File::create(&Path::new(&file_name))
@@ -31,6 +28,13 @@ impl SpeechFilePath {
                 .expect("failed to create file"),
             name: file_name,
         }
+    }
+
+    pub fn file_name(&self) -> String {
+        let parts: Vec<&str> = self.value.to_str().unwrap().split('.').collect();
+        let mut file_name_builder = String::from(parts[0]);
+        file_name_builder.push_str(".mp3");
+        file_name_builder
     }
 }
 

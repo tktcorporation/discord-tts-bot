@@ -85,24 +85,25 @@ pub async fn generate_speech_file(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::Path;
 
     #[tokio::test]
     async fn test_generate_sound() {
         let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
-        let file_path = path.join("sounds").join("sample");
+        let file_path: SpeechFilePath = path.join("sounds").join("sample").into();
+        let right = file_path.file_name();
         let result = generate_speech_file(
             String::from("おはようございます"),
             VoiceId::Mizuki,
-            file_path.clone(),
+            file_path,
             true,
         )
         .await;
         assert!(result.is_ok());
         let path = result.unwrap();
         assert!(Path::new(&path).exists());
-        let mut right = String::from(file_path.clone().to_str().unwrap());
-        right.push_str(".mp3");
+        
         assert_eq!(path, right);
     }
 }
