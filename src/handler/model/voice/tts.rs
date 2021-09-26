@@ -103,7 +103,7 @@ mod tests {
         assert!(result.is_ok());
         let path = result.unwrap();
         assert!(Path::new(&path).exists());
-        
+
         assert_eq!(path, right);
     }
 }
