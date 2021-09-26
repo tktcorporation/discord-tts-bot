@@ -7,6 +7,8 @@ use songbird::SerenityInit;
 mod handler;
 use handler::Handler;
 
+mod infrastructure;
+
 mod commands;
 use commands::GENERAL_GROUP;
 

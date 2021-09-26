@@ -6,3 +6,9 @@ use serenity::async_trait;
 pub trait Speaker {
     async fn speech(&self, msg: SpeechMessage);
 }
+
+#[cfg_attr(test, mockall::automock)]
+#[async_trait]
+pub trait FilePath {
+    async fn path(&self);
+}

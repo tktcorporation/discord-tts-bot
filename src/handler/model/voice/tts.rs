@@ -1,5 +1,6 @@
 use std::env;
 
+use crate::infrastructure::{GuildPath, SoundFile, SoundPath, SpeechFilePath};
 use std::ffi::OsStr;
 use std::path::Path;
 
@@ -24,10 +25,10 @@ use tokio::io::AsyncWriteExt;
 /// .await;
 /// Path::new(result.unwrap()).exists(); // true or false
 /// ```
-pub async fn generate_speech_file<P: AsRef<OsStr>>(
+pub async fn generate_speech_file(
     content: String,
     voice_id: VoiceId,
-    file_path: P,
+    file_path: SpeechFilePath,
     verbose: bool,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let region = EnvironmentProvider::new().region().unwrap_or_else(|| {
@@ -37,7 +38,7 @@ pub async fn generate_speech_file<P: AsRef<OsStr>>(
     if verbose {
         println!("polly client version: {}\n", polly::PKG_VERSION);
         println!("Region:   {:?}", &region);
-        println!("Filename: {}", file_path.as_ref().to_str().unwrap());
+        // println!("Filename: {}", file_path.into().to_str().unwrap());
 
         // SubscriberBuilder::default()
         //     .with_env_filter("info")
@@ -72,22 +73,14 @@ pub async fn generate_speech_file<P: AsRef<OsStr>>(
         .await
         .expect("failed to read data");
 
-    let parts: Vec<&str> = file_path.as_ref().to_str().unwrap().split('.').collect();
-    let mut file_name_builder = String::from(parts[0]);
-    file_name_builder.push_str(".mp3");
-    let file_name = file_name_builder.clone().to_string();
-    let out_file = Path::new(&file_name);
-
     // create the dir before running this line.
-    let mut file = tokio::fs::File::create(&out_file)
-        .await
-        .expect("failed to create file");
+    let mut file = file_path.file().await;
 
-    file.write_all_buf(&mut blob)
+    file.value.write_all_buf(&mut blob)
         .await
         .expect("failed to write to file");
 
-    Ok(file_name)
+    Ok(file.name)
 }
 
 #[cfg(test)]

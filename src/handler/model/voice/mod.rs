@@ -2,6 +2,7 @@ mod path;
 mod tts;
 use super::super::usecase::interface::Speaker;
 use super::text_to_speech_message::SpeechMessage;
+use crate::infrastructure;
 use polly::model::VoiceId;
 use serenity::{async_trait, client::Context, model::id};
 use songbird::ffmpeg;
@@ -88,7 +89,7 @@ impl Speaker for Voice {
     }
 }
 
-async fn _speech_file_path(guild_id: &id::GuildId) -> std::path::PathBuf {
+async fn _speech_file_path(guild_id: &id::GuildId) -> infrastructure::SpeechFilePath {
     use rand::Rng;
 
     let root = env!("CARGO_MANIFEST_DIR");
@@ -102,6 +103,7 @@ async fn _speech_file_path(guild_id: &id::GuildId) -> std::path::PathBuf {
     path.join("sounds")
         .join(guild_id_digest_str)
         .join(rand_num.to_string())
+        .into()
 }
 
 async fn _members(
