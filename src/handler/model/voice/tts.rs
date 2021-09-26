@@ -1,7 +1,6 @@
 use std::env;
 
-use std::ffi::OsStr;
-use std::path::Path;
+use crate::infrastructure::SpeechFilePath;
 
 use polly::model::{OutputFormat, TextType, VoiceId};
 use polly::{Client, Config, Region};
@@ -24,10 +23,10 @@ use tokio::io::AsyncWriteExt;
 /// .await;
 /// Path::new(result.unwrap()).exists(); // true or false
 /// ```
-pub async fn generate_speech_file<P: AsRef<OsStr>>(
+pub async fn generate_speech_file(
     content: String,
     voice_id: VoiceId,
-    file_path: P,
+    file_path: SpeechFilePath,
     verbose: bool,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let region = EnvironmentProvider::new().region().unwrap_or_else(|| {
@@ -37,7 +36,7 @@ pub async fn generate_speech_file<P: AsRef<OsStr>>(
     if verbose {
         println!("polly client version: {}\n", polly::PKG_VERSION);
         println!("Region:   {:?}", &region);
-        println!("Filename: {}", file_path.as_ref().to_str().unwrap());
+        // println!("Filename: {}", file_path.into().to_str().unwrap());
 
         // SubscriberBuilder::default()
         //     .with_env_filter("info")
@@ -72,45 +71,39 @@ pub async fn generate_speech_file<P: AsRef<OsStr>>(
         .await
         .expect("failed to read data");
 
-    let parts: Vec<&str> = file_path.as_ref().to_str().unwrap().split('.').collect();
-    let mut file_name_builder = String::from(parts[0]);
-    file_name_builder.push_str(".mp3");
-    let file_name = file_name_builder.clone().to_string();
-    let out_file = Path::new(&file_name);
-
     // create the dir before running this line.
-    let mut file = tokio::fs::File::create(&out_file)
-        .await
-        .expect("failed to create file");
+    let mut file = file_path.file().await;
 
-    file.write_all_buf(&mut blob)
+    file.value
+        .write_all_buf(&mut blob)
         .await
         .expect("failed to write to file");
 
-    Ok(file_name)
+    Ok(file.name)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::Path;
 
     #[tokio::test]
     async fn test_generate_sound() {
         let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
-        let file_path = path.join("sounds").join("sample");
+        let file_path: SpeechFilePath = path.join("sounds").join("sample").into();
+        let right = file_path.file_name();
         let result = generate_speech_file(
             String::from("おはようございます"),
             VoiceId::Mizuki,
-            file_path.clone(),
+            file_path,
             true,
         )
         .await;
         assert!(result.is_ok());
         let path = result.unwrap();
         assert!(Path::new(&path).exists());
-        let mut right = String::from(file_path.clone().to_str().unwrap());
-        right.push_str(".mp3");
+
         assert_eq!(path, right);
     }
 }

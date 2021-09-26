@@ -2,14 +2,12 @@ mod path;
 mod tts;
 use super::super::usecase::interface::Speaker;
 use super::text_to_speech_message::SpeechMessage;
+use crate::infrastructure;
 use polly::model::VoiceId;
 use serenity::{async_trait, client::Context, model::id};
 use songbird::ffmpeg;
 use songbird::input::Input;
 use std::ffi::OsStr;
-use std::path::Path;
-use tiger::digest::Digest;
-use tiger::Tiger;
 use tts::generate_speech_file;
 
 use songbird::{self, Songbird};
@@ -75,7 +73,9 @@ impl Speaker for Voice {
     async fn speech(&self, msg: SpeechMessage) {
         match self.handler().await {
             Ok(handler) => {
-                let file_path = _speech_file_path(&self.guild_id).await;
+                let root = env!("CARGO_MANIFEST_DIR");
+                let file_path =
+                    infrastructure::SoundFile::new(root).speech_file_path(&self.guild_id);
                 let speech_file =
                     generate_speech_file(msg.value, VoiceId::Mizuki, file_path, false)
                         .await
@@ -86,22 +86,6 @@ impl Speaker for Voice {
             Err(str) => println!("{}", str),
         }
     }
-}
-
-async fn _speech_file_path(guild_id: &id::GuildId) -> std::path::PathBuf {
-    use rand::Rng;
-
-    let root = env!("CARGO_MANIFEST_DIR");
-    let path = Path::new(root);
-    let digest = Tiger::digest(guild_id.to_string().as_bytes());
-    let guild_id_digest_str = format!("{:X}", digest);
-    std::fs::create_dir_all(path.join("sounds").join(guild_id_digest_str.clone()))
-        .expect("fail to create a dir of guild path");
-    // guild ごとに最大5ファイル持つ
-    let rand_num: i32 = rand::thread_rng().gen_range(0..4);
-    path.join("sounds")
-        .join(guild_id_digest_str)
-        .join(rand_num.to_string())
 }
 
 async fn _members(
@@ -146,12 +130,13 @@ async fn get_input_from_local<P: AsRef<OsStr>>(file_path: P) -> Input {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::Path;
 
     #[tokio::test]
     async fn create_tts_file() {
         let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
-        let file_path = path.join("sounds").join("tts");
+        let file_path: infrastructure::SpeechFilePath = path.join("sounds").join("tts").into();
         let speech_file = generate_speech_file(
             "おはようございます".to_string(),
             VoiceId::Mizuki,
