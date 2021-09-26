@@ -88,9 +88,10 @@ pub struct SoundFile {
 }
 
 impl SoundFile {
-    pub fn new() -> Self {
+    /// base: env!("CARGO_MANIFEST_DIR")
+    pub fn new(base: &str) -> Self {
         SoundFile {
-            base: env!("CARGO_MANIFEST_DIR").to_string(),
+            base: base.to_string(),
         }
     }
     pub fn root_path(self) -> SoundPath {
