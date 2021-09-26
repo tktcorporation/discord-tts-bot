@@ -49,11 +49,11 @@ impl SpeechFilePath {
         let mut file_name_builder = String::from(parts[0]);
         file_name_builder.push_str(".mp3");
         let file_name = file_name_builder.clone().to_string();
-        
+
         SpeechFile {
             value: File::create(&Path::new(&file_name))
-            .await
-            .expect("failed to create file"),
+                .await
+                .expect("failed to create file"),
             name: file_name,
         }
     }
@@ -95,8 +95,7 @@ impl SoundFile {
         }
     }
     pub fn root_path(self) -> SoundPath {
-        let base = env!("CARGO_MANIFEST_DIR");
-        let path = Path::new(base);
+        let path = Path::new(&self.base);
         let sound_path = path.join("sounds");
         std::fs::create_dir_all(&sound_path).expect("fail to create a dir of guild path");
         sound_path.into()

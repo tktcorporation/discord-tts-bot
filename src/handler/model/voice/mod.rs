@@ -8,9 +8,6 @@ use serenity::{async_trait, client::Context, model::id};
 use songbird::ffmpeg;
 use songbird::input::Input;
 use std::ffi::OsStr;
-use std::path::Path;
-use tiger::digest::Digest;
-use tiger::Tiger;
 use tts::generate_speech_file;
 
 use songbird::{self, Songbird};
@@ -76,7 +73,9 @@ impl Speaker for Voice {
     async fn speech(&self, msg: SpeechMessage) {
         match self.handler().await {
             Ok(handler) => {
-                let file_path = _speech_file_path(&self.guild_id);
+                let root = env!("CARGO_MANIFEST_DIR");
+                let file_path =
+                    infrastructure::SoundFile::new(root).speech_file_path(&self.guild_id);
                 let speech_file =
                     generate_speech_file(msg.value, VoiceId::Mizuki, file_path, false)
                         .await
@@ -87,13 +86,6 @@ impl Speaker for Voice {
             Err(str) => println!("{}", str),
         }
     }
-}
-
-fn _speech_file_path(guild_id: &id::GuildId) -> infrastructure::SpeechFilePath {
-    use rand::Rng;
-
-    let root = env!("CARGO_MANIFEST_DIR");
-    infrastructure::SoundFile::new(root).speech_file_path(guild_id)
 }
 
 async fn _members(

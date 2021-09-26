@@ -1,8 +1,6 @@
 use std::env;
 
-use crate::infrastructure::{GuildPath, SoundFile, SoundPath, SpeechFilePath};
-use std::ffi::OsStr;
-use std::path::Path;
+use crate::infrastructure::SpeechFilePath;
 
 use polly::model::{OutputFormat, TextType, VoiceId};
 use polly::{Client, Config, Region};
@@ -76,7 +74,8 @@ pub async fn generate_speech_file(
     // create the dir before running this line.
     let mut file = file_path.file().await;
 
-    file.value.write_all_buf(&mut blob)
+    file.value
+        .write_all_buf(&mut blob)
         .await
         .expect("failed to write to file");
 
