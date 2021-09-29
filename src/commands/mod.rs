@@ -22,13 +22,13 @@ use services::check_msg;
 #[cfg(any(feature = "tts", feature = "music"))]
 #[group]
 #[commands(
-    deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute, help, bgm
+    deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute, help, bgm, invite
 )]
 pub(crate) struct General;
 
 #[cfg(not(any(feature = "tts", feature = "music")))]
 #[group]
-#[commands(join, leave, ping)]
+#[commands(join, leave, ping, invite)]
 pub(crate) struct General;
 
 #[command]
@@ -41,6 +41,23 @@ async fn help(ctx: &Context, msg: &Message) -> CommandResult {
                     + &env::var("DISCORD_CMD_PREFIX")
                         .expect("Expected a command prefix in the environment")
                     + "join` でボイスチャットに入るよ",
+            )
+            .await,
+    );
+    Ok(())
+}
+
+#[command]
+async fn invite(ctx: &Context, msg: &Message) -> CommandResult {
+    let comment = match services::invite(ctx).await {
+        Ok(s) => s,
+        Err(e) => format!("{:?}", e),
+    };
+    check_msg(
+        msg.channel_id
+            .say(
+                &ctx.http,
+                comment,
             )
             .await,
     );
