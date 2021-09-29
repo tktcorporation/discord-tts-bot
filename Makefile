@@ -1,6 +1,6 @@
 lint:
-	cargo clippy -Z unstable-options --all --all-targets --all-features --fix
+	cargo +nightly clippy --all --all-targets --all-features --fix -Z unstable-options --allow-dirty
 watch:
-	cargo watch --features tts,music
+	cargo watch --features tts,music -x fmt
 run:
 	cargo run --features tts,music
