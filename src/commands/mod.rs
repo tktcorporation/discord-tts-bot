@@ -9,7 +9,7 @@ use serenity::{
         Args, CommandResult,
     },
     http::Http,
-    model::{channel::Message, misc::Mentionable, prelude::ChannelId},
+    model::{channel::Message, prelude::ChannelId},
 };
 
 use songbird::{
@@ -19,10 +19,6 @@ use songbird::{
 
 mod services;
 use services::check_msg;
-
-use songbird::ffmpeg;
-use std::path::Path;
-
 #[cfg(any(feature = "tts", feature = "music"))]
 #[group]
 #[commands(
@@ -94,52 +90,12 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
 async fn join(ctx: &Context, msg: &Message) -> CommandResult {
     let guild = msg.guild(&ctx.cache).await.unwrap();
     let guild_id = guild.id;
-
-    let channel_id = guild
-        .voice_states
-        .get(&msg.author.id)
-        .and_then(|voice_state| voice_state.channel_id);
-
-    let connect_to = match channel_id {
-        Some(channel) => channel,
-        None => {
-            check_msg(msg.reply(ctx, "Not in a voice channel").await);
-
-            return Ok(());
-        }
-    };
-
     let manager = songbird::get(ctx)
         .await
-        .expect("Songbird Voice client placed in at initialisation.")
-        .clone();
+        .expect("Songbird Voice client placed in at initialisation.");
 
-    let (handle_lock, success) = manager.join(guild_id, connect_to).await;
-
-    if let Ok(_channel) = success {
-        check_msg(
-            msg.channel_id
-                .say(&ctx.http, &format!("Joined {}", connect_to.mention()))
-                .await,
-        );
-
-        let mut handle = handle_lock.lock().await;
-
-        let root = env!("CARGO_MANIFEST_DIR");
-        let path = Path::new(root);
-        let file_path = path.join("sounds").join("shabeko_dayo.wav");
-        let input = ffmpeg(file_path)
-            .await
-            .expect("This might fail: handle this error!");
-        handle.enqueue_source(input)
-    } else {
-        check_msg(
-            msg.channel_id
-                .say(&ctx.http, "Error joining the channel")
-                .await,
-        );
-    }
-
+    let voice = services::join::Voice { manager, guild_id };
+    services::join::join(ctx, msg, voice).await.unwrap();
     Ok(())
 }
 

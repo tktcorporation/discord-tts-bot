@@ -12,6 +12,8 @@ mod infrastructure;
 mod commands;
 use commands::GENERAL_GROUP;
 
+mod model;
+
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
