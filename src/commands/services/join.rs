@@ -9,8 +9,8 @@ use serenity::{
 use songbird::{self, ffmpeg};
 use std::path::PathBuf;
 
-pub use crate::model::{Message, Voice};
 use crate::infrastructure::{SoundFile, SoundPath};
+pub use crate::model::{Message, Voice};
 
 impl Voice {
     async fn join(
