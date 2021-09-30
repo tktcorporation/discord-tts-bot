@@ -8,13 +8,6 @@ pub struct Voice {
     pub guild_id: id::GuildId,
 }
 
-// pub struct Leaved(bool);
-// impl Into<bool> for Leaved {
-//     fn into(self) -> bool {
-//         self.0
-//     }
-// }
-
 impl Voice {
     pub async fn from(ctx: &Context, guild_id: id::GuildId) -> Voice {
         let manager = songbird::get(ctx)

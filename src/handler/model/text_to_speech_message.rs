@@ -1,9 +1,6 @@
+pub use crate::model::Message;
 use serenity::model::channel::Message as SerenityMessage;
 use std::env;
-
-pub struct Message {
-    msg: SerenityMessage,
-}
 
 #[derive(Debug, PartialEq)]
 pub struct SpeechMessage {
