@@ -7,9 +7,10 @@ use serenity::{
     },
 };
 use songbird::{self, ffmpeg};
-use std::path::Path;
+use std::path::PathBuf;
 
 pub use crate::model::{Message, Voice};
+use crate::infrastructure::{SoundFile, SoundPath};
 
 impl Voice {
     async fn join(
@@ -54,17 +55,20 @@ async fn _join(joiner: &Voice, connect_to: SerenityChannelId) -> Result<(), Stri
     if let Ok(_channel) = success {
         let mut handle = handle_lock.lock().await;
 
-        let root = env!("CARGO_MANIFEST_DIR");
-        let path = Path::new(root);
-        let file_path = path.join("sounds").join("shabeko_dayo.wav");
-        let input = ffmpeg(file_path)
-            .await
-            .expect("This might fail: handle this error!");
+        let input = welcome_audio(SoundFile::new(env!("CARGO_MANIFEST_DIR")).root_path()).await;
         handle.enqueue_source(input);
         Ok(())
     } else {
         Err("Error joining the channel".to_string())
     }
+}
+
+async fn welcome_audio(path: SoundPath) -> songbird::input::Input {
+    let path: PathBuf = path.into();
+    let file_path = path.join("shabeko_dayo.wav");
+    ffmpeg(file_path)
+        .await
+        .expect("This might fail: handle this error!")
 }
 
 // #[async_trait]
