@@ -1,5 +1,7 @@
 pub mod join;
 use serenity::{model::channel::Message, Result as SerenityResult};
+mod invite;
+pub use invite::invite;
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
 pub fn check_msg(result: SerenityResult<Message>) {

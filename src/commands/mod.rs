@@ -22,13 +22,14 @@ use services::check_msg;
 #[cfg(any(feature = "tts", feature = "music"))]
 #[group]
 #[commands(
-    deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute, help, bgm
+    deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute, help, bgm,
+    invite
 )]
 pub(crate) struct General;
 
 #[cfg(not(any(feature = "tts", feature = "music")))]
 #[group]
-#[commands(join, leave, ping)]
+#[commands(join, leave, ping, invite)]
 pub(crate) struct General;
 
 #[command]
@@ -44,6 +45,16 @@ async fn help(ctx: &Context, msg: &Message) -> CommandResult {
             )
             .await,
     );
+    Ok(())
+}
+
+#[command]
+async fn invite(ctx: &Context, msg: &Message) -> CommandResult {
+    let comment = match services::invite(ctx).await {
+        Ok(s) => format!("このURLで招待できるよ\n{}", s),
+        Err(e) => format!("{:?}", e),
+    };
+    check_msg(msg.reply(&ctx, comment).await);
     Ok(())
 }
 
