@@ -51,10 +51,10 @@ async fn help(ctx: &Context, msg: &Message) -> CommandResult {
 #[command]
 async fn invite(ctx: &Context, msg: &Message) -> CommandResult {
     let comment = match services::invite(ctx).await {
-        Ok(s) => s,
+        Ok(s) => format!("このURLで招待できるよ\n{}", s),
         Err(e) => format!("{:?}", e),
     };
-    check_msg(msg.channel_id.say(&ctx.http, comment).await);
+    check_msg(msg.reply(&ctx, comment).await);
     Ok(())
 }
 
