@@ -22,7 +22,8 @@ use services::check_msg;
 #[cfg(any(feature = "tts", feature = "music"))]
 #[group]
 #[commands(
-    deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute, help, bgm, invite
+    deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute, help, bgm,
+    invite
 )]
 pub(crate) struct General;
 
@@ -53,14 +54,7 @@ async fn invite(ctx: &Context, msg: &Message) -> CommandResult {
         Ok(s) => s,
         Err(e) => format!("{:?}", e),
     };
-    check_msg(
-        msg.channel_id
-            .say(
-                &ctx.http,
-                comment,
-            )
-            .await,
-    );
+    check_msg(msg.channel_id.say(&ctx.http, comment).await);
     Ok(())
 }
 
