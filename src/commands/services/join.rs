@@ -71,6 +71,17 @@ async fn welcome_audio(path: SoundPath) -> songbird::input::Input {
         .expect("This might fail: handle this error!")
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_welcome_audio() {
+        let path = SoundFile::new(env!("CARGO_MANIFEST_DIR")).root_path();
+        welcome_audio(path).await;
+    }
+}
+
 // #[async_trait]
 // pub trait Joiner {
 //     async fn join(
