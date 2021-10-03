@@ -10,7 +10,7 @@ readme = "README.md"
 tts = []
 music = []
 
-default = []
+default = ["tts"]
 
 [dependencies]
 hyper = "^0.14.13"

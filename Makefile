@@ -1,7 +1,7 @@
 all: fmt clippy test
 fmt:
 	cargo fmt --all
-clippy:
+lint:
 	cargo +nightly clippy --all --all-targets --all-features --fix -Z unstable-options --allow-dirty
 test:
 	cargo test --all-features
