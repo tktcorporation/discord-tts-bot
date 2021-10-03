@@ -4,19 +4,19 @@ use serenity::{
     model::channel::Message,
 };
 
+use super::super::service::{send_track_info_message, TrackTiming};
 use super::check_msg;
-use songbird::input::restartable::Restartable;
+use songbird::input::{restartable::Restartable, Input};
 
 pub async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    let comment = match _play(ctx, msg, args).await {
-        Ok(s) => s,
-        Err(s) => format!("Error: {}", s),
+    match _play(ctx, msg, args).await {
+        Ok(_) => {}
+        Err(s) => check_msg(msg.channel_id.say(&ctx.http, format!("Error: {}", s)).await),
     };
-    check_msg(msg.channel_id.say(&ctx.http, comment).await);
     Ok(())
 }
 
-async fn _play(ctx: &Context, msg: &Message, args: Args) -> Result<String, String> {
+async fn _play(ctx: &Context, msg: &Message, args: Args) -> Result<(), String> {
     let url = args.message();
 
     let guild = msg.guild(&ctx.cache).await.unwrap();
@@ -40,12 +40,17 @@ async fn _play(ctx: &Context, msg: &Message, args: Args) -> Result<String, Strin
             }
         };
 
-        handler.enqueue_source(source.into());
+        let input: Input = source.into();
+        send_track_info_message(
+            TrackTiming::Added,
+            input.metadata.as_ref(),
+            msg.channel_id,
+            ctx.http.clone(),
+        )
+        .await;
+        handler.enqueue_source(input);
 
-        Ok(format!(
-            "Added song to queue: position {}",
-            handler.queue().len()
-        ))
+        Ok(())
     } else {
         Err(String::from("Not in a voice channel to play in"))
     }

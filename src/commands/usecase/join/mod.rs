@@ -6,11 +6,13 @@ use serenity::{
         misc::Mentionable,
     },
 };
-use songbird::{self, ffmpeg};
 use std::path::PathBuf;
+mod voice_event_handler;
 
 use crate::infrastructure::{SoundFile, SoundPath};
 pub use crate::model::{Message, Voice};
+
+use songbird::{self, ffmpeg, Event, TrackEvent};
 
 impl Voice {
     async fn join(
@@ -40,7 +42,7 @@ pub async fn join(ctx: &Context, msg: &SerenityMessage, joiner: Voice) -> Result
         }
     };
 
-    let comment = match _join(&joiner, connect_to).await {
+    let comment = match _join(&joiner, connect_to, ctx.http.clone(), msg.channel_id).await {
         Ok(()) => format!("Joined {}", connect_to.mention()),
         Err(e) => e,
     };
@@ -49,11 +51,25 @@ pub async fn join(ctx: &Context, msg: &SerenityMessage, joiner: Voice) -> Result
     Ok(())
 }
 
-async fn _join(joiner: &Voice, connect_to: SerenityChannelId) -> Result<(), String> {
+async fn _join(
+    joiner: &Voice,
+    connect_to: SerenityChannelId,
+    http: std::sync::Arc<serenity::http::Http>,
+    text_channel_id: SerenityChannelId,
+) -> Result<(), String> {
     let (handle_lock, success) = joiner.join(connect_to).await;
-
     if let Ok(_channel) = success {
         let mut handle = handle_lock.lock().await;
+
+        // handle.add_global_event(
+        //     Event::Track(TrackEvent::End),
+        //     voice_event_handler::TrackNotifier::new(text_channel_id, http.clone()),
+        // );
+
+        handle.add_global_event(
+            Event::Track(TrackEvent::Play),
+            voice_event_handler::TrackPlayNotifier::new(text_channel_id, http),
+        );
 
         let input = welcome_audio(SoundFile::new(env!("CARGO_MANIFEST_DIR")).root_path()).await;
         handle.enqueue_source(input);
