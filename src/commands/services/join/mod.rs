@@ -7,7 +7,11 @@ use serenity::{
     },
 };
 use songbird::{self, ffmpeg};
+use songbird::{
+    CoreEvent,
+};
 use std::path::PathBuf;
+mod voice_event_handler;
 
 use crate::infrastructure::{SoundFile, SoundPath};
 pub use crate::model::{Message, Voice};
@@ -54,6 +58,11 @@ async fn _join(joiner: &Voice, connect_to: SerenityChannelId) -> Result<(), Stri
 
     if let Ok(_channel) = success {
         let mut handle = handle_lock.lock().await;
+
+        handle.add_global_event(
+            CoreEvent::SpeakingUpdate.into(),
+            voice_event_handler::Receiver::new(),
+        );
 
         let input = welcome_audio(SoundFile::new(env!("CARGO_MANIFEST_DIR")).root_path()).await;
         handle.enqueue_source(input);
