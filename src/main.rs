@@ -1,6 +1,6 @@
 use std::env;
 
-use serenity::{client::Client, framework::StandardFramework};
+use serenity::client::Client;
 
 use songbird::SerenityInit;
 
@@ -10,9 +10,11 @@ use handler::Handler;
 mod infrastructure;
 
 mod commands;
-use commands::GENERAL_GROUP;
 
 mod model;
+
+mod framework;
+use framework::build_framework;
 
 #[tokio::main]
 async fn main() {
@@ -21,14 +23,7 @@ async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    let framework = StandardFramework::new()
-        .configure(|c| {
-            c.prefix(
-                &env::var("DISCORD_CMD_PREFIX")
-                    .expect("Expected a command prefix in the environment"),
-            )
-        })
-        .group(&GENERAL_GROUP);
+    let framework = build_framework();
 
     let mut client = build_client(&token, framework)
         .await
