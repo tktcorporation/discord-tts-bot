@@ -16,8 +16,10 @@ use songbird::{
     Event, EventContext, EventHandler as VoiceEventHandler, TrackEvent,
 };
 
-mod services;
-use services::check_msg;
+mod usecase;
+use usecase::check_msg;
+mod service;
+
 #[cfg(any(feature = "tts", feature = "music"))]
 #[group]
 #[commands(
@@ -50,7 +52,7 @@ pub(crate) struct General;
 #[command]
 #[description = "Give a URL to invite this bot."]
 async fn invite(ctx: &Context, msg: &Message) -> CommandResult {
-    let comment = match services::invite(ctx).await {
+    let comment = match usecase::invite(ctx).await {
         Ok(s) => format!("このURLで招待できるよ\n{}", s),
         Err(e) => format!("{:?}", e),
     };
@@ -106,8 +108,8 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
         .await
         .expect("Songbird Voice client placed in at initialisation.");
 
-    let voice = services::join::Voice { manager, guild_id };
-    services::join::join(ctx, msg, voice).await.unwrap();
+    let voice = usecase::join::Voice { manager, guild_id };
+    usecase::join::join(ctx, msg, voice).await.unwrap();
     Ok(())
 }
 
@@ -323,7 +325,7 @@ impl VoiceEventHandler for SongEndNotifier {
 #[aliases("q")]
 #[only_in(guilds)]
 async fn queue(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
-    services::queue(ctx, msg).await
+    usecase::queue(ctx, msg).await
 }
 
 #[command]
@@ -331,7 +333,7 @@ async fn queue(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
 #[aliases("p")]
 #[only_in(guilds)]
 async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    services::play(ctx, msg, args).await
+    usecase::play(ctx, msg, args).await
 }
 
 #[command]
