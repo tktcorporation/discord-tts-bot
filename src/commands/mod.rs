@@ -1,4 +1,3 @@
-use std::env;
 use std::{sync::Arc, time::Duration};
 
 use serenity::{
@@ -12,7 +11,10 @@ use serenity::{
     model::{channel::Message, prelude::ChannelId},
 };
 
-use songbird::{input, Event, EventContext, EventHandler as VoiceEventHandler, TrackEvent};
+use songbird::{
+    input::{self},
+    Event, EventContext, EventHandler as VoiceEventHandler, TrackEvent,
+};
 
 mod services;
 use services::check_msg;
@@ -29,23 +31,24 @@ pub(crate) struct General;
 #[commands(join, leave, ping, invite)]
 pub(crate) struct General;
 
-#[command]
-async fn help(ctx: &Context, msg: &Message) -> CommandResult {
-    check_msg(
-        msg.channel_id
-            .say(
-                &ctx.http,
-                "`".to_string()
-                    + &env::var("DISCORD_CMD_PREFIX")
-                        .expect("Expected a command prefix in the environment")
-                    + "join` でボイスチャットに入るよ",
-            )
-            .await,
-    );
-    Ok(())
-}
+// #[command]
+// async fn help(ctx: &Context, msg: &Message) -> CommandResult {
+//     check_msg(
+//         msg.channel_id
+//             .say(
+//                 &ctx.http,
+//                 "`".to_string()
+//                     + &env::var("DISCORD_CMD_PREFIX")
+//                         .expect("Expected a command prefix in the environment")
+//                     + "join` でボイスチャットに入るよ",
+//             )
+//             .await,
+//     );
+//     Ok(())
+// }
 
 #[command]
+#[description = "Give a URL to invite this bot."]
 async fn invite(ctx: &Context, msg: &Message) -> CommandResult {
     let comment = match services::invite(ctx).await {
         Ok(s) => format!("このURLで招待できるよ\n{}", s),
@@ -94,6 +97,7 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[description = "Join your voice channel to use tts."]
 #[only_in(guilds)]
 async fn join(ctx: &Context, msg: &Message) -> CommandResult {
     let guild = msg.guild(&ctx.cache).await.unwrap();
@@ -108,6 +112,7 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[description = "Leave from your voice channel."]
 #[only_in(guilds)]
 async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
     let guild = msg.guild(&ctx.cache).await.unwrap();
