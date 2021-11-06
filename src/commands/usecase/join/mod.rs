@@ -45,6 +45,7 @@ pub async fn join(ctx: &Context, msg: &SerenityMessage, joiner: Voice) -> Result
     let (handle_lock, success) = joiner.join(connect_to).await;
     let comment = match success {
         Ok(()) => {
+            _clear(&handle_lock).await;
             _queue_join_message(handle_lock, ctx.http.clone(), msg.channel_id).await;
             format!("Joined {}", connect_to.mention())
         }
@@ -69,6 +70,11 @@ async fn _queue_join_message(
 
     let input = welcome_audio(SoundFile::new(env!("CARGO_MANIFEST_DIR")).root_path()).await;
     handle.enqueue_source(input)
+}
+
+async fn _clear(handle_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>) {
+    let call = handle_lock.lock().await;
+    call.queue().stop();
 }
 
 async fn welcome_audio(path: SoundPath) -> songbird::input::Input {
