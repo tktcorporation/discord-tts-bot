@@ -42,41 +42,33 @@ pub async fn join(ctx: &Context, msg: &SerenityMessage, joiner: Voice) -> Result
         }
     };
 
-    let comment = match _join(&joiner, connect_to, ctx.http.clone(), msg.channel_id).await {
-        Ok(()) => format!("Joined {}", connect_to.mention()),
-        Err(e) => e,
+    let (handle_lock, success) = joiner.join(connect_to).await;
+    let comment = match success {
+        Ok(()) => {
+            _queue_join_message(handle_lock, ctx.http.clone(), msg.channel_id).await;
+            format!("Joined {}", connect_to.mention())
+        }
+        Err(e) => e.to_string(),
     };
 
     check_msg(msg.channel_id.say(&ctx.http, &comment).await);
     Ok(())
 }
 
-async fn _join(
-    joiner: &Voice,
-    connect_to: SerenityChannelId,
+async fn _queue_join_message(
+    handle_lock: std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>,
     http: std::sync::Arc<serenity::http::Http>,
     text_channel_id: SerenityChannelId,
-) -> Result<(), String> {
-    let (handle_lock, success) = joiner.join(connect_to).await;
-    if let Ok(_channel) = success {
-        let mut handle = handle_lock.lock().await;
+) {
+    let mut handle = handle_lock.lock().await;
 
-        // handle.add_global_event(
-        //     Event::Track(TrackEvent::End),
-        //     voice_event_handler::TrackNotifier::new(text_channel_id, http.clone()),
-        // );
+    handle.add_global_event(
+        Event::Track(TrackEvent::Play),
+        voice_event_handler::TrackPlayNotifier::new(text_channel_id, http),
+    );
 
-        handle.add_global_event(
-            Event::Track(TrackEvent::Play),
-            voice_event_handler::TrackPlayNotifier::new(text_channel_id, http),
-        );
-
-        let input = welcome_audio(SoundFile::new(env!("CARGO_MANIFEST_DIR")).root_path()).await;
-        handle.enqueue_source(input);
-        Ok(())
-    } else {
-        Err("Error joining the channel".to_string())
-    }
+    let input = welcome_audio(SoundFile::new(env!("CARGO_MANIFEST_DIR")).root_path()).await;
+    handle.enqueue_source(input)
 }
 
 async fn welcome_audio(path: SoundPath) -> songbird::input::Input {
