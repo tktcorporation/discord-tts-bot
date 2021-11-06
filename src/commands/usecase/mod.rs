@@ -6,6 +6,8 @@ mod queue;
 pub use queue::queue;
 mod play;
 pub use play::play;
+mod clear;
+pub use clear::clear;
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
 pub fn check_msg(result: SerenityResult<Message>) {

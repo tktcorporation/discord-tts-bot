@@ -23,7 +23,7 @@ mod service;
 #[cfg(any(feature = "tts", feature = "music"))]
 #[group]
 #[commands(
-    deafen, join, leave, mute, play_fade, play, queue, skip, stop, ping, undeafen, unmute, bgm,
+    deafen, join, leave, mute, play_fade, play, queue, skip, clear, ping, undeafen, unmute, bgm,
     invite
 )]
 pub(crate) struct General;
@@ -422,30 +422,10 @@ async fn skip(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
 
 #[command]
 #[only_in(guilds)]
-async fn stop(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
-    let guild = msg.guild(&ctx.cache).await.unwrap();
-    let guild_id = guild.id;
-
-    let manager = songbird::get(ctx)
-        .await
-        .expect("Songbird Voice client placed in at initialisation.")
-        .clone();
-
-    if let Some(handler_lock) = manager.get(guild_id) {
-        let handler = handler_lock.lock().await;
-        let queue = handler.queue();
-        let _ = queue.stop();
-
-        check_msg(msg.channel_id.say(&ctx.http, "Queue cleared.").await);
-    } else {
-        check_msg(
-            msg.channel_id
-                .say(&ctx.http, "Not in a voice channel to play in")
-                .await,
-        );
-    }
-
-    Ok(())
+#[description = "Clear all queue."]
+#[aliases("stop")]
+async fn clear(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+    usecase::clear(ctx, msg).await
 }
 
 #[command]

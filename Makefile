@@ -1,4 +1,4 @@
-all: fmt clippy test
+all: fmt lint test
 fmt:
 	cargo fmt --all
 lint:
