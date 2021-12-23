@@ -27,7 +27,7 @@ impl Message {
         false
     }
 
-    pub fn to_speech_text(&self) -> SpeechMessage {
+    pub fn to_speech_message(&self) -> SpeechMessage {
         // urlはそのまま読まない
         let str = if self.msg.content.contains("http") {
             "url".to_string()
@@ -98,25 +98,25 @@ mod tests {
     }
 
     #[cfg(test)]
-    mod to_speech_text_tests {
+    mod to_speech_message_tests {
         use super::*;
 
         #[test]
-        fn test_to_speech_text() {
+        fn test_to_speech_message() {
             let message = message_factory("https://example.com");
-            assert_eq!("url", &message.to_speech_text().value);
+            assert_eq!("url", &message.to_speech_message().value);
         }
 
         #[test]
-        fn test_to_speech_text_not_ssl() {
+        fn test_to_speech_message_not_ssl() {
             let message = message_factory("http://example.com");
-            assert_eq!("url", &message.to_speech_text().value);
+            assert_eq!("url", &message.to_speech_message().value);
         }
 
         #[test]
-        fn test_to_speech_text_mix() {
+        fn test_to_speech_message_mix() {
             let message = message_factory("おはようhttps://example.comこんにちは");
-            assert_eq!("url", &message.to_speech_text().value);
+            assert_eq!("url", &message.to_speech_message().value);
         }
     }
 

@@ -5,7 +5,7 @@ pub async fn text_to_speech(speaker: Box<dyn Speaker + Sync + Send>, msg: Messag
     if msg.is_ignore() {
         return;
     };
-    speaker.speech(msg.to_speech_text()).await;
+    speaker.speech(msg.to_speech_message()).await;
 }
 
 #[cfg(test)]
