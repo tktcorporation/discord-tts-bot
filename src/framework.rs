@@ -28,7 +28,7 @@ pub fn build_framework() -> StandardFramework {
         .configure(|c| {
             c.prefix(
                 &env::var("DISCORD_CMD_PREFIX")
-                    .expect("Expected a command prefix in the environment"),
+                    .unwrap_or_else(|_| "-".to_string()),
             )
         })
         .help(&MY_HELP)
