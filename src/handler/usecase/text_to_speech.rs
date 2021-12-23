@@ -22,8 +22,8 @@ mod tests {
         let mut speaker = MockSpeaker::new();
         let msg = message_factory("some message");
         speaker.expect_speech().times(1).return_const(());
-        assert_eq!(msg.is_command(), false);
-        assert_eq!(msg.is_from_bot(), false);
+        assert!(!msg.is_command());
+        assert!(!msg.is_from_bot());
         text_to_speech(Box::new(speaker), msg).await;
     }
 

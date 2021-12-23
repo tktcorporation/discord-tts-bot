@@ -26,10 +26,7 @@ async fn my_help(
 pub fn build_framework() -> StandardFramework {
     StandardFramework::new()
         .configure(|c| {
-            c.prefix(
-                &env::var("DISCORD_CMD_PREFIX")
-                    .unwrap_or_else(|_| "-".to_string()),
-            )
+            c.prefix(&env::var("DISCORD_CMD_PREFIX").unwrap_or_else(|_| "-".to_string()))
         })
         .help(&MY_HELP)
         .group(&GENERAL_GROUP)

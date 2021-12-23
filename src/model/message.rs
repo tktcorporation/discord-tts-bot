@@ -11,7 +11,8 @@ impl Message {
     }
     pub fn is_command(&self) -> bool {
         if self.msg.content.starts_with(
-            (env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment") + " ")
+            (env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment")
+                + " ")
                 .as_str(),
         ) {
             return true;
