@@ -2,7 +2,8 @@ use super::super::model::text_to_speech_message::Message;
 use super::interface::Speaker;
 
 pub async fn text_to_speech(speaker: Box<dyn Speaker + Sync + Send>, msg: Message) {
-    if msg.is_ignore() {
+    // If it's a bot message or command, ignore it.
+    if msg.is_from_bot() || msg.is_command() {
         return;
     };
     speaker.speech(msg.to_speech_message()).await;
@@ -21,7 +22,8 @@ mod tests {
         let mut speaker = MockSpeaker::new();
         let msg = message_factory("some message");
         speaker.expect_speech().times(1).return_const(());
-
+        assert_eq!(msg.is_command(), false);
+        assert_eq!(msg.is_from_bot(), false);
         text_to_speech(Box::new(speaker), msg).await;
     }
 
