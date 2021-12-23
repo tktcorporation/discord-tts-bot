@@ -1,6 +1,4 @@
 pub use crate::model::Message;
-use serenity::model::channel::Message as SerenityMessage;
-use std::env;
 
 #[derive(Debug, PartialEq)]
 pub struct SpeechMessage {
@@ -8,26 +6,7 @@ pub struct SpeechMessage {
 }
 
 impl Message {
-    pub fn new(msg: SerenityMessage) -> Message {
-        Message { msg }
-    }
-    pub fn is_ignore(&self) -> bool {
-        // botに反応しないようにする
-        if self.msg.author.bot {
-            return true;
-        };
-
-        // コマンドに反応しないようにする
-        if self.msg.content.starts_with(
-            &env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment"),
-        ) {
-            return true;
-        };
-
-        false
-    }
-
-    pub fn to_speech_text(&self) -> SpeechMessage {
+    pub fn to_speech_message(&self) -> SpeechMessage {
         // urlはそのまま読まない
         let str = if self.msg.content.contains("http") {
             "url".to_string()
@@ -70,6 +49,7 @@ fn replace_channel_string(content: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serenity::model::channel::Message as SerenityMessage;
 
     #[cfg(test)]
     mod remove_mention_string_test {
@@ -98,49 +78,25 @@ mod tests {
     }
 
     #[cfg(test)]
-    mod to_speech_text_tests {
+    mod to_speech_message_tests {
         use super::*;
 
         #[test]
-        fn test_to_speech_text() {
+        fn test_to_speech_message() {
             let message = message_factory("https://example.com");
-            assert_eq!("url", &message.to_speech_text().value);
+            assert_eq!("url", &message.to_speech_message().value);
         }
 
         #[test]
-        fn test_to_speech_text_not_ssl() {
+        fn test_to_speech_message_not_ssl() {
             let message = message_factory("http://example.com");
-            assert_eq!("url", &message.to_speech_text().value);
+            assert_eq!("url", &message.to_speech_message().value);
         }
 
         #[test]
-        fn test_to_speech_text_mix() {
+        fn test_to_speech_message_mix() {
             let message = message_factory("おはようhttps://example.comこんにちは");
-            assert_eq!("url", &message.to_speech_text().value);
-        }
-    }
-
-    #[cfg(test)]
-    mod is_ignore_tests {
-        use super::*;
-
-        #[test]
-        fn test_is_ignore_msg() {
-            let message = message_factory("a");
-            assert!(!message.is_ignore());
-        }
-
-        #[test]
-        fn test_is_ignore_msg_and() {
-            let message = message_factory("hogehoege&sa");
-            assert!(!message.is_ignore());
-        }
-
-        #[test]
-        fn test_is_ignore_msg_cmd_pref() {
-            let content = &(env::var("DISCORD_CMD_PREFIX").unwrap() + "hogehoge")[..];
-            let message = message_factory(content);
-            assert!(message.is_ignore());
+            assert_eq!("url", &message.to_speech_message().value);
         }
     }
 
