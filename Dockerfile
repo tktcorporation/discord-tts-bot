@@ -1,4 +1,4 @@
-FROM rust:1.55-slim-buster AS build-env
+FROM rust:1.57-slim-buster AS build-env
 
 RUN apt-get update && \
     apt-get install -y \
