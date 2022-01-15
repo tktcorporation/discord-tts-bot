@@ -34,10 +34,12 @@ fn remove_role_string(content: &str) -> String {
 fn replace_emoji_string(content: &str) -> String {
     use regex::Regex;
     let re = Regex::new(r"<:(.+):[0-9]+>").unwrap();
-    re.captures_iter(content).collect::<Vec<_>>().iter().fold(
-        content.to_string(),
-        |acc, cap| acc.replace(&cap[0], &cap[1]),
-    )
+    re.captures_iter(content)
+        .collect::<Vec<_>>()
+        .iter()
+        .fold(content.to_string(), |acc, cap| {
+            acc.replace(&cap[0], &cap[1])
+        })
 }
 fn replace_channel_string(content: &str) -> String {
     use regex::Regex;
@@ -84,10 +86,13 @@ mod tests {
             let content = "<:butter:872873394570424340>さんま<:sanma:872873394570424340>";
             use regex::Regex;
             let re = Regex::new(r"<:(.+?):[0-9]+>").unwrap();
-            let result = re.captures_iter(content).collect::<Vec<_>>().iter().fold(
-                content.to_string(),
-                |acc, cap| acc.replace(&cap[0], &cap[1]),
-            );
+            let result = re
+                .captures_iter(content)
+                .collect::<Vec<_>>()
+                .iter()
+                .fold(content.to_string(), |acc, cap| {
+                    acc.replace(&cap[0], &cap[1])
+                });
             assert_eq!("butterさんまsanma", result);
         }
 
