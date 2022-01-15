@@ -15,6 +15,7 @@ options:
         - sparkles
         - lipstick
         - memo
+        - loop
         - bookmark
         - technologist
   commit_groups:
@@ -27,6 +28,7 @@ options:
       sparkles: Introduce new features
       lipstick: Add or update the UI and style files
       memo: Add or update documentation
+      loop: Change requirements / dependencies
       bookmark: Release / Version tags
       technologist: Improve developer experience
   merges:
