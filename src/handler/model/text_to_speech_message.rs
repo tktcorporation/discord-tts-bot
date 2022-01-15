@@ -14,9 +14,9 @@ impl Message {
             self.msg.content.clone()
         };
         SpeechMessage {
-            value: replace_channel_string(
-                &remove_emoji_string(&remove_mention_string(&str[..])[..])[..],
-            ),
+            value: remove_role_string(&replace_channel_string(
+                &replace_emoji_string(&remove_mention_string(&str[..])[..])[..],
+            )),
         }
     }
 }
@@ -26,15 +26,20 @@ fn remove_mention_string(content: &str) -> String {
     let re = Regex::new(r"<@![0-9]+>").unwrap();
     re.replace_all(content, "").to_string()
 }
-fn remove_emoji_string(content: &str) -> String {
+fn remove_role_string(content: &str) -> String {
+    use regex::Regex;
+    let re = Regex::new(r"<@&[0-9]+>").unwrap();
+    re.replace_all(content, "").to_string()
+}
+fn replace_emoji_string(content: &str) -> String {
     use regex::Regex;
     let re = Regex::new(r"<:(.+):[0-9]+>").unwrap();
-    if let Some(caps) = re.captures(content) {
-        re.replace_all(content, caps.get(1).unwrap().as_str())
-            .to_string()
-    } else {
-        content.to_string()
-    }
+    re.captures_iter(content)
+        .collect::<Vec<_>>()
+        .iter()
+        .fold(content.to_string(), |acc, cap| {
+            acc.replace(&cap[0], &cap[1])
+        })
 }
 fn replace_channel_string(content: &str) -> String {
     use regex::Regex;
@@ -63,10 +68,32 @@ mod tests {
         }
 
         #[test]
+        fn test_remove_role_string() {
+            let str = "aaa<@&8379454856049>eeee";
+            let result = remove_role_string(str);
+            assert_eq!("aaaeeee", result);
+        }
+
+        #[test]
         fn test_remove_emoji_string() {
             let str = "<:butter:872873394570424340>";
-            let result = remove_emoji_string(str);
+            let result = replace_emoji_string(str);
             assert_eq!("butter", result);
+        }
+
+        #[test]
+        fn test_remove_double_emoji_string() {
+            let content = "<:butter:872873394570424340>さんま<:sanma:872873394570424340>";
+            use regex::Regex;
+            let re = Regex::new(r"<:(.+?):[0-9]+>").unwrap();
+            let result = re
+                .captures_iter(content)
+                .collect::<Vec<_>>()
+                .iter()
+                .fold(content.to_string(), |acc, cap| {
+                    acc.replace(&cap[0], &cap[1])
+                });
+            assert_eq!("butterさんまsanma", result);
         }
 
         #[test]

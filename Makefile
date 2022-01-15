@@ -2,7 +2,7 @@ all: fmt lint test
 fmt:
 	cargo fmt --all
 lint:
-	cargo +nightly clippy --all --all-targets --all-features --fix -Z unstable-options --allow-dirty
+	cargo +nightly clippy --all --all-targets --all-features --fix -Z unstable-options --allow-dirty --allow-staged
 test:
 	cargo test --all-features
 watch:
