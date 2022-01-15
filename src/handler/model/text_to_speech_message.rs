@@ -14,9 +14,9 @@ impl Message {
             self.msg.content.clone()
         };
         SpeechMessage {
-            value: replace_channel_string(
+            value: remove_role_string(&replace_channel_string(
                 &remove_emoji_string(&remove_mention_string(&str[..])[..])[..],
-            ),
+            )),
         }
     }
 }
@@ -24,6 +24,11 @@ impl Message {
 fn remove_mention_string(content: &str) -> String {
     use regex::Regex;
     let re = Regex::new(r"<@![0-9]+>").unwrap();
+    re.replace_all(content, "").to_string()
+}
+fn remove_role_string(content: &str) -> String {
+    use regex::Regex;
+    let re = Regex::new(r"<@&[0-9]+>").unwrap();
     re.replace_all(content, "").to_string()
 }
 fn remove_emoji_string(content: &str) -> String {
@@ -59,6 +64,13 @@ mod tests {
         fn test_remove_mention_string() {
             let str = "aaa<@!8379454856049>eeee";
             let result = remove_mention_string(str);
+            assert_eq!("aaaeeee", result);
+        }
+
+        #[test]
+        fn test_remove_role_string() {
+            let str = "aaa<@&8379454856049>eeee";
+            let result = remove_role_string(str);
             assert_eq!("aaaeeee", result);
         }
 
