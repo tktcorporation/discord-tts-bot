@@ -13,20 +13,20 @@ music = []
 default = ["tts"]
 
 [dependencies]
-hyper = "^0.14.13"
+hyper = "0.14.16"
 polly = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.7-alpha", package = "aws-sdk-polly" }
 aws-types = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.7-alpha", package = "aws-types" }
-tracing-subscriber = { version = "0.2.16", features = ["fmt"] }
-tiger = "^0.1"
-rand = "^0.8"
-serde_json = "^1.0"
-regex = "^1.5"
-html-escape = "^0.2"
-mockall = "^0.10.2"
-mockall_double = "0.1.0"
+tracing-subscriber = { version = "0.3.6", features = ["fmt"] }
+tiger = "0.2.0"
+rand = "0.8.4"
+serde_json = "1.0.74"
+regex = "1.5.4"
+html-escape = "0.2.9"
+mockall = "0.11.0"
+mockall_double = "0.2.1"
 
 [dependencies.songbird]
-version = "0.2.0"
+version = "0.2.1"
 features = ["builtin-queue"]
 
 [dependencies.serenity]
@@ -34,7 +34,7 @@ version = "0.10.9"
 features = ["cache", "standard_framework", "voice", "rustls_backend"]
 
 [dependencies.tokio]
-version = "1.12.0"
+version = "1.15.0"
 features = ["macros", "rt-multi-thread"]
 
 [dev-dependencies]
