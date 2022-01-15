@@ -1,4 +1,5 @@
 pub use crate::model::Message;
+use regex::Regex;
 
 #[derive(Debug, PartialEq)]
 pub struct SpeechMessage {
@@ -13,42 +14,81 @@ impl Message {
         } else {
             self.msg.content.clone()
         };
-        SpeechMessage {
-            value: remove_role_string(&replace_channel_string(
-                &replace_emoji_string(&remove_mention_string(&str[..])[..])[..],
-            )),
+        // convert discord styled string for speech
+        let converted = convert_discord_string(&str);
+        SpeechMessage { value: converted }
+    }
+}
+
+#[derive(Debug)]
+enum DiscordStringType {
+    Channel,
+    Role,
+    Emoji,
+    Mention,
+}
+impl DiscordStringType {
+    fn to_regex(&self) -> Regex {
+        match self {
+            DiscordStringType::Channel => Regex::new(r"<#[0-9]+?>").unwrap(),
+            DiscordStringType::Role => Regex::new(r"<@&[0-9]+?>").unwrap(),
+            DiscordStringType::Emoji => Regex::new(r"<:(.+?):[0-9]+?>").unwrap(),
+            DiscordStringType::Mention => Regex::new(r"<@![0-9]+?>").unwrap(),
+        }
+    }
+    fn to_convert_type(&self) -> ConvertType {
+        match self {
+            DiscordStringType::Channel => ConvertType::Empty,
+            DiscordStringType::Role => ConvertType::Empty,
+            DiscordStringType::Emoji => ConvertType::MatchString,
+            DiscordStringType::Mention => ConvertType::Empty,
+        }
+    }
+    fn from_str(s: &str) -> Option<DiscordStringType> {
+        let type_ = DiscordStringType::Channel;
+        if type_.to_regex().is_match(s) {
+            return Some(type_);
+        }
+        let type_ = DiscordStringType::Role;
+        if type_.to_regex().is_match(s) {
+            return Some(type_);
+        }
+        let type_ = DiscordStringType::Emoji;
+        if type_.to_regex().is_match(s) {
+            return Some(type_);
+        }
+        let type_ = DiscordStringType::Mention;
+        if type_.to_regex().is_match(s) {
+            return Some(type_);
+        }
+        None
+    }
+}
+
+enum ConvertType {
+    Empty,
+    MatchString,
+}
+impl ConvertType {
+    fn convert(&self, regex: &Regex, str: &str) -> String {
+        match self {
+            ConvertType::Empty => regex.replace_all(str, "").to_string(),
+            ConvertType::MatchString => regex
+                .captures_iter(str)
+                .collect::<Vec<_>>()
+                .iter()
+                .fold(str.to_string(), |acc, cap| acc.replace(&cap[0], &cap[1])),
         }
     }
 }
 
-fn remove_mention_string(content: &str) -> String {
-    use regex::Regex;
-    let re = Regex::new(r"<@![0-9]+>").unwrap();
-    re.replace_all(content, "").to_string()
-}
-fn remove_role_string(content: &str) -> String {
-    use regex::Regex;
-    let re = Regex::new(r"<@&[0-9]+>").unwrap();
-    re.replace_all(content, "").to_string()
-}
-fn replace_emoji_string(content: &str) -> String {
-    use regex::Regex;
-    let re = Regex::new(r"<:(.+?):[0-9]+>").unwrap();
-    re.captures_iter(content)
-        .collect::<Vec<_>>()
-        .iter()
-        .fold(content.to_string(), |acc, cap| {
-            acc.replace(&cap[0], &cap[1])
-        })
-}
-fn replace_channel_string(content: &str) -> String {
-    use regex::Regex;
-    let re = Regex::new(r"<#[0-9]+>").unwrap();
-    if re.captures(content).is_some() {
-        "channel".to_string()
+fn convert_discord_string(str: &str) -> String {
+    let (re, convert_type) = if let Some(type_) = DiscordStringType::from_str(str) {
+        (type_.to_regex(), type_.to_convert_type())
     } else {
-        content.to_string()
-    }
+        return str.to_string();
+    };
+    convert_discord_string(&convert_type.convert(&re, str))
 }
 
 #[cfg(test)]
@@ -57,42 +97,60 @@ mod tests {
     use serenity::model::channel::Message as SerenityMessage;
 
     #[cfg(test)]
-    mod remove_mention_string_test {
+    mod convert_discord_string_test {
         use super::*;
 
         #[test]
         fn test_remove_mention_string() {
             let str = "aaa<@!8379454856049>eeee";
-            let result = remove_mention_string(str);
+            let result = convert_discord_string(str);
             assert_eq!("aaaeeee", result);
+        }
+        #[test]
+        fn test_remove_double_mention_string() {
+            let str = "aaa<@!8379454856049>eeee<@!8379454856049>uuu";
+            let result = convert_discord_string(str);
+            assert_eq!("aaaeeeeuuu", result);
         }
 
         #[test]
         fn test_remove_role_string() {
             let str = "aaa<@&8379454856049>eeee";
-            let result = remove_role_string(str);
+            let result = convert_discord_string(str);
             assert_eq!("aaaeeee", result);
+        }
+        #[test]
+        fn test_remove_double_role_string() {
+            let str = "aaa<@&8379454856049>eeee<@&8379454856049>uuu";
+            let result = convert_discord_string(str);
+            assert_eq!("aaaeeeeuuu", result);
         }
 
         #[test]
         fn test_remove_emoji_string() {
             let str = "<:butter:872873394570424340>";
-            let result = replace_emoji_string(str);
+            let result = convert_discord_string(str);
             assert_eq!("butter", result);
         }
 
         #[test]
         fn test_remove_double_emoji_string() {
             let content = "<:butter:872873394570424340>さんま<:sanma:872873394570424340>";
-            let result = replace_emoji_string(content);
+            let result = convert_discord_string(content);
             assert_eq!("butterさんまsanma", result);
         }
 
         #[test]
         fn test_replace_channel_string() {
-            let str = "<#795680552845443113>";
-            let result = replace_channel_string(str);
-            assert_eq!("channel", result);
+            let str = "aaa<#795680552845443113>rrr";
+            let result = convert_discord_string(str);
+            assert_eq!("aaarrr", result);
+        }
+        #[test]
+        fn test_replace_double_channel_string() {
+            let str = "aaa<#795680552845443113>rrr<#795680552845443113>sss";
+            let result = convert_discord_string(str);
+            assert_eq!("aaarrrsss", result);
         }
     }
 
@@ -101,21 +159,30 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_to_speech_message() {
+        fn test_message() {
             let message = message_factory("https://example.com");
             assert_eq!("url", &message.to_speech_message().value);
         }
 
         #[test]
-        fn test_to_speech_message_not_ssl() {
+        fn test_not_ssl() {
             let message = message_factory("http://example.com");
             assert_eq!("url", &message.to_speech_message().value);
         }
 
         #[test]
-        fn test_to_speech_message_mix() {
+        fn test_url() {
             let message = message_factory("おはようhttps://example.comこんにちは");
             assert_eq!("url", &message.to_speech_message().value);
+        }
+
+        #[test]
+        fn test_mix() {
+            let message = message_factory("<@!8379454856049>おはよう<:sanma:872873394570424340>こんにちは<#795680552845443113>でも<@&8379454856049>これは<@&8379454856049><:butter:872873394570424340>です");
+            assert_eq!(
+                "おはようsanmaこんにちはでもこれはbutterです",
+                &message.to_speech_message().value
+            );
         }
     }
 
