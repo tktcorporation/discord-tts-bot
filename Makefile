@@ -9,3 +9,10 @@ watch:
 	cargo watch --features tts,music -x fmt -x clippy
 run:
 	cargo run --all-features
+install:
+	rustup update
+	rustup install nightly
+	rustup component add clippy rustfmt rust-analysis rust-src rls
+	cargo install cargo-watch
+	rustup component add clippy --toolchain nightly-x86_64-unknown-linux-gnu
+	cargo install cargo-edit
