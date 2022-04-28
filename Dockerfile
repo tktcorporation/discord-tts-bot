@@ -1,4 +1,4 @@
-FROM rust:1.57-slim-buster AS build-env
+FROM rust:1.60-slim-bullseye AS build-env
 
 RUN apt-get update && \
     apt-get install -y \
@@ -36,7 +36,7 @@ RUN cargo build --release --features "tts"
 
 CMD [ "/bin/sh",  "-c", "cargo run" ]
 
-FROM debian:buster-20210621-slim
+FROM debian:bullseye-20220418-slim
 
 RUN apt-get update && \
     apt-get install -y \
