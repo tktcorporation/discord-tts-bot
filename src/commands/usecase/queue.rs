@@ -1,6 +1,6 @@
 use serenity::{client::Context, framework::standard::CommandResult, model::channel::Message};
 
-use super::check_msg;
+use super::{check_msg, error::Error};
 
 pub async fn queue(ctx: &Context, msg: &Message) -> CommandResult {
     match _queue(ctx, msg).await {
@@ -35,7 +35,7 @@ pub async fn queue(ctx: &Context, msg: &Message) -> CommandResult {
 async fn _queue(
     ctx: &Context,
     msg: &Message,
-) -> Result<std::vec::Vec<songbird::tracks::TrackHandle>, String> {
+) -> Result<std::vec::Vec<songbird::tracks::TrackHandle>, Error> {
     let guild = msg.guild(&ctx.cache).await.unwrap();
     let guild_id = guild.id;
 
@@ -52,6 +52,6 @@ async fn _queue(
 
         Ok(handler.queue().current_queue())
     } else {
-        Err(String::from("Not in a voice channel"))
+        Err(Error::NotInVoiceChannel)
     }
 }
