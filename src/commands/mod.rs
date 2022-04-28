@@ -333,7 +333,30 @@ async fn queue(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
 #[aliases("p")]
 #[only_in(guilds)]
 async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    usecase::play(ctx, msg, args).await
+    use usecase::error::Error;
+    match usecase::play(ctx, msg, args).await {
+        Ok(_) => {}
+        Err(s) => match s {
+            Error::NotInVoiceChannel => {
+                let guild = msg.guild(&ctx.cache).await.unwrap();
+                let guild_id = guild.id;
+                let manager = songbird::get(ctx)
+                    .await
+                    .expect("Songbird Voice client placed in at initialisation.");
+
+                let voice = usecase::join::Voice { manager, guild_id };
+                usecase::join::join(ctx, msg, voice).await.unwrap();
+                check_msg(
+                    msg.reply(ctx, "I joined the channel. Please use play command again.")
+                        .await,
+                );
+            }
+            Error::ErrorSourcingFfmpeg => {
+                check_msg(msg.reply(ctx, Error::ErrorSourcingFfmpeg).await);
+            }
+        },
+    };
+    Ok(())
 }
 
 #[command]

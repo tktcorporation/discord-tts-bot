@@ -1,22 +1,10 @@
-use serenity::{
-    client::Context,
-    framework::standard::{Args, CommandResult},
-    model::channel::Message,
-};
+use serenity::{client::Context, framework::standard::Args, model::channel::Message};
 
 use super::super::service::{send_track_info_message, TrackTiming};
-use super::check_msg;
+use super::error::Error;
 use songbird::input::{restartable::Restartable, Input};
 
-pub async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    match _play(ctx, msg, args).await {
-        Ok(_) => {}
-        Err(s) => check_msg(msg.channel_id.say(&ctx.http, format!("Error: {}", s)).await),
-    };
-    Ok(())
-}
-
-async fn _play(ctx: &Context, msg: &Message, args: Args) -> Result<(), String> {
+pub async fn play(ctx: &Context, msg: &Message, args: Args) -> Result<(), Error> {
     let url = args.message();
 
     let guild = msg.guild(&ctx.cache).await.unwrap();
@@ -36,7 +24,7 @@ async fn _play(ctx: &Context, msg: &Message, args: Args) -> Result<(), String> {
             Ok(source) => source,
             Err(why) => {
                 println!("Err starting source: {:?}", why);
-                return Err(String::from("Error sourcing ffmpeg"));
+                return Err(Error::ErrorSourcingFfmpeg);
             }
         };
 
@@ -52,7 +40,7 @@ async fn _play(ctx: &Context, msg: &Message, args: Args) -> Result<(), String> {
 
         Ok(())
     } else {
-        Err(String::from("Not in a voice channel to play in"))
+        Err(Error::NotInVoiceChannel)
     }
 }
 
