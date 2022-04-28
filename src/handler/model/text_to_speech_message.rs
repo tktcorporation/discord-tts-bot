@@ -33,7 +33,7 @@ impl DiscordStringType {
             DiscordStringType::Channel => Regex::new(r"<#[0-9]+?>").unwrap(),
             DiscordStringType::Role => Regex::new(r"<@&[0-9]+?>").unwrap(),
             DiscordStringType::Emoji => Regex::new(r"<:(.+?):[0-9]+?>").unwrap(),
-            DiscordStringType::Mention => Regex::new(r"<@![0-9]+?>").unwrap(),
+            DiscordStringType::Mention => Regex::new(r"<@[0-9]+?>").unwrap(),
         }
     }
     fn to_convert_type(&self) -> ConvertType {
@@ -102,13 +102,13 @@ mod tests {
 
         #[test]
         fn test_remove_mention_string() {
-            let str = "aaa<@!8379454856049>eeee";
+            let str = "aaa<@8379454856049>eeee";
             let result = convert_discord_string(str);
             assert_eq!("aaaeeee", result);
         }
         #[test]
         fn test_remove_double_mention_string() {
-            let str = "aaa<@!8379454856049>eeee<@!8379454856049>uuu";
+            let str = "aaa<@8379454856049>eeee<@8379454856049>uuu";
             let result = convert_discord_string(str);
             assert_eq!("aaaeeeeuuu", result);
         }
@@ -178,7 +178,7 @@ mod tests {
 
         #[test]
         fn test_mix() {
-            let message = message_factory("<@!8379454856049>おはよう<:sanma:872873394570424340>こんにちは<#795680552845443113>でも<@&8379454856049>これは<@&8379454856049><:butter:872873394570424340>です");
+            let message = message_factory("<@8379454856049>おはよう<:sanma:872873394570424340>こんにちは<#795680552845443113>でも<@&8379454856049>これは<@&8379454856049><:butter:872873394570424340>です");
             assert_eq!(
                 "おはようsanmaこんにちはでもこれはbutterです",
                 &message.to_speech_message().value
