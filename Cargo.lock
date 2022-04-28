@@ -475,7 +475,7 @@ dependencies = [
 
 [[package]]
 name = "discord-speech-bot"
-version = "0.8.5"
+version = "0.8.6"
 dependencies = [
  "aws-sdk-polly",
  "aws-types",
