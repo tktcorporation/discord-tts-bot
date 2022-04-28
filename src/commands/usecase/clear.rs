@@ -1,6 +1,6 @@
 use serenity::{client::Context, framework::standard::CommandResult, model::channel::Message};
 
-use super::check_msg;
+use super::{check_msg, error::Error};
 
 pub async fn clear(ctx: &Context, msg: &Message) -> CommandResult {
     let message = match _clear(ctx, msg).await {
@@ -11,7 +11,7 @@ pub async fn clear(ctx: &Context, msg: &Message) -> CommandResult {
     Ok(())
 }
 
-async fn _clear(ctx: &Context, msg: &Message) -> Result<String, String> {
+async fn _clear(ctx: &Context, msg: &Message) -> Result<String, Error> {
     let guild = msg.guild(&ctx.cache).await.unwrap();
     let guild_id = guild.id;
 
@@ -36,6 +36,6 @@ async fn _clear(ctx: &Context, msg: &Message) -> Result<String, String> {
             removed => format!("Removed **{}** titles from the queue!", removed),
         })
     } else {
-        Err(String::from("Not in a voice channel to play in"))
+        Err(Error::NotInVoiceChannel)
     }
 }

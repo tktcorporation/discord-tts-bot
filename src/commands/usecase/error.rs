@@ -1,0 +1,21 @@
+use std::error::Error as StdError;
+use std::fmt;
+
+#[allow(clippy::enum_variant_names)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[non_exhaustive]
+pub enum Error {
+    NotInVoiceChannel,
+    ErrorSourcingFfmpeg,
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::NotInVoiceChannel => f.write_str("Not in a voice channel."),
+            Error::ErrorSourcingFfmpeg => f.write_str("Error sourcing ffmpeg."),
+        }
+    }
+}
+
+impl StdError for Error {}

@@ -8,6 +8,7 @@ mod play;
 pub use play::play;
 mod clear;
 pub use clear::clear;
+pub mod error;
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
 pub fn check_msg(result: SerenityResult<Message>) {
