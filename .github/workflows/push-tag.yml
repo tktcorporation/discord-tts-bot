@@ -13,7 +13,7 @@ jobs:
       is_new_release: ${{ steps.check_push.outputs.is_push }}
     steps:
       - name: checkout
-        uses: actions/checkout@v2.2.0
+        uses: actions/checkout@v2.4.2
         with:
           fetch-depth: 0
           # NOTE @v2 uses the token as an auth http header. Set it to
