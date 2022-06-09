@@ -181,9 +181,9 @@ jobs:
         command: test
         args: --all --all-features --all-targets
 
-  deny-check:
-    name: cargo-deny check
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - uses: EmbarkStudios/cargo-deny-action@v1
+#   deny-check:
+#     name: cargo-deny check
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v1
+#     - uses: EmbarkStudios/cargo-deny-action@v1
