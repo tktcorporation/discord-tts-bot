@@ -127,7 +127,7 @@ jobs:
           tar czvf ../../../${{ matrix.name }} discord-speech-bot
           cd -
       - name: Deploy | Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.name }}
           path: ${{ matrix.name }}
