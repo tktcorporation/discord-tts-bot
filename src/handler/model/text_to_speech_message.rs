@@ -16,7 +16,8 @@ impl Message {
         };
         // convert discord styled string for speech
         let converted = convert_discord_string(&str);
-        SpeechMessage { value: converted }
+        let translated = translate_to_ojosama(&converted);
+        SpeechMessage { value: translated }
     }
 }
 
@@ -91,6 +92,18 @@ fn convert_discord_string(str: &str) -> String {
     convert_discord_string(&convert_type.convert(&re, str))
 }
 
+fn translate_to_ojosama(str: &str) -> String {
+    use std::process::Command;
+    let stdout = Command::new("ojosama")
+        .arg("-t")
+        .arg(str)
+        .output()
+        .expect("failed to translate to ojosama")
+        .stdout;
+    println!("{:?}", stdout);
+    String::from_utf8(stdout).unwrap()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -155,6 +168,17 @@ mod tests {
     }
 
     #[cfg(test)]
+    mod translate_to_ojosama_test {
+        use super::*;
+        #[test]
+        fn test_translate_to_ojosama() {
+            let str = "ハーブがありました";
+            let result = translate_to_ojosama(str);
+            assert_eq!("おハーブがありましたわ", result);
+        }
+    }
+
+    #[cfg(test)]
     mod to_speech_message_tests {
         use super::*;
 
@@ -180,7 +204,7 @@ mod tests {
         fn test_mix() {
             let message = message_factory("<@8379454856049>おはよう<:sanma:872873394570424340>こんにちは<#795680552845443113>でも<@&8379454856049>これは<@&8379454856049><:butter:872873394570424340>です");
             assert_eq!(
-                "おはようsanmaこんにちはでもこれはbutterです",
+                "おはようsanmaこんにちはでもこちらはbutterですわ",
                 &message.to_speech_message().value
             );
         }

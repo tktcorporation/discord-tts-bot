@@ -20,6 +20,10 @@ RUN curl https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
 RUN curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/bin/youtube-dl && \
     chmod a+rx /usr/bin/youtube-dl
 
+RUN curl -L https://github.com/jiro4989/ojosama/releases/download/v0.3.0/ojosama_0.3.0_linux_x86_64.tar.gz -o /tmp/ojosama_0.3.0_linux_x86_64.tar.gz && \
+    tar -xzf /tmp/ojosama_0.3.0_linux_x86_64.tar.gz -C /usr/local/bin && \
+    rm /tmp/ojosama_0.3.0_linux_x86_64.tar.gz
+
 ENV LC_ALL=C.UTF-8
 
 COPY Cargo.lock Cargo.lock
@@ -56,6 +60,10 @@ RUN apt-get update && \
 
 RUN curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/bin/youtube-dl && \
     chmod a+rx /usr/bin/youtube-dl
+
+RUN curl -L https://github.com/jiro4989/ojosama/releases/download/v0.3.0/ojosama_0.3.0_linux_x86_64.tar.gz -o /tmp/ojosama_0.3.0_linux_x86_64.tar.gz && \
+    tar -xzf /tmp/ojosama_0.3.0_linux_x86_64.tar.gz -C /usr/local/bin && \
+    rm /tmp/ojosama_0.3.0_linux_x86_64.tar.gz
 
 ENV LC_ALL=C.UTF-8
 
