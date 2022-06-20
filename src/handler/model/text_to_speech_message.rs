@@ -172,9 +172,9 @@ mod tests {
         use super::*;
         #[test]
         fn test_translate_to_ojosama() {
-            let str = "ハーブがありました！";
+            let str = "ハーブがありました";
             let result = translate_to_ojosama(str);
-            assert_eq!("おハーブがありましたわ～！", result);
+            assert_eq!("おハーブがありましたわ", result);
         }
     }
 
@@ -204,7 +204,7 @@ mod tests {
         fn test_mix() {
             let message = message_factory("<@8379454856049>おはよう<:sanma:872873394570424340>こんにちは<#795680552845443113>でも<@&8379454856049>これは<@&8379454856049><:butter:872873394570424340>です");
             assert_eq!(
-                "おはようsanmaこんにちはでもこれはbutterです",
+                "おはようsanmaこんにちはでもこちらはbutterですわ",
                 &message.to_speech_message().value
             );
         }
