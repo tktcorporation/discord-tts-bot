@@ -16,7 +16,8 @@ impl Message {
         };
         // convert discord styled string for speech
         let converted = convert_discord_string(&str);
-        SpeechMessage { value: converted }
+        let translated = translate_to_ojosama(&converted);
+        SpeechMessage { value: translated }
     }
 }
 
@@ -91,6 +92,18 @@ fn convert_discord_string(str: &str) -> String {
     convert_discord_string(&convert_type.convert(&re, str))
 }
 
+fn translate_to_ojosama(str: &str) -> String {
+    use std::process::Command;
+    let stdout = Command::new("ojosama")
+        .arg("-t")
+        .arg(str)
+        .output()
+        .expect("failed to translate to ojosama")
+        .stdout;
+    println!("{:?}", stdout);
+    String::from_utf8(stdout).unwrap()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -151,6 +164,17 @@ mod tests {
             let str = "aaa<#795680552845443113>rrr<#795680552845443113>sss";
             let result = convert_discord_string(str);
             assert_eq!("aaarrrsss", result);
+        }
+    }
+
+    #[cfg(test)]
+    mod translate_to_ojosama_test {
+        use super::*;
+        #[test]
+        fn test_translate_to_ojosama() {
+            let str = "ハーブがありました！";
+            let result = translate_to_ojosama(str);
+            assert_eq!("おハーブがありましたわ～！", result);
         }
     }
 
