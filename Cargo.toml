@@ -1,8 +1,8 @@
 [package]
 name = "discord-speech-bot"
-version = "0.8.7"
+version = "0.9.0"
 authors = ["tktcorporation"]
-edition = "2018"
+edition = "2021"
 license = "MIT"
 readme = "README.md"
 
