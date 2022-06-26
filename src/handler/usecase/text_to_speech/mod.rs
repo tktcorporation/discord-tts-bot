@@ -1,4 +1,3 @@
-#[cfg(feature = "tts")]
 mod text_to_speech_message;
 use super::interface::Speaker;
 use text_to_speech_message::Message;
