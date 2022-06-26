@@ -10,8 +10,8 @@ mod model;
 use model::context::Context as Ctx;
 
 #[cfg(feature = "tts")]
-use model::{speaker::CurrentVoiceState, text_to_speech_message::Message, voice::Voice};
-mod usecase;
+use model::{speaker::CurrentVoiceState, voice::Voice};
+pub mod usecase;
 use usecase::set_help_message_to_activity::set_help_message_to_activity;
 
 #[cfg(feature = "tts")]
@@ -32,7 +32,7 @@ impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: SerenityMessage) {
         let guild_id = msg.guild(&ctx.cache).await.unwrap().id;
         let voice = Voice::from(&ctx, guild_id).await;
-        let tts_msg = Message::new(msg);
+        let tts_msg = crate::model::Message::new(msg);
         text_to_speech(Box::new(voice), tts_msg).await
     }
 

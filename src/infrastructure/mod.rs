@@ -1,8 +1,13 @@
-mod sound_file;
-pub use sound_file::SoundFile;
-mod speech_file_path;
-pub use speech_file_path::SpeechFilePath;
+mod path_router;
+
+// root/sounds
+pub use path_router::SharedSoundPath;
+
+// root/tmp/guild_id
+pub use path_router::GuildPath;
 mod sound_path;
+// root/tmp/guild_id/sounds
 pub use sound_path::SoundPath;
-mod guild_path;
-pub use guild_path::GuildPath;
+mod speech_file_path;
+// root/tmp/guild_id/sounds/speech_file
+pub use speech_file_path::SpeechFilePath;
