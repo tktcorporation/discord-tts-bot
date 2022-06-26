@@ -10,6 +10,7 @@ target/
 .DS_Store
 .envrc
 .env
+tmp/
 
 # Sound data
 /sounds/*

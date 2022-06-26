@@ -1,12 +1,28 @@
-use super::super::model::text_to_speech_message::Message;
+#[cfg(feature = "tts")]
+mod text_to_speech_message;
 use super::interface::Speaker;
+use text_to_speech_message::Message;
+pub mod config;
+pub mod speech_options;
+use crate::infrastructure::GuildPath;
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct SpeechMessage {
+    pub value: String,
+}
 
 pub async fn text_to_speech(speaker: Box<dyn Speaker + Sync + Send>, msg: Message) {
     // If it's a bot message or command, ignore it.
     if msg.is_from_bot() || msg.is_command() {
         return;
     };
-    speaker.speech(msg.to_speech_message()).await;
+    let config = config::client::new(GuildPath::new(&speaker.guild_id()))
+        .read()
+        .unwrap();
+    let speech_options = config
+        .map(|config| config.speech_options)
+        .unwrap_or_default();
+    speaker.speech(msg.to_speech_message(speech_options)).await;
 }
 
 #[cfg(test)]
@@ -15,13 +31,14 @@ mod tests {
     use super::super::interface::MockSpeaker;
     use super::*;
     use regex::Regex;
-    use serenity::model::channel::Message as SerenityMessage;
+    use serenity::model::{channel::Message as SerenityMessage, id::GuildId};
 
     #[tokio::test]
     async fn test_text_to_speech() {
         let mut speaker = MockSpeaker::new();
         let msg = message_factory("some message");
         speaker.expect_speech().times(1).return_const(());
+        speaker.expect_guild_id().times(1).return_const(GuildId(1));
         assert!(!msg.is_command());
         assert!(!msg.is_from_bot());
         text_to_speech(Box::new(speaker), msg).await;

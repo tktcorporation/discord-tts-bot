@@ -1,3 +1,4 @@
+use super::SoundPath;
 use std::path::Path;
 use tokio::fs::File;
 
@@ -19,6 +20,16 @@ pub struct SpeechFilePath {
 }
 
 impl SpeechFilePath {
+    pub fn new(sound_path: SoundPath) -> SpeechFilePath {
+        use rand::Rng;
+
+        // guild ごとに最大5ファイル持つ
+        let rand_num: i32 = rand::thread_rng().gen_range(0..4);
+        std::path::PathBuf::from(sound_path)
+            .join(rand_num.to_string())
+            .into()
+    }
+
     pub async fn file(self) -> SpeechFile {
         let file_name = self.file_name();
 

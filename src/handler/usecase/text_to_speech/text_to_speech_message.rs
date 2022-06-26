@@ -1,13 +1,10 @@
+use super::speech_options::SpeechOptions;
+use super::SpeechMessage;
 pub use crate::model::Message;
 use regex::Regex;
 
-#[derive(Debug, PartialEq)]
-pub struct SpeechMessage {
-    pub value: String,
-}
-
 impl Message {
-    pub fn to_speech_message(&self) -> SpeechMessage {
+    pub fn to_speech_message(&self, options: SpeechOptions) -> SpeechMessage {
         // urlはそのまま読まない
         let str = if self.msg.content.contains("http") {
             "url".to_string()
@@ -16,8 +13,14 @@ impl Message {
         };
         // convert discord styled string for speech
         let converted = convert_discord_string(&str);
-        let translated = translate_to_ojosama(&converted);
-        SpeechMessage { value: translated }
+        let message = if options.is_ojosama {
+            // translate ojosama styled string for speech
+            translate_to_ojosama(&converted)
+        } else {
+            converted
+        };
+
+        SpeechMessage { value: message }
     }
 }
 
@@ -185,19 +188,34 @@ mod tests {
         #[test]
         fn test_message() {
             let message = message_factory("https://example.com");
-            assert_eq!("url", &message.to_speech_message().value);
+            assert_eq!(
+                "url",
+                &message
+                    .to_speech_message(SpeechOptions { is_ojosama: false },)
+                    .value
+            );
         }
 
         #[test]
         fn test_not_ssl() {
             let message = message_factory("http://example.com");
-            assert_eq!("url", &message.to_speech_message().value);
+            assert_eq!(
+                "url",
+                &message
+                    .to_speech_message(SpeechOptions { is_ojosama: false },)
+                    .value
+            );
         }
 
         #[test]
         fn test_url() {
             let message = message_factory("おはようhttps://example.comこんにちは");
-            assert_eq!("url", &message.to_speech_message().value);
+            assert_eq!(
+                "url",
+                &message
+                    .to_speech_message(SpeechOptions { is_ojosama: false },)
+                    .value
+            );
         }
 
         #[test]
@@ -205,7 +223,9 @@ mod tests {
             let message = message_factory("<@8379454856049>おはよう<:sanma:872873394570424340>こんにちは<#795680552845443113>でも<@&8379454856049>これは<@&8379454856049><:butter:872873394570424340>です");
             assert_eq!(
                 "おはようsanmaこんにちはでもこちらはbutterですわ",
-                &message.to_speech_message().value
+                &message
+                    .to_speech_message(SpeechOptions { is_ojosama: true },)
+                    .value
             );
         }
     }

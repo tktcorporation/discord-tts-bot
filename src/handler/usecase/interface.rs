@@ -1,10 +1,11 @@
-use super::super::model::text_to_speech_message::SpeechMessage;
+use super::text_to_speech::SpeechMessage;
 use serenity::async_trait;
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait Speaker {
     async fn speech(&self, msg: SpeechMessage);
+    fn guild_id(&self) -> serenity::model::id::GuildId;
 }
 
 #[cfg_attr(test, mockall::automock)]

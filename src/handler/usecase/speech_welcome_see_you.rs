@@ -2,9 +2,9 @@ use super::interface::Speaker;
 
 use super::super::model::{
     speaker::{self, ChangeOfStates, CurrentVoiceState},
-    text_to_speech_message::SpeechMessage,
     voice::Voice,
 };
+use super::text_to_speech::SpeechMessage;
 #[cfg(feature = "tts")]
 use serenity::model::voice;
 

@@ -1,6 +1,5 @@
-use super::super::usecase::interface::Speaker;
-use super::text_to_speech_message::SpeechMessage;
-use crate::infrastructure;
+use super::super::usecase::{interface::Speaker, text_to_speech::SpeechMessage};
+use crate::infrastructure::{GuildPath, SoundPath, SpeechFilePath};
 pub use crate::model::Voice;
 use polly::model::VoiceId;
 use serenity::async_trait;
@@ -16,9 +15,7 @@ impl Speaker for Voice {
     async fn speech(&self, msg: SpeechMessage) {
         match self.handler().await {
             Ok(handler) => {
-                let root = env!("CARGO_MANIFEST_DIR");
-                let file_path =
-                    infrastructure::SoundFile::new(root).speech_file_path(&self.guild_id);
+                let file_path = SpeechFilePath::new(SoundPath::new(GuildPath::new(&self.guild_id)));
                 let speech_file =
                     generate_speech_file(msg.value, VoiceId::Mizuki, file_path, false)
                         .await
@@ -29,12 +26,15 @@ impl Speaker for Voice {
             Err(str) => println!("{}", str),
         }
     }
+    fn guild_id(&self) -> serenity::model::id::GuildId {
+        self.guild_id
+    }
 }
 
 async fn get_input_from_local<P: AsRef<OsStr>>(file_path: P) -> Input {
-    return ffmpeg(file_path)
+    ffmpeg(file_path)
         .await
-        .expect("This might fail: handle this error!");
+        .expect("This might fail: handle this error!")
 }
 
 async fn play_input(
@@ -54,7 +54,7 @@ mod tests {
     async fn create_tts_file() {
         let root = env!("CARGO_MANIFEST_DIR");
         let path = Path::new(root);
-        let file_path: infrastructure::SpeechFilePath = path.join("sounds").join("tts").into();
+        let file_path: SpeechFilePath = path.join("sounds").join("tts").into();
         let speech_file = generate_speech_file(
             "おはようございます".to_string(),
             VoiceId::Mizuki,

@@ -6,10 +6,9 @@ use serenity::{
         misc::Mentionable,
     },
 };
-use std::path::PathBuf;
 mod voice_event_handler;
 
-use crate::infrastructure::{SoundFile, SoundPath};
+use crate::infrastructure::SharedSoundPath;
 pub use crate::model::{Message, Voice};
 
 use songbird::{self, ffmpeg, Event, TrackEvent};
@@ -68,7 +67,7 @@ async fn _queue_join_message(
         voice_event_handler::TrackPlayNotifier::new(text_channel_id, http),
     );
 
-    let input = welcome_audio(SoundFile::new(env!("CARGO_MANIFEST_DIR")).root_path()).await;
+    let input = welcome_audio().await;
     handle.enqueue_source(input)
 }
 
@@ -77,9 +76,8 @@ async fn _clear(handle_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::
     call.queue().stop();
 }
 
-async fn welcome_audio(path: SoundPath) -> songbird::input::Input {
-    let path: PathBuf = path.into();
-    let file_path = path.join("shabeko_dayo.wav");
+async fn welcome_audio() -> songbird::input::Input {
+    let file_path = SharedSoundPath::new().welcome_audio_path();
     ffmpeg(file_path)
         .await
         .expect("This might fail: handle this error!")
@@ -91,8 +89,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_welcome_audio() {
-        let path = SoundFile::new(env!("CARGO_MANIFEST_DIR")).root_path();
-        welcome_audio(path).await;
+        welcome_audio().await;
     }
 }
 

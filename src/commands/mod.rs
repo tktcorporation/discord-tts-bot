@@ -23,8 +23,8 @@ mod service;
 #[cfg(any(feature = "tts", feature = "music"))]
 #[group]
 #[commands(
-    deafen, join, leave, mute, play_fade, play, queue, skip, clear, ping, undeafen, unmute, bgm,
-    invite
+    deafen, join, ojoin, leave, mute, play_fade, play, queue, skip, clear, ping, undeafen, unmute,
+    bgm, invite
 )]
 pub(crate) struct General;
 
@@ -102,6 +102,7 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
 #[description = "Join your voice channel to use tts."]
 #[only_in(guilds)]
 async fn join(ctx: &Context, msg: &Message) -> CommandResult {
+    use crate::handler::usecase::text_to_speech::{config, speech_options};
     let guild = msg.guild(&ctx.cache).await.unwrap();
     let guild_id = guild.id;
     let manager = songbird::get(ctx)
@@ -109,6 +110,30 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
         .expect("Songbird Voice client placed in at initialisation.");
 
     let voice = usecase::join::Voice { manager, guild_id };
+    let client = config::client::new(crate::infrastructure::GuildPath::new(&voice.guild_id));
+    client.write(config::Config {
+        speech_options: speech_options::SpeechOptions::default(),
+    });
+    usecase::join::join(ctx, msg, voice).await.unwrap();
+    Ok(())
+}
+
+#[command]
+#[description = "Join your voice channel to use tts."]
+#[only_in(guilds)]
+async fn ojoin(ctx: &Context, msg: &Message) -> CommandResult {
+    use crate::handler::usecase::text_to_speech::{config, speech_options};
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
+    let manager = songbird::get(ctx)
+        .await
+        .expect("Songbird Voice client placed in at initialisation.");
+
+    let voice = usecase::join::Voice { manager, guild_id };
+    let client = config::client::new(crate::infrastructure::GuildPath::new(&voice.guild_id));
+    client.write(config::Config {
+        speech_options: speech_options::SpeechOptions { is_ojosama: true },
+    });
     usecase::join::join(ctx, msg, voice).await.unwrap();
     Ok(())
 }
