@@ -60,16 +60,11 @@ RUN apt-get update && \
  && apt-get -y clean \
  && rm -rf /var/lib/apt/lists/*
 
-RUN curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/bin/youtube-dl && \
-    chmod a+rx /usr/bin/youtube-dl
-
-RUN curl -L https://github.com/jiro4989/ojosama/releases/download/v${ojosama_version}/ojosama_${ojosama_version}_linux_x86_64.tar.gz -o /tmp/ojosama_${ojosama_version}_linux_x86_64.tar.gz && \
-    tar -xzf /tmp/ojosama_${ojosama_version}_linux_x86_64.tar.gz -C /usr/local/bin && \
-    rm /tmp/ojosama_${ojosama_version}_linux_x86_64.tar.gz
-
 ENV LC_ALL=C.UTF-8
 
 COPY --from=build-env /target/release/discord-speech-bot /bin/discord-speech-bot
 COPY --from=build-env /sounds /sounds
+COPY --from=build-env /usr/bin/youtube-dl /bin/youtube-dl
+COPY --from=build-env /usr/bin/ojosama /bin/ojosama
 
 CMD [ "/bin/sh",  "-c", "discord-speech-bot" ]
