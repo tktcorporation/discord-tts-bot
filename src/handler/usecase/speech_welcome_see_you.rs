@@ -1,31 +1,25 @@
 use super::interface::Speaker;
 
-use super::super::model::{
-    speaker::{self, ChangeOfStates, CurrentVoiceState},
-    voice::Voice,
-};
+use super::super::model::{speaker::ChangeOfStates, voice::Voice};
 use super::text_to_speech::SpeechMessage;
 #[cfg(feature = "tts")]
-use serenity::model::voice;
+use serenity::model::prelude::User;
 
 use serenity::client::Context;
 
-pub async fn change_check(
-    ctx: &Context,
-    state: CurrentVoiceState,
-    old_voice_state: Option<voice::VoiceState>,
-) {
-    let change = state.change_of_states(old_voice_state);
-    let member = state.voice_member().await.expect("member is not received");
-    let voice = Voice::from(ctx, member.guild_id).await;
-    if voice.is_alone(ctx).await.unwrap() {
-        return voice.leave().await.unwrap();
-    }
-    if let speaker::Role::Bot = member.role(ctx).await {
-        return println!("This is me(bot). My entering is ignored.");
-    }
-    if let Some(message) = greeting_word(&change, &member.user.name) {
+pub async fn speech_greeting(ctx: &Context, voice: &Voice, change: &ChangeOfStates, user: &User) {
+    let name = match user.nick_in(ctx, voice.guild_id()).await {
+        Some(n) => n,
+        None => user.name.clone(),
+    };
+    if let Some(message) = greeting_word(change, &name) {
         voice.speech(message).await
+    }
+}
+
+pub async fn leave_if_alone(ctx: &Context, voice: &Voice) {
+    if voice.is_alone(ctx).await.unwrap() {
+        voice.leave().await.unwrap()
     }
 }
 
