@@ -1,5 +1,6 @@
 #[cfg(feature = "tts")]
-use serenity::model::{channel::Message as SerenityMessage, voice};
+use serenity::model::channel::Message as SerenityMessage;
+use serenity::model::voice;
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
@@ -9,13 +10,15 @@ use serenity::{
 mod model;
 use model::context::Context as Ctx;
 
-#[cfg(feature = "tts")]
-use model::{speaker::CurrentVoiceState, voice::Voice};
+use model::{
+    speaker::{CurrentVoiceState, Role},
+    voice::Voice,
+};
 pub mod usecase;
 use usecase::set_help_message_to_activity::set_help_message_to_activity;
 
 #[cfg(feature = "tts")]
-use usecase::{speech_welcome_see_you::change_check, text_to_speech::text_to_speech};
+use usecase::{speech_welcome_see_you::speech_greeting, text_to_speech::text_to_speech};
 
 pub struct Handler;
 
@@ -36,7 +39,6 @@ impl EventHandler for Handler {
         text_to_speech(Box::new(voice), tts_msg).await
     }
 
-    #[cfg(feature = "tts")]
     async fn voice_state_update(
         &self,
         ctx: Context,
@@ -45,7 +47,23 @@ impl EventHandler for Handler {
         new_voice_state: voice::VoiceState,
     ) {
         let state = CurrentVoiceState::new(new_voice_state);
-        change_check(&ctx, state, old_voice_state).await;
+        #[cfg(feature = "tts")]
+        let change = state.change_of_states(old_voice_state.as_ref());
+        let member = state.voice_member().await.expect("member is not received");
+        let voice = Voice::from(&ctx, member.guild_id).await;
+        let role = member.role(&ctx).await;
+        if let Role::Me = role {
+            return println!("This is me(bot). My entering is ignored.");
+        }
+        #[cfg(feature = "tts")]
+        speech_greeting(&ctx, &voice, &change, &member.user).await;
+        leave_if_alone(&ctx, &voice).await;
+    }
+}
+
+async fn leave_if_alone(ctx: &Context, voice: &Voice) {
+    if voice.is_alone(ctx).await.unwrap() {
+        voice.leave().await.unwrap()
     }
 }
 

@@ -16,3 +16,4 @@ install:
 	cargo install cargo-watch
 	rustup component add clippy --toolchain nightly-x86_64-unknown-linux-gnu
 	cargo install cargo-edit
+	cargo install cargo-hack

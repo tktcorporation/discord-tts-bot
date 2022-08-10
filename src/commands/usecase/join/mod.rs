@@ -9,7 +9,7 @@ use serenity::{
 mod voice_event_handler;
 
 use crate::infrastructure::SharedSoundPath;
-pub use crate::model::{Message, Voice};
+pub use crate::model::Voice;
 
 use songbird::{self, ffmpeg, Event, TrackEvent};
 

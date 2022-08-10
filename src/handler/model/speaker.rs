@@ -18,7 +18,7 @@ impl VoiceMember {
     pub async fn role(&self, ctx: &Context) -> Role {
         let current_user_id = ctx.cache.current_user_id().await;
         if current_user_id == self.user.id {
-            return Role::Bot;
+            return Role::Me;
         }
         Role::Other
     }
@@ -42,7 +42,7 @@ impl CurrentVoiceState {
 
     pub fn change_of_states(
         &self,
-        previous_voice_state: Option<voice::VoiceState>,
+        previous_voice_state: Option<&voice::VoiceState>,
     ) -> ChangeOfStates {
         match previous_voice_state {
             // 他サーバーに反応しないように
@@ -65,6 +65,6 @@ pub enum ChangeOfStates {
 }
 
 pub enum Role {
-    Bot,
+    Me,
     Other,
 }

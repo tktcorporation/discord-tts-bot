@@ -36,10 +36,12 @@ impl Voice {
     }
 
     pub async fn is_alone(&self, ctx: &Context) -> Result<bool, String> {
-        match self.members(ctx).await {
-            Ok(members) => Ok(members.len() <= 1),
-            Err(str) => Err(str),
-        }
+        let members = match self.members(ctx).await {
+            Ok(members) => members,
+            Err(str) => return Err(str),
+        };
+        // exclude bot members
+        Ok(!members.iter().any(|member| !member.user.bot))
     }
 
     pub async fn leave(&self) -> std::result::Result<(), songbird::error::JoinError> {
