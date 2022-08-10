@@ -1,10 +1,14 @@
 name: CI
-
 on:
-  push:
-    branches:
-      - master
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  pull-requests: write
+  contents: write
 
 defaults:
   run:
@@ -22,6 +26,7 @@ jobs:
   check:
     # Run `cargo check` first to ensure that the pushed code at least compiles.
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
     - uses: actions/checkout@master
     - uses: actions-rs/toolchain@v1
@@ -60,6 +65,7 @@ jobs:
 
   check-docs:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
     - uses: actions/checkout@master
     - uses: actions-rs/toolchain@v1
@@ -92,6 +98,7 @@ jobs:
 
   cargo-hack:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
     - uses: actions/checkout@master
     - uses: actions-rs/toolchain@v1
@@ -127,6 +134,7 @@ jobs:
     # Test against the stable, beta, and nightly Rust toolchains on ubuntu-latest.
     needs: check
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     strategy:
       matrix:
         rust:
@@ -186,9 +194,20 @@ jobs:
         command: test
         args: --all --all-features --all-targets
 
-#   deny-check:
-#     name: cargo-deny check
-#     runs-on: ubuntu-latest
-#     steps:
-#     - uses: actions/checkout@v1
-#     - uses: EmbarkStudios/cargo-deny-action@v1
+  dependabot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    needs: test-versions
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1.3.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Enable auto-merge for Dependabot PRs
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor' }}
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
