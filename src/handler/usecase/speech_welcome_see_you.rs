@@ -2,11 +2,11 @@ use super::interface::Speaker;
 
 use super::super::model::{speaker::ChangeOfStates, voice::Voice};
 use super::text_to_speech::SpeechMessage;
-#[cfg(feature = "tts")]
 use serenity::model::prelude::User;
 
 use serenity::client::Context;
 
+#[cfg(feature = "tts")]
 pub async fn speech_greeting(ctx: &Context, voice: &Voice, change: &ChangeOfStates, user: &User) {
     let name = match user.nick_in(ctx, voice.guild_id()).await {
         Some(n) => n,
@@ -17,12 +17,7 @@ pub async fn speech_greeting(ctx: &Context, voice: &Voice, change: &ChangeOfStat
     }
 }
 
-pub async fn leave_if_alone(ctx: &Context, voice: &Voice) {
-    if voice.is_alone(ctx).await.unwrap() {
-        voice.leave().await.unwrap()
-    }
-}
-
+#[cfg(feature = "tts")]
 fn greeting_word(change_of_states: &ChangeOfStates, name: &str) -> Option<SpeechMessage> {
     match change_of_states {
         ChangeOfStates::Stay => None,

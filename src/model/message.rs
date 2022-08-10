@@ -5,6 +5,7 @@ pub struct Message {
     pub msg: SerenityMessage,
 }
 
+#[cfg(feature = "tts")]
 impl Message {
     pub fn new(msg: SerenityMessage) -> Message {
         Message { msg }

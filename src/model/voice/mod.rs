@@ -41,11 +41,7 @@ impl Voice {
             Err(str) => return Err(str),
         };
         // exclude bot members
-        let members = members
-            .iter()
-            .filter(|member| !member.user.bot)
-            .collect::<Vec<_>>();
-        Ok(members.is_empty())
+        Ok(!members.iter().any(|member| !member.user.bot))
     }
 
     pub async fn leave(&self) -> std::result::Result<(), songbird::error::JoinError> {
