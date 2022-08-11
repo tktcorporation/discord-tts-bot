@@ -194,10 +194,10 @@ jobs:
         command: test
         args: --all --all-features --all-targets
 
-  dependabot:
+  renovate:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ github.actor == 'renovate[bot]' }}
     needs: test-versions
     steps:
       - name: Dependabot metadata
