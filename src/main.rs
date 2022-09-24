@@ -10,6 +10,7 @@ use handler::Handler;
 mod infrastructure;
 
 mod commands;
+mod slash_commands;
 
 mod model;
 

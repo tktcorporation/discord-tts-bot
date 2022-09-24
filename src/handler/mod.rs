@@ -1,3 +1,5 @@
+use serenity::model::application::command::Command;
+use serenity::model::application::interaction::{Interaction, InteractionResponseType};
 #[cfg(feature = "tts")]
 use serenity::model::channel::Message as SerenityMessage;
 use serenity::model::voice;
@@ -10,6 +12,7 @@ use serenity::{
 mod model;
 use model::context::Context as Ctx;
 
+use crate::slash_commands;
 use model::{
     speaker::{CurrentVoiceState, Role},
     voice::Voice,
@@ -25,10 +28,39 @@ pub struct Handler;
 #[async_trait]
 #[cfg_attr(feature = "mock", mockall::automock)]
 impl EventHandler for Handler {
+    async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
+        if let Interaction::ApplicationCommand(command) = interaction {
+            println!("Received command interaction: {:#?}", command);
+
+            let content = match command.data.name.as_str() {
+                "join" => slash_commands::join::run(&ctx, &command).await,
+                _ => "not implemented :(".to_string(),
+            };
+
+            if let Err(why) = command
+                .create_interaction_response(&ctx.http, |response| {
+                    response
+                        .kind(InteractionResponseType::ChannelMessageWithSource)
+                        .interaction_response_data(|message| message.content(content))
+                })
+                .await
+            {
+                println!("Cannot respond to slash command: {}", why);
+            }
+        }
+    }
+
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
+
+        Command::set_global_application_commands(&ctx.http, |commands| {
+            commands.create_application_command(|command| slash_commands::join::register(command))
+        })
+        .await
+        .unwrap();
+
         let cont = Ctx::new(ctx);
-        set_help_message_to_activity(Box::new(cont)).await
+        set_help_message_to_activity(Box::new(cont)).await;
     }
 
     #[cfg(feature = "tts")]
