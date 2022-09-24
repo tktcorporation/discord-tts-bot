@@ -1,10 +1,7 @@
 use super::check_msg;
 use serenity::{
     client::Context,
-    model::{
-        channel::Message as SerenityMessage, id, id::ChannelId as SerenityChannelId,
-        misc::Mentionable,
-    },
+    model::{channel::Message as SerenityMessage, id, id::ChannelId as SerenityChannelId},
 };
 mod voice_event_handler;
 
@@ -26,7 +23,7 @@ impl Voice {
 }
 
 pub async fn join(ctx: &Context, msg: &SerenityMessage, joiner: Voice) -> Result<(), String> {
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let channel_id = guild
         .voice_states
         .get(&msg.author.id)
@@ -46,7 +43,7 @@ pub async fn join(ctx: &Context, msg: &SerenityMessage, joiner: Voice) -> Result
         Ok(()) => {
             _clear(&handle_lock).await;
             _queue_join_message(handle_lock, ctx.http.clone(), msg.channel_id).await;
-            format!("Joined {}", connect_to.mention())
+            format!("Joined {}", connect_to.name(&ctx.cache).await.unwrap())
         }
         Err(e) => e.to_string(),
     };
@@ -68,7 +65,7 @@ async fn _queue_join_message(
     );
 
     let input = welcome_audio().await;
-    handle.enqueue_source(input)
+    handle.enqueue_source(input);
 }
 
 async fn _clear(handle_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>) {

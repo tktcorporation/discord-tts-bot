@@ -1,6 +1,6 @@
 use std::env;
 
-use serenity::client::Client;
+use serenity::{client::Client, prelude::GatewayIntents};
 
 use songbird::SerenityInit;
 
@@ -25,7 +25,9 @@ async fn main() {
 
     let framework = build_framework();
 
-    let mut client = build_client(&token, framework)
+    let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
+
+    let mut client = build_client(&token, framework, intents)
         .await
         .expect("Err creating client");
 
@@ -38,8 +40,9 @@ async fn main() {
 async fn build_client(
     token: &str,
     framework: serenity::framework::StandardFramework,
+    intents: GatewayIntents,
 ) -> Result<serenity::Client, serenity::Error> {
-    Client::builder(token)
+    Client::builder(token, intents)
         .event_handler(Handler)
         .framework(framework)
         .register_songbird()

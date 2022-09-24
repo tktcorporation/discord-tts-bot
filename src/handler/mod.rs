@@ -33,7 +33,7 @@ impl EventHandler for Handler {
 
     #[cfg(feature = "tts")]
     async fn message(&self, ctx: Context, msg: SerenityMessage) {
-        let guild_id = msg.guild(&ctx.cache).await.unwrap().id;
+        let guild_id = msg.guild(&ctx.cache).unwrap().id;
         let voice = Voice::from(&ctx, guild_id).await;
         let tts_msg = crate::model::Message::new(msg);
         text_to_speech(Box::new(voice), tts_msg).await
@@ -42,7 +42,6 @@ impl EventHandler for Handler {
     async fn voice_state_update(
         &self,
         ctx: Context,
-        _: Option<serenity::model::id::GuildId>,
         old_voice_state: Option<voice::VoiceState>,
         new_voice_state: voice::VoiceState,
     ) {
