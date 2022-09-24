@@ -62,7 +62,7 @@ async fn invite(ctx: &Context, msg: &Message) -> CommandResult {
 
 #[command]
 async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
 
     let manager = songbird::get(ctx)
@@ -103,7 +103,7 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
 #[only_in(guilds)]
 async fn join(ctx: &Context, msg: &Message) -> CommandResult {
     use crate::handler::usecase::text_to_speech::{config, speech_options};
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
     let manager = songbird::get(ctx)
         .await
@@ -123,7 +123,7 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 #[only_in(guilds)]
 async fn ojoin(ctx: &Context, msg: &Message) -> CommandResult {
     use crate::handler::usecase::text_to_speech::{config, speech_options};
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
     let manager = songbird::get(ctx)
         .await
@@ -142,7 +142,7 @@ async fn ojoin(ctx: &Context, msg: &Message) -> CommandResult {
 #[description = "Leave from your voice channel."]
 #[only_in(guilds)]
 async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
 
     let manager = songbird::get(ctx)
@@ -171,7 +171,7 @@ async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 #[command]
 #[only_in(guilds)]
 async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
 
     let manager = songbird::get(ctx)
@@ -240,7 +240,7 @@ async fn play_fade(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
         return Ok(());
     }
 
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
 
     let manager = songbird::get(ctx)
@@ -363,7 +363,7 @@ async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         Ok(_) => {}
         Err(s) => match s {
             Error::NotInVoiceChannel => {
-                let guild = msg.guild(&ctx.cache).await.unwrap();
+                let guild = msg.guild(&ctx.cache).unwrap();
                 let guild_id = guild.id;
                 let manager = songbird::get(ctx)
                     .await
@@ -401,7 +401,7 @@ async fn bgm(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     }
     let input = get_bgm_input().await.unwrap();
 
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
 
     let manager = songbird::get(ctx)
@@ -438,7 +438,7 @@ async fn bgm(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
 #[aliases("s")]
 #[only_in(guilds)]
 async fn skip(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
 
     let manager = songbird::get(ctx)
@@ -481,7 +481,7 @@ async fn clear(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
 #[command]
 #[only_in(guilds)]
 async fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
 
     let manager = songbird::get(ctx)
@@ -514,7 +514,7 @@ async fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
 #[command]
 #[only_in(guilds)]
 async fn unmute(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
     let manager = songbird::get(ctx)
         .await

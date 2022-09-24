@@ -36,7 +36,7 @@ async fn _queue(
     ctx: &Context,
     msg: &Message,
 ) -> Result<std::vec::Vec<songbird::tracks::TrackHandle>, Error> {
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
 
     let manager = songbird::get(ctx)

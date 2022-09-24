@@ -7,7 +7,7 @@ use songbird::input::{restartable::Restartable, Input};
 pub async fn play(ctx: &Context, msg: &Message, args: Args) -> Result<(), Error> {
     let url = args.message();
 
-    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
 
     let manager = songbird::get(ctx)
