@@ -16,6 +16,16 @@ impl Voice {
         Voice { manager, guild_id }
     }
 
+    pub async fn join(
+        &self,
+        connect_to: id::ChannelId,
+    ) -> (
+        std::sync::Arc<tokio::sync::Mutex<songbird::Call>>,
+        songbird::error::JoinResult<()>,
+    ) {
+        self.manager.join(self.guild_id, connect_to).await
+    }
+
     pub async fn handler(
         &self,
     ) -> Result<std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>, &str> {

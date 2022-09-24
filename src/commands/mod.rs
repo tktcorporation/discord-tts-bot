@@ -16,7 +16,7 @@ use songbird::{
     Event, EventContext, EventHandler as VoiceEventHandler, TrackEvent,
 };
 
-mod usecase;
+pub mod usecase;
 use usecase::check_msg;
 mod service;
 
@@ -102,19 +102,24 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
 #[description = "Join your voice channel to use tts."]
 #[only_in(guilds)]
 async fn join(ctx: &Context, msg: &Message) -> CommandResult {
-    use crate::handler::usecase::text_to_speech::{config, speech_options};
+    use crate::handler::usecase::text_to_speech::speech_options;
     let guild = msg.guild(&ctx.cache).unwrap();
-    let guild_id = guild.id;
-    let manager = songbird::get(ctx)
-        .await
-        .expect("Songbird Voice client placed in at initialisation.");
-
-    let voice = usecase::join::Voice { manager, guild_id };
-    let client = config::client::new(crate::infrastructure::GuildPath::new(&voice.guild_id));
-    client.write(config::Config {
-        speech_options: speech_options::SpeechOptions::default(),
-    });
-    usecase::join::join(ctx, msg, voice).await.unwrap();
+    match usecase::join::join(
+        ctx,
+        guild,
+        &msg.author.id,
+        msg.channel_id,
+        speech_options::SpeechOptions::default(),
+    )
+    .await
+    {
+        Ok(comment) => {
+            check_msg(msg.reply(&ctx, comment).await);
+        }
+        Err(e) => {
+            check_msg(msg.reply(&ctx, format!("{:?}", e)).await);
+        }
+    }
     Ok(())
 }
 
@@ -122,19 +127,24 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 #[description = "Join your voice channel to use tts."]
 #[only_in(guilds)]
 async fn ojoin(ctx: &Context, msg: &Message) -> CommandResult {
-    use crate::handler::usecase::text_to_speech::{config, speech_options};
+    use crate::handler::usecase::text_to_speech::speech_options;
     let guild = msg.guild(&ctx.cache).unwrap();
-    let guild_id = guild.id;
-    let manager = songbird::get(ctx)
-        .await
-        .expect("Songbird Voice client placed in at initialisation.");
-
-    let voice = usecase::join::Voice { manager, guild_id };
-    let client = config::client::new(crate::infrastructure::GuildPath::new(&voice.guild_id));
-    client.write(config::Config {
-        speech_options: speech_options::SpeechOptions { is_ojosama: true },
-    });
-    usecase::join::join(ctx, msg, voice).await.unwrap();
+    match usecase::join::join(
+        ctx,
+        guild,
+        &msg.author.id,
+        msg.channel_id,
+        speech_options::SpeechOptions { is_ojosama: true },
+    )
+    .await
+    {
+        Ok(comment) => {
+            check_msg(msg.reply(&ctx, comment).await);
+        }
+        Err(e) => {
+            check_msg(msg.reply(&ctx, format!("{:?}", e)).await);
+        }
+    }
     Ok(())
 }
 
@@ -363,18 +373,28 @@ async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         Ok(_) => {}
         Err(s) => match s {
             Error::NotInVoiceChannel => {
+                use crate::handler::usecase::text_to_speech::speech_options;
                 let guild = msg.guild(&ctx.cache).unwrap();
-                let guild_id = guild.id;
-                let manager = songbird::get(ctx)
-                    .await
-                    .expect("Songbird Voice client placed in at initialisation.");
-
-                let voice = usecase::join::Voice { manager, guild_id };
-                usecase::join::join(ctx, msg, voice).await.unwrap();
-                check_msg(
-                    msg.reply(ctx, "I joined the channel. Please use play command again.")
-                        .await,
-                );
+                match usecase::join::join(
+                    ctx,
+                    guild,
+                    &msg.author.id,
+                    msg.channel_id,
+                    speech_options::SpeechOptions { is_ojosama: true },
+                )
+                .await
+                {
+                    Ok(comment) => {
+                        check_msg(msg.reply(&ctx, comment).await);
+                        check_msg(
+                            msg.reply(ctx, "I joined the channel. Please use play command again.")
+                                .await,
+                        );
+                    }
+                    Err(e) => {
+                        check_msg(msg.reply(&ctx, format!("{:?}", e)).await);
+                    }
+                }
             }
             Error::ErrorSourcingFfmpeg => {
                 check_msg(msg.reply(ctx, Error::ErrorSourcingFfmpeg).await);

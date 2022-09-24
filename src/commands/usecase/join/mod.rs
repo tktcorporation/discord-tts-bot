@@ -1,55 +1,55 @@
-use super::check_msg;
-use serenity::{
-    client::Context,
-    model::{channel::Message as SerenityMessage, id, id::ChannelId as SerenityChannelId},
-};
+use serenity::{self, client::Context, model::id::ChannelId as SerenityChannelId};
 mod voice_event_handler;
 
+use crate::handler::usecase::text_to_speech::{config, speech_options};
 use crate::infrastructure::SharedSoundPath;
 pub use crate::model::Voice;
 
 use songbird::{self, ffmpeg, Event, TrackEvent};
 
-impl Voice {
-    async fn join(
-        &self,
-        connect_to: id::ChannelId,
-    ) -> (
-        std::sync::Arc<tokio::sync::Mutex<songbird::Call>>,
-        songbird::error::JoinResult<()>,
-    ) {
-        self.manager.join(self.guild_id, connect_to).await
-    }
-}
+pub async fn join(
+    ctx: &Context,
+    guild: serenity::model::guild::Guild,
+    caller_id: &serenity::model::id::UserId,
+    called_channnel_id: serenity::model::id::ChannelId,
+    speech_options: speech_options::SpeechOptions,
+) -> Result<String, String> {
+    let manager = songbird::get(ctx)
+        .await
+        .expect("Songbird Voice client placed in at initialisation.");
+    let voice = Voice {
+        manager,
+        guild_id: guild.clone().id,
+    };
 
-pub async fn join(ctx: &Context, msg: &SerenityMessage, joiner: Voice) -> Result<(), String> {
-    let guild = msg.guild(&ctx.cache).unwrap();
+    // voice settings
+    let client = config::client::new(crate::infrastructure::GuildPath::new(&voice.guild_id));
+    client.write(config::Config { speech_options });
+
     let channel_id = guild
         .voice_states
-        .get(&msg.author.id)
+        .get(caller_id)
         .and_then(|voice_state| voice_state.channel_id);
 
     let connect_to = match channel_id {
         Some(channel) => channel,
         None => {
-            check_msg(msg.reply(ctx, "Not in a voice channel").await);
-
-            return Ok(());
+            return Err("Not in a voice channel".to_string());
         }
     };
 
-    let (handle_lock, success) = joiner.join(connect_to).await;
-    let comment = match success {
+    let (handle_lock, success) = voice.join(connect_to).await;
+    match success {
         Ok(()) => {
             _clear(&handle_lock).await;
-            _queue_join_message(handle_lock, ctx.http.clone(), msg.channel_id).await;
-            format!("Joined {}", connect_to.name(&ctx.cache).await.unwrap())
+            _queue_join_message(handle_lock, ctx.http.clone(), called_channnel_id).await;
+            Ok(format!(
+                "Joined {}",
+                connect_to.name(&ctx.cache).await.unwrap()
+            ))
         }
-        Err(e) => e.to_string(),
-    };
-
-    check_msg(msg.channel_id.say(&ctx.http, &comment).await);
-    Ok(())
+        Err(e) => Err(e.to_string()),
+    }
 }
 
 async fn _queue_join_message(
