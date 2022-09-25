@@ -71,21 +71,16 @@ act release
 
 - Heroku Account
 
-### Deploy
+### Release & Deploy
 
-```bash
-docker-compose run heroku /bin/bash
-```
-
-```bash:in_container
-heroku create <APP_NAME>
-heroku login
-apk add docker
-heroku container:login
-heroku container:push app -a <APP_NAME>
-heroku container:release app -a <APP_NAME>
-heroku ps:scale app=1 -a <APP_NAME>
-```
+1. `git switch master`
+1. `git pull`
+1. `git switch -c release/vx.x.x`
+1. Bump up to vx.x.x in Cargo.toml
+1. `git commit -m 'vx.x.x'`
+1. `git push --set-upstream origin release/vx.x.x`
+1. Create Pull Request
+1. Merge Pull Request
 
 ## To invite sample bot
 https://discord.com/api/oauth2/authorize?client_id=798137406946934784&permissions=2184261184&scope=bot
