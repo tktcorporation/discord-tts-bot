@@ -2,12 +2,12 @@ use serenity::builder::CreateApplicationCommand;
 use serenity::client::Context;
 use serenity::model::application::interaction::application_command::ApplicationCommandInteraction;
 
-pub use crate::commands::usecase;
+use super::super::services;
 
 pub async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> String {
     let guild = ctx.cache.guild(command.guild_id.unwrap()).unwrap();
     use crate::handler::usecase::text_to_speech::speech_options;
-    usecase::join::join(
+    services::join::join(
         ctx,
         guild,
         &command.user.id,

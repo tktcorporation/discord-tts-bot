@@ -12,7 +12,7 @@ use serenity::{
 mod model;
 use model::context::Context as Ctx;
 
-use crate::slash_commands;
+use crate::commands::slash_commands;
 use model::{
     speaker::{CurrentVoiceState, Role},
     voice::Voice,
