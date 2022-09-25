@@ -5,15 +5,23 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
+  - package-ecosystem: "cargo" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
     assignees:
       - "tktcorporation"
     commit-message:
-      prefix: "chore"
-      include: "scope"
+      prefix: "⬆️"
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "tktcorporation"
+    commit-message:
+      prefix: "⬆️"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -22,5 +30,4 @@ updates:
     assignees:
       - "tktcorporation"
     commit-message:
-      prefix: "chore"
-      include: "scope"
+      prefix: "⬆️"
