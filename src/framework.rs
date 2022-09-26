@@ -1,6 +1,6 @@
 use std::{collections::HashSet, env};
 
-use super::commands::GENERAL_GROUP;
+use crate::commands::message_commands::GENERAL_GROUP;
 use serenity::{
     framework::standard::{
         help_commands, macros::help, Args, CommandGroup, CommandResult, HelpOptions,
