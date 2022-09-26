@@ -1,15 +1,16 @@
-use serenity::{client::Context, framework::standard::Args, model::channel::Message};
+use serenity::{client::Context, model};
 
 use super::super::service::{send_track_info_message, TrackTiming};
 use super::error::Error;
 use songbird::input::{restartable::Restartable, Input};
+use songbird::tracks::create_player;
 
-pub async fn play(ctx: &Context, msg: &Message, args: Args) -> Result<(), Error> {
-    let url = args.message();
-
-    let guild = msg.guild(&ctx.cache).unwrap();
-    let guild_id = guild.id;
-
+pub async fn play(
+    ctx: &Context,
+    guild_id: model::id::GuildId,
+    channel_id: model::id::ChannelId,
+    url: &str,
+) -> Result<(), Error> {
     let manager = songbird::get(ctx)
         .await
         .expect("Songbird Voice client placed in at initialisation.")
@@ -27,16 +28,18 @@ pub async fn play(ctx: &Context, msg: &Message, args: Args) -> Result<(), Error>
                 return Err(Error::ErrorSourcingFfmpeg);
             }
         };
-
         let input: Input = source.into();
         send_track_info_message(
             TrackTiming::Added,
             input.metadata.as_ref(),
-            msg.channel_id,
+            channel_id,
             ctx.http.clone(),
         )
         .await;
-        handler.enqueue_source(input);
+
+        let (mut audio, _audio_handle) = create_player(input);
+        audio.set_volume(0.1);
+        handler.enqueue(audio);
 
         Ok(())
     } else {
