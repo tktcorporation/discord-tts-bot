@@ -7,6 +7,7 @@ use songbird::ffmpeg;
 use songbird::input::Input;
 use std::ffi::OsStr;
 mod tts;
+use songbird::tracks::create_player;
 use tts::generate_speech_file;
 
 #[async_trait]
@@ -42,7 +43,9 @@ async fn play_input(
     input: Input,
 ) {
     let mut handler = handler_lock.lock().await;
-    handler.enqueue_source(input);
+    let (mut audio, _audio_handle) = create_player(input);
+    audio.set_volume(1.0);
+    handler.enqueue(audio);
 }
 
 #[cfg(test)]

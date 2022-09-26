@@ -31,21 +31,28 @@ impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::ApplicationCommand(command) = interaction {
             println!("Received command interaction: {:#?}", command);
+            command
+                .create_interaction_response(&ctx.http, |response| {
+                    response
+                        .kind(InteractionResponseType::DeferredChannelMessageWithSource)
+                        .interaction_response_data(|message| message.content("Processing..."))
+                })
+                .await
+                .unwrap();
 
             let content = match command.data.name.as_str() {
                 "join" => slash_commands::join::run(&ctx, &command).await,
+                "leave" => slash_commands::leave::run(&ctx, &command).await,
+                "play" => slash_commands::play::run(&ctx, &command).await,
+                "ping" => slash_commands::ping::run(&command.data.options),
                 _ => "not implemented :(".to_string(),
             };
 
             if let Err(why) = command
-                .create_interaction_response(&ctx.http, |response| {
-                    response
-                        .kind(InteractionResponseType::ChannelMessageWithSource)
-                        .interaction_response_data(|message| message.content(content))
-                })
+                .edit_original_interaction_response(&ctx.http, |response| response.content(content))
                 .await
             {
-                println!("Cannot respond to slash command: {}", why);
+                println!("Cannot respond to slash command: {:?}", why);
             }
         }
     }
@@ -54,7 +61,11 @@ impl EventHandler for Handler {
         println!("{} is connected!", ready.user.name);
 
         Command::set_global_application_commands(&ctx.http, |commands| {
-            commands.create_application_command(|command| slash_commands::join::register(command))
+            commands
+                .create_application_command(|command| slash_commands::ping::register(command))
+                .create_application_command(|command| slash_commands::join::register(command))
+                .create_application_command(|command| slash_commands::leave::register(command))
+                .create_application_command(|command| slash_commands::play::register(command))
         })
         .await
         .unwrap();

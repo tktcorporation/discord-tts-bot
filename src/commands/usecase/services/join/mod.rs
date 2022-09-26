@@ -1,11 +1,15 @@
-use serenity::{self, client::Context, model::id::ChannelId as SerenityChannelId};
+use serenity::{
+    self,
+    client::Context,
+    model::{id::ChannelId as SerenityChannelId, mention::Mention},
+};
 mod voice_event_handler;
 
 use crate::handler::usecase::text_to_speech::{config, speech_options};
 use crate::infrastructure::SharedSoundPath;
 pub use crate::model::Voice;
 
-use songbird::{self, ffmpeg, Event, TrackEvent};
+use songbird::{self, create_player, ffmpeg, Event, TrackEvent};
 
 pub async fn join(
     ctx: &Context,
@@ -43,10 +47,7 @@ pub async fn join(
         Ok(()) => {
             _clear(&handle_lock).await;
             _queue_join_message(handle_lock, ctx.http.clone(), called_channnel_id).await;
-            Ok(format!(
-                "Joined {}",
-                connect_to.name(&ctx.cache).await.unwrap()
-            ))
+            Ok(format!("Joined {}", Mention::from(connect_to)))
         }
         Err(e) => Err(e.to_string()),
     }
@@ -65,7 +66,9 @@ async fn _queue_join_message(
     );
 
     let input = welcome_audio().await;
-    handle.enqueue_source(input);
+    let (mut audio, _audio_handle) = create_player(input);
+    audio.set_volume(1.0);
+    handle.enqueue(audio);
 }
 
 async fn _clear(handle_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>) {

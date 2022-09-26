@@ -8,6 +8,8 @@ mod play;
 pub use play::play;
 mod clear;
 pub use clear::clear;
+mod leave;
+pub use leave::leave;
 pub mod error;
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.

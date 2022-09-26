@@ -12,7 +12,8 @@ use super::services::{self, check_msg};
 #[only_in(guilds)]
 async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     use services::error::Error;
-    match services::play(ctx, msg, args).await {
+    let guild = msg.guild(&ctx.cache).unwrap();
+    match services::play(ctx, guild.id, msg.channel_id, args.message()).await {
         Ok(_) => {}
         Err(s) => match s {
             Error::NotInVoiceChannel => {
