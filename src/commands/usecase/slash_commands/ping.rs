@@ -1,10 +1,17 @@
+use serenity::async_trait;
 use serenity::builder::CreateApplicationCommand;
-use serenity::model::prelude::interaction::application_command::CommandDataOption;
+use serenity::client::Context;
+use serenity::model::application::interaction::application_command::ApplicationCommandInteraction;
 
-pub fn run(_options: &[CommandDataOption]) -> String {
-    "Hey, I'm alive!".to_string()
-}
+use super::SlashCommand;
 
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name("ping").description("A ping command")
+pub struct Ping {}
+#[async_trait]
+impl SlashCommand for Ping {
+    async fn run(_ctx: &Context, _command: &ApplicationCommandInteraction) -> Option<String> {
+        "Hey, I'm alive!".to_string().into()
+    }
+    fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
+        command.description("Check if the bot is alive.")
+    }
 }

@@ -12,7 +12,7 @@ use serenity::{
 mod model;
 use model::context::Context as Ctx;
 
-use crate::commands::slash_commands;
+use crate::commands::slash_commands::SlashCommands;
 use model::{
     speaker::{CurrentVoiceState, Role},
     voice::Voice,
@@ -40,19 +40,33 @@ impl EventHandler for Handler {
                 .await
                 .unwrap();
 
-            let content = match command.data.name.as_str() {
-                "join" => slash_commands::join::run(&ctx, &command).await,
-                "leave" => slash_commands::leave::run(&ctx, &command).await,
-                "play" => slash_commands::play::run(&ctx, &command).await,
-                "ping" => slash_commands::ping::run(&command.data.options),
-                _ => "not implemented :(".to_string(),
+            let content = match SlashCommands::from_str(command.data.name.as_str()) {
+                Some(slash_command) => slash_command.run(&ctx, &command).await,
+                None => Some("Unknown command".to_string()),
             };
 
-            if let Err(why) = command
-                .edit_original_interaction_response(&ctx.http, |response| response.content(content))
-                .await
-            {
-                println!("Cannot respond to slash command: {:?}", why);
+            if let Some(content) = content {
+                match command
+                    .edit_original_interaction_response(&ctx.http, |response| {
+                        response.content(content)
+                    })
+                    .await
+                {
+                    Ok(_) => (),
+                    Err(e) => {
+                        command
+                            .edit_original_interaction_response(&ctx.http, |response| {
+                                response.content(format!("Error: {:?}", e))
+                            })
+                            .await
+                            .unwrap();
+                    }
+                }
+            } else {
+                command
+                    .delete_original_interaction_response(&ctx.http)
+                    .await
+                    .unwrap();
             }
         }
     }
@@ -62,10 +76,11 @@ impl EventHandler for Handler {
 
         Command::set_global_application_commands(&ctx.http, |commands| {
             commands
-                .create_application_command(|command| slash_commands::ping::register(command))
-                .create_application_command(|command| slash_commands::join::register(command))
-                .create_application_command(|command| slash_commands::leave::register(command))
-                .create_application_command(|command| slash_commands::play::register(command))
+                .create_application_command(|command| SlashCommands::Join.register(command))
+                .create_application_command(|command| SlashCommands::Leave.register(command))
+                .create_application_command(|command| SlashCommands::Ping.register(command))
+                .create_application_command(|command| SlashCommands::Play.register(command))
+                .create_application_command(|command| SlashCommands::Clear.register(command))
         })
         .await
         .unwrap();
@@ -108,14 +123,3 @@ async fn leave_if_alone(ctx: &Context, voice: &Voice) {
         voice.leave().await.unwrap()
     }
 }
-
-// async fn debug_print(msg: &SerenityMessage, ctx: &Context) {
-//     // サーバーのID
-//     eprintln!("guild_id = {:?}", msg.guild_id);
-//     // チャンネル名
-//     let channel_name = msg.channel_id.name(&ctx.cache).await;
-//     eprintln!("channel_name = {:?}", channel_name);
-//     // メッセージの送信
-//     let content = msg.content.clone();
-//     eprintln!("message received: {:?}", content);
-// }

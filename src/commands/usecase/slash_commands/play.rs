@@ -1,3 +1,4 @@
+use serenity::async_trait;
 use serenity::builder::CreateApplicationCommand;
 use serenity::{
     client::Context,
@@ -8,37 +9,39 @@ use serenity::{
 };
 
 use super::super::services;
+use super::SlashCommand;
 
-pub async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> String {
-    let url_option = command
-        .data
-        .options
-        .get(0)
-        .expect("url option is required")
-        .resolved
-        .clone()
-        .unwrap();
-    let url = match url_option {
-        CommandDataOptionValue::String(url) => url.clone(),
-        _ => {
-            return "Must provide a URL to a video or audio".to_string();
+pub struct Play {}
+#[async_trait]
+impl SlashCommand for Play {
+    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> Option<String> {
+        let url_option = command
+            .data
+            .options
+            .get(0)
+            .expect("url option is required")
+            .resolved
+            .clone()
+            .unwrap();
+        let url = match url_option {
+            CommandDataOptionValue::String(url) => url.clone(),
+            _ => {
+                return Some("Must provide a URL to a video or audio".to_string());
+            }
+        };
+        match services::play(ctx, command.guild_id.unwrap(), command.channel_id, &url).await {
+            Ok(_) => Some(format!("Queue {}", url)),
+            Err(e) => Some(format!("{:?}", e)),
         }
-    };
-    match services::play(ctx, command.guild_id.unwrap(), command.channel_id, &url).await {
-        Ok(_) => "ok".to_string(),
-        Err(e) => format!("{:?}", e),
     }
-}
 
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command
-        .name("play")
-        .description("play music")
-        .create_option(|option| {
+    fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
+        command.description("play music").create_option(|option| {
             option
-                .name("url")
+                .name("url or search query")
                 .description("url or search query")
                 .kind(CommandOptionType::String)
                 .required(true)
         })
+    }
 }
