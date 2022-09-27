@@ -1,20 +1,8 @@
-use serenity::{client::Context, framework::standard::CommandResult, model::channel::Message};
+use serenity::{client::Context, model::prelude::GuildId};
 
-use super::{check_msg, error::Error};
+use super::error::Error;
 
-pub async fn clear(ctx: &Context, msg: &Message) -> CommandResult {
-    let message = match _clear(ctx, msg).await {
-        Ok(s) => s,
-        Err(s) => format!("Error: {}", s),
-    };
-    check_msg(msg.reply(ctx, message).await);
-    Ok(())
-}
-
-async fn _clear(ctx: &Context, msg: &Message) -> Result<String, Error> {
-    let guild = msg.guild(&ctx.cache).unwrap();
-    let guild_id = guild.id;
-
+pub async fn clear(ctx: &Context, guild_id: GuildId) -> Result<String, Error> {
     let manager = songbird::get(ctx)
         .await
         .expect("Songbird Voice client placed in at initialisation.")
