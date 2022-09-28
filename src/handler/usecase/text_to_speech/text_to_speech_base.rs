@@ -1,7 +1,10 @@
+#[cfg(feature = "tts")]
 use super::super::interface::Speaker;
+#[cfg(feature = "tts")]
 use super::config;
 #[cfg(feature = "tts")]
 use super::text_to_speech_message::Message;
+#[cfg(feature = "tts")]
 use crate::infrastructure::GuildPath;
 
 #[derive(Debug, PartialEq, Eq)]

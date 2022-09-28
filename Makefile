@@ -3,6 +3,8 @@ fmt:
 	cargo fmt --all
 lint:
 	cargo +nightly clippy --all --all-targets --all-features --fix -Z unstable-options --allow-dirty --allow-staged
+hack:
+	cargo hack check --each-feature --no-dev-deps --all
 test:
 	cargo test --all-features
 watch:

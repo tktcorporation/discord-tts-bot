@@ -1,6 +1,9 @@
+#[cfg(feature = "tts")]
 use serenity::model::channel::Message as SerenityMessage;
+#[cfg(feature = "tts")]
 use std::env;
 
+#[cfg(feature = "tts")]
 pub struct Message {
     pub msg: SerenityMessage,
 }
