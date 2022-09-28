@@ -107,7 +107,6 @@ impl EventHandler for Handler {
         new_voice_state: voice::VoiceState,
     ) {
         let state = CurrentVoiceState::new(new_voice_state);
-        #[cfg(feature = "tts")]
         let change = state.change_of_states(old_voice_state.as_ref());
         let member = state.voice_member().await.expect("member is not received");
         let voice = Voice::from(&ctx, member.guild_id).await;
