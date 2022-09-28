@@ -81,6 +81,9 @@ impl EventHandler for Handler {
                 .create_application_command(|command| SlashCommands::Ping.register(command))
                 .create_application_command(|command| SlashCommands::Play.register(command))
                 .create_application_command(|command| SlashCommands::Clear.register(command))
+                .create_application_command(|command| SlashCommands::Deafen.register(command))
+                .create_application_command(|command| SlashCommands::Mute.register(command))
+                .create_application_command(|command| SlashCommands::Invite.register(command))
         })
         .await
         .unwrap();
@@ -119,7 +122,13 @@ impl EventHandler for Handler {
 }
 
 async fn leave_if_alone(ctx: &Context, voice: &Voice) {
-    if voice.is_alone(ctx).await.unwrap() {
-        voice.leave().await.unwrap()
+    use crate::model::voice::Error;
+    match voice.is_alone(ctx).await {
+        Ok(true) => voice.leave().await.unwrap(),
+        Ok(false) => (),
+        Err(e) => match e {
+            Error::ConnectionNotFound => (),
+            Error::NotInVoiceChannel => (),
+        },
     }
 }

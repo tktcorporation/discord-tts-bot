@@ -11,13 +11,15 @@ pub use crate::model::Voice;
 
 use songbird::{self, create_player, ffmpeg, Event, TrackEvent};
 
+use super::error::Error;
+
 pub async fn join(
     ctx: &Context,
     guild: serenity::model::guild::Guild,
     caller_id: &serenity::model::id::UserId,
     called_channnel_id: serenity::model::id::ChannelId,
     speech_options: speech_options::SpeechOptions,
-) -> Result<String, String> {
+) -> Result<String, Error> {
     let manager = songbird::get(ctx)
         .await
         .expect("Songbird Voice client placed in at initialisation.");
@@ -38,7 +40,7 @@ pub async fn join(
     let connect_to = match channel_id {
         Some(channel) => channel,
         None => {
-            return Err("Not in a voice channel".to_string());
+            return Err(Error::NotInVoiceChannel);
         }
     };
 
@@ -49,7 +51,7 @@ pub async fn join(
             _queue_join_message(handle_lock, ctx.http.clone(), called_channnel_id).await;
             Ok(format!("Joined {}", Mention::from(connect_to)))
         }
-        Err(e) => Err(e.to_string()),
+        Err(e) => Err(Error::JoinError(e)),
     }
 }
 

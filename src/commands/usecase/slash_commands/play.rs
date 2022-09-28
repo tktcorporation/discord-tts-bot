@@ -38,7 +38,7 @@ impl SlashCommand for Play {
     fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
         command.description("play music").create_option(|option| {
             option
-                .name("url or search query")
+                .name("url")
                 .description("url or search query")
                 .kind(CommandOptionType::String)
                 .required(true)

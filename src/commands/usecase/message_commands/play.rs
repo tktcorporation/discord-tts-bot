@@ -19,7 +19,7 @@ async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
             Error::NotInVoiceChannel => {
                 use crate::handler::usecase::text_to_speech::speech_options;
                 let guild = msg.guild(&ctx.cache).unwrap();
-                match services::join::join(
+                match services::join(
                     ctx,
                     guild,
                     &msg.author.id,
@@ -40,8 +40,8 @@ async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
                     }
                 }
             }
-            Error::ErrorSourcingFfmpeg => {
-                check_msg(msg.reply(ctx, Error::ErrorSourcingFfmpeg).await);
+            _ => {
+                check_msg(msg.reply(ctx, s).await);
             }
         },
     };

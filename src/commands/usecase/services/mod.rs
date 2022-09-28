@@ -1,16 +1,23 @@
-pub mod join;
 use serenity::{model::channel::Message, Result as SerenityResult};
-mod invite;
-pub use invite::invite;
-mod queue;
-pub use queue::queue;
-mod play;
-pub use play::play;
+
 mod clear;
-pub use clear::clear;
-mod leave;
-pub use leave::leave;
+mod deafen;
 pub mod error;
+mod invite;
+mod join;
+mod leave;
+mod mute;
+mod play;
+mod queue;
+
+pub use clear::clear;
+pub use deafen::deafen;
+pub use invite::invite;
+pub use join::join;
+pub use leave::leave;
+pub use mute::mute;
+pub use play::play;
+pub use queue::queue;
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
 pub fn check_msg(result: SerenityResult<Message>) {
