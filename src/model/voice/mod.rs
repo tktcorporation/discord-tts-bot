@@ -68,8 +68,15 @@ impl Voice {
         Ok(!members.iter().any(|member| !member.user.bot))
     }
 
-    pub async fn leave(&self) -> std::result::Result<(), songbird::error::JoinError> {
-        self.manager.leave(self.guild_id).await
+    pub async fn remove(&self) -> std::result::Result<(), songbird::error::JoinError> {
+        match self.manager.remove(self.guild_id).await {
+            Ok(_) => Ok(()),
+            Err(e) => match e {
+                songbird::error::JoinError::Dropped => Ok(()),
+                songbird::error::JoinError::NoCall => Ok(()),
+                _ => Err(e),
+            },
+        }
     }
 
     pub async fn guild_id_and_channel_id(

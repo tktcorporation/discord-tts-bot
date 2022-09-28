@@ -14,7 +14,7 @@ use model::context::Context as Ctx;
 
 use crate::commands::slash_commands::SlashCommands;
 use model::{
-    speaker::{CurrentVoiceState, Role},
+    speaker::{ChangeOfStates, CurrentVoiceState, Role},
     voice::Voice,
 };
 pub mod usecase;
@@ -113,6 +113,10 @@ impl EventHandler for Handler {
         let voice = Voice::from(&ctx, member.guild_id).await;
         let role = member.role(&ctx).await;
         if let Role::Me = role {
+            if let ChangeOfStates::Leave = change {
+                voice.remove().await.unwrap();
+                println!("removed");
+            };
             return println!("This is me(bot). My entering is ignored.");
         }
         #[cfg(feature = "tts")]
@@ -124,7 +128,7 @@ impl EventHandler for Handler {
 async fn leave_if_alone(ctx: &Context, voice: &Voice) {
     use crate::model::voice::Error;
     match voice.is_alone(ctx).await {
-        Ok(true) => voice.leave().await.unwrap(),
+        Ok(true) => voice.remove().await.unwrap(),
         Ok(false) => (),
         Err(e) => match e {
             Error::ConnectionNotFound => (),
