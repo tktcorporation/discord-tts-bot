@@ -1,7 +1,7 @@
 use serenity::{
     client::Context,
     framework::standard::{macros::command, Args, CommandResult},
-    model::channel::Message,
+    model::{self, channel::Message, guild},
 };
 
 use super::services::{self, check_msg};
@@ -11,39 +11,44 @@ use super::services::{self, check_msg};
 #[aliases("p")]
 #[only_in(guilds)]
 async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    use services::error::Error;
     let guild = msg.guild(&ctx.cache).unwrap();
-    match services::play(ctx, guild.id, msg.channel_id, args.message()).await {
-        Ok(_) => {}
-        Err(s) => match s {
+    let play_url = args.message();
+    let comment = join_and_play(ctx, guild, msg.channel_id, &msg.author.id, play_url).await;
+    check_msg(msg.reply(&ctx, comment).await);
+    Ok(())
+}
+
+async fn join_and_play(
+    ctx: &Context,
+    guild: guild::Guild,
+    called_channel_id: model::id::ChannelId,
+    caller_user_id: &model::id::UserId,
+    play_url: &str,
+) -> String {
+    use services::error::Error;
+    match services::play(ctx, guild.id, called_channel_id, play_url).await {
+        Ok(_) => format!("Queue {}", play_url),
+        Err(e) => match e {
             Error::NotInVoiceChannel => {
                 use crate::handler::usecase::text_to_speech::speech_options;
-                let guild = msg.guild(&ctx.cache).unwrap();
-                match services::join::join(
+                let joined_message = match services::join(
                     ctx,
-                    guild,
-                    &msg.author.id,
-                    msg.channel_id,
-                    speech_options::SpeechOptions { is_ojosama: true },
+                    guild.clone(),
+                    caller_user_id,
+                    called_channel_id,
+                    speech_options::SpeechOptions::default(),
                 )
                 .await
                 {
-                    Ok(comment) => {
-                        check_msg(msg.reply(&ctx, comment).await);
-                        check_msg(
-                            msg.reply(ctx, "I joined the channel. Please use play command again.")
-                                .await,
-                        );
-                    }
-                    Err(e) => {
-                        check_msg(msg.reply(&ctx, format!("{:?}", e)).await);
-                    }
-                }
+                    Ok(s) => s,
+                    Err(e) => return e.to_string(),
+                };
+                if let Err(e) = services::play(ctx, guild.id, called_channel_id, play_url).await {
+                    return e.to_string();
+                };
+                joined_message + format!(" and Queue {}", play_url).as_str()
             }
-            Error::ErrorSourcingFfmpeg => {
-                check_msg(msg.reply(ctx, Error::ErrorSourcingFfmpeg).await);
-            }
+            _ => e.to_string(),
         },
-    };
-    Ok(())
+    }
 }

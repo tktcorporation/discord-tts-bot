@@ -1,6 +1,6 @@
 use super::super::usecase::{interface::Speaker, text_to_speech::SpeechMessage};
 use crate::infrastructure::{GuildPath, SoundPath, SpeechFilePath};
-pub use crate::model::Voice;
+pub use crate::model::{voice::Error, Voice};
 use polly::model::VoiceId;
 use serenity::async_trait;
 use songbird::ffmpeg;
@@ -24,7 +24,10 @@ impl Speaker for Voice {
                 let input = get_input_from_local(speech_file).await;
                 play_input(&handler, input).await;
             }
-            Err(str) => println!("{}", str),
+            Err(e) => match e {
+                Error::ConnectionNotFound => (),
+                Error::NotInVoiceChannel => (),
+            },
         }
     }
     fn guild_id(&self) -> serenity::model::id::GuildId {

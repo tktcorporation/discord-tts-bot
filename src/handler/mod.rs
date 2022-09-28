@@ -14,7 +14,7 @@ use model::context::Context as Ctx;
 
 use crate::commands::slash_commands::SlashCommands;
 use model::{
-    speaker::{CurrentVoiceState, Role},
+    speaker::{ChangeOfStates, CurrentVoiceState, Role},
     voice::Voice,
 };
 pub mod usecase;
@@ -81,6 +81,9 @@ impl EventHandler for Handler {
                 .create_application_command(|command| SlashCommands::Ping.register(command))
                 .create_application_command(|command| SlashCommands::Play.register(command))
                 .create_application_command(|command| SlashCommands::Clear.register(command))
+                .create_application_command(|command| SlashCommands::Deafen.register(command))
+                .create_application_command(|command| SlashCommands::Mute.register(command))
+                .create_application_command(|command| SlashCommands::Invite.register(command))
         })
         .await
         .unwrap();
@@ -110,6 +113,10 @@ impl EventHandler for Handler {
         let voice = Voice::from(&ctx, member.guild_id).await;
         let role = member.role(&ctx).await;
         if let Role::Me = role {
+            if let ChangeOfStates::Leave = change {
+                voice.remove().await.unwrap();
+                println!("removed");
+            };
             return println!("This is me(bot). My entering is ignored.");
         }
         #[cfg(feature = "tts")]
@@ -119,7 +126,13 @@ impl EventHandler for Handler {
 }
 
 async fn leave_if_alone(ctx: &Context, voice: &Voice) {
-    if voice.is_alone(ctx).await.unwrap() {
-        voice.leave().await.unwrap()
+    use crate::model::voice::Error;
+    match voice.is_alone(ctx).await {
+        Ok(true) => voice.remove().await.unwrap(),
+        Ok(false) => (),
+        Err(e) => match e {
+            Error::ConnectionNotFound => (),
+            Error::NotInVoiceChannel => (),
+        },
     }
 }

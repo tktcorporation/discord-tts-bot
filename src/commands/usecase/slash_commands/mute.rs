@@ -6,27 +6,16 @@ use serenity::model::application::interaction::application_command::ApplicationC
 use super::super::services;
 use super::SlashCommand;
 
-pub struct Join {}
+pub struct Mute {}
 #[async_trait]
-impl SlashCommand for Join {
+impl SlashCommand for Mute {
     async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> Option<String> {
-        let guild = ctx.cache.guild(command.guild_id.unwrap()).unwrap();
-        use crate::handler::usecase::text_to_speech::speech_options;
-        match services::join(
-            ctx,
-            guild,
-            &command.user.id,
-            command.channel_id,
-            speech_options::SpeechOptions::default(),
-        )
-        .await
-        {
+        match services::mute(ctx, command.guild_id.unwrap()).await {
             Ok(s) => Some(s),
             Err(e) => Some(e.to_string()),
         }
     }
-
     fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-        command.description("Join your voice channel to use tts.")
+        command.description("Mute the bot.")
     }
 }

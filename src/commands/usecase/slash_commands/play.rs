@@ -1,6 +1,7 @@
 use serenity::async_trait;
 use serenity::builder::CreateApplicationCommand;
 use serenity::{
+    self,
     client::Context,
     model::application::{
         command::CommandOptionType,
@@ -29,16 +30,38 @@ impl SlashCommand for Play {
                 return Some("Must provide a URL to a video or audio".to_string());
             }
         };
-        match services::play(ctx, command.guild_id.unwrap(), command.channel_id, &url).await {
+        let guild_id = command.guild_id.unwrap();
+        match services::play(ctx, guild_id, command.channel_id, &url).await {
             Ok(_) => Some(format!("Queue {}", url)),
-            Err(e) => Some(format!("{:?}", e)),
+            Err(e) => match e {
+                services::error::Error::NotInVoiceChannel => {
+                    use crate::handler::usecase::text_to_speech::speech_options;
+                    let joined_message = match services::join(
+                        ctx,
+                        ctx.cache.guild(guild_id).unwrap(),
+                        &command.user.id,
+                        command.channel_id,
+                        speech_options::SpeechOptions::default(),
+                    )
+                    .await
+                    {
+                        Ok(s) => s,
+                        Err(e) => return Some(e.to_string()),
+                    };
+                    if let Err(e) = services::play(ctx, guild_id, command.channel_id, &url).await {
+                        return Some(e.to_string());
+                    };
+                    Some(joined_message + format!(" and Queue {}", url).as_str())
+                }
+                _ => Some(e.to_string()),
+            },
         }
     }
 
     fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
         command.description("play music").create_option(|option| {
             option
-                .name("url or search query")
+                .name("url")
                 .description("url or search query")
                 .kind(CommandOptionType::String)
                 .required(true)

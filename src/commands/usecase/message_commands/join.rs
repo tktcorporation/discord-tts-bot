@@ -12,7 +12,7 @@ use super::services::{self, check_msg};
 async fn join(ctx: &Context, msg: &Message) -> CommandResult {
     use crate::handler::usecase::text_to_speech::speech_options;
     let guild = msg.guild(&ctx.cache).unwrap();
-    match services::join::join(
+    match services::join(
         ctx,
         guild,
         &msg.author.id,
