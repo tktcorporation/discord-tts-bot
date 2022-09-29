@@ -6,16 +6,16 @@ use serenity::model::application::interaction::application_command::ApplicationC
 use super::super::services;
 use super::{SlashCommand, SlashCommandResult};
 
-pub struct Invite {}
+pub struct Queue {}
 #[async_trait]
-impl SlashCommand for Invite {
-    async fn run(ctx: &Context, _command: &ApplicationCommandInteraction) -> SlashCommandResult {
-        match services::invite(ctx).await {
-            Ok(s) => SlashCommandResult::Simple(Some(s)),
+impl SlashCommand for Queue {
+    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> SlashCommandResult {
+        match services::queue::queue(ctx, command.guild_id.unwrap()).await {
+            Ok(queue) => SlashCommandResult::Embed(services::queue::create_queue_embed(&queue, 0)),
             Err(e) => SlashCommandResult::Simple(Some(e.to_string())),
         }
     }
     fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-        command.description("Invite the bot to your server.")
+        command.description("List the current queue.")
     }
 }

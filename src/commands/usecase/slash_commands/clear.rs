@@ -6,15 +6,15 @@ use serenity::{
 };
 
 use super::super::services;
-use super::SlashCommand;
+use super::{SlashCommand, SlashCommandResult};
 
 pub struct Clear {}
 #[async_trait]
 impl SlashCommand for Clear {
-    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> Option<String> {
+    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> SlashCommandResult {
         match services::clear(ctx, command.guild_id.unwrap()).await {
-            Ok(s) => Some(s),
-            Err(e) => Some(format!("Error: {:?}", e)),
+            Ok(s) => SlashCommandResult::Simple(Some(s)),
+            Err(e) => SlashCommandResult::Simple(Some(format!("Error: {:?}", e))),
         }
     }
 

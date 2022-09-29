@@ -12,7 +12,7 @@ use serenity::{
 mod model;
 use model::context::Context as Ctx;
 
-use crate::commands::slash_commands::SlashCommands;
+use crate::commands::slash_commands::{SlashCommandResult, SlashCommands};
 use model::{
     speaker::{ChangeOfStates, CurrentVoiceState, Role},
     voice::Voice,
@@ -40,33 +40,51 @@ impl EventHandler for Handler {
                 .await
                 .unwrap();
 
-            let content = match SlashCommands::from_str(command.data.name.as_str()) {
+            let command_result = match SlashCommands::from_str(command.data.name.as_str()) {
                 Some(slash_command) => slash_command.run(&ctx, &command).await,
-                None => Some("Unknown command".to_string()),
-            };
-
-            if let Some(content) = content {
-                match command
-                    .edit_original_interaction_response(&ctx.http, |response| {
-                        response.content(content)
-                    })
-                    .await
-                {
-                    Ok(_) => (),
-                    Err(e) => {
-                        command
-                            .edit_original_interaction_response(&ctx.http, |response| {
-                                response.content(format!("Error: {:?}", e))
-                            })
-                            .await
-                            .unwrap();
-                    }
+                None => {
+                    command
+                        .edit_original_interaction_response(&ctx.http, |response| {
+                            response.content("Unknown command")
+                        })
+                        .await
+                        .unwrap();
+                    return;
                 }
-            } else {
-                command
-                    .delete_original_interaction_response(&ctx.http)
-                    .await
-                    .unwrap();
+            };
+            let result = match command_result {
+                SlashCommandResult::Simple(None) => {
+                    command
+                        .delete_original_interaction_response(&ctx.http)
+                        .await
+                        .unwrap();
+                    return;
+                }
+                SlashCommandResult::Simple(Some(message)) => {
+                    command
+                        .edit_original_interaction_response(&ctx.http, |response| {
+                            response.content(message)
+                        })
+                        .await
+                }
+                SlashCommandResult::Embed(embed) => {
+                    command
+                        .edit_original_interaction_response(&ctx.http, |response| {
+                            response.set_embed(embed)
+                        })
+                        .await
+                }
+            };
+            match result {
+                Ok(_) => (),
+                Err(e) => {
+                    command
+                        .edit_original_interaction_response(&ctx.http, |response| {
+                            response.content(format!("Error: {:?}", e))
+                        })
+                        .await
+                        .unwrap();
+                }
             }
         }
     }
@@ -84,6 +102,8 @@ impl EventHandler for Handler {
                 .create_application_command(|command| SlashCommands::Deafen.register(command))
                 .create_application_command(|command| SlashCommands::Mute.register(command))
                 .create_application_command(|command| SlashCommands::Invite.register(command))
+                .create_application_command(|command| SlashCommands::Skip.register(command))
+                .create_application_command(|command| SlashCommands::Queue.register(command))
         })
         .await
         .unwrap();

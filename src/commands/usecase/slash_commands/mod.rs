@@ -8,14 +8,21 @@ mod leave;
 mod mute;
 mod ping;
 mod play;
+mod queue;
+mod skip;
 
-use serenity::builder::CreateApplicationCommand;
+use serenity::builder::{CreateApplicationCommand, CreateEmbed};
 use serenity::client::Context;
 use serenity::model::application::interaction::application_command::ApplicationCommandInteraction;
 
+pub enum SlashCommandResult {
+    Simple(Option<String>),
+    Embed(CreateEmbed),
+}
+
 #[async_trait]
 pub trait SlashCommand {
-    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> Option<String>;
+    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> SlashCommandResult;
     fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand;
 }
 
@@ -28,6 +35,8 @@ pub enum SlashCommands {
     Deafen,
     Mute,
     Invite,
+    Skip,
+    Queue,
 }
 
 impl SlashCommands {
@@ -41,6 +50,8 @@ impl SlashCommands {
             "deafen" => Some(Self::Deafen),
             "mute" => Some(Self::Mute),
             "invite" => Some(Self::Invite),
+            "skip" => Some(Self::Skip),
+            "queue" => Some(Self::Queue),
             _ => None,
         }
     }
@@ -49,7 +60,7 @@ impl SlashCommands {
         &self,
         ctx: &Context,
         command: &ApplicationCommandInteraction,
-    ) -> Option<String> {
+    ) -> SlashCommandResult {
         match self {
             Self::Clear => clear::Clear::run(ctx, command).await,
             Self::Join => join::Join::run(ctx, command).await,
@@ -59,6 +70,8 @@ impl SlashCommands {
             Self::Deafen => deafen::Deafen::run(ctx, command).await,
             Self::Mute => mute::Mute::run(ctx, command).await,
             Self::Invite => invite::Invite::run(ctx, command).await,
+            Self::Skip => skip::Skip::run(ctx, command).await,
+            Self::Queue => queue::Queue::run(ctx, command).await,
         }
     }
 
@@ -75,6 +88,8 @@ impl SlashCommands {
             Self::Deafen => deafen::Deafen::register(command).name("deafen"),
             Self::Mute => mute::Mute::register(command).name("mute"),
             Self::Invite => invite::Invite::register(command).name("invite"),
+            Self::Skip => skip::Skip::register(command).name("skip"),
+            Self::Queue => queue::Queue::register(command).name("queue"),
         }
     }
 }

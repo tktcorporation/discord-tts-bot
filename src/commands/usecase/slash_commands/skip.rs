@@ -6,16 +6,16 @@ use serenity::model::application::interaction::application_command::ApplicationC
 use super::super::services;
 use super::{SlashCommand, SlashCommandResult};
 
-pub struct Invite {}
+pub struct Skip {}
 #[async_trait]
-impl SlashCommand for Invite {
-    async fn run(ctx: &Context, _command: &ApplicationCommandInteraction) -> SlashCommandResult {
-        match services::invite(ctx).await {
+impl SlashCommand for Skip {
+    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> SlashCommandResult {
+        match services::skip(ctx, command.guild_id.unwrap()).await {
             Ok(s) => SlashCommandResult::Simple(Some(s)),
             Err(e) => SlashCommandResult::Simple(Some(e.to_string())),
         }
     }
     fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-        command.description("Invite the bot to your server.")
+        command.description("Skip the current queue.")
     }
 }
