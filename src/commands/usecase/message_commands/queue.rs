@@ -12,26 +12,11 @@ use super::services;
 #[only_in(guilds)]
 async fn queue(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     let guild = msg.guild(&ctx.cache).unwrap();
-    match services::queue(ctx, guild.id).await {
+    match services::queue::queue(ctx, guild.id).await {
         Ok(queue) => {
             msg.channel_id
                 .send_message(ctx.http.clone(), |m| {
-                    m.embed(|e| {
-                        e.title("List Queue");
-                        for (i, val) in queue.iter().enumerate() {
-                            e.field(
-                                ".",
-                                format!(
-                                    "`{}` {}",
-                                    i + 1,
-                                    val.metadata().title.as_ref().unwrap_or(&String::from(""))
-                                ),
-                                false,
-                            );
-                        }
-                        e
-                    });
-                    m
+                    m.set_embed(services::queue::create_queue_embed(&queue, 0))
                 })
                 .await
                 .unwrap();

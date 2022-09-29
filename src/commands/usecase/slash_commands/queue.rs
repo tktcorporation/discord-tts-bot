@@ -1,5 +1,5 @@
 use serenity::async_trait;
-use serenity::builder::{CreateApplicationCommand, CreateEmbed};
+use serenity::builder::CreateApplicationCommand;
 use serenity::client::Context;
 use serenity::model::application::interaction::application_command::ApplicationCommandInteraction;
 
@@ -10,23 +10,8 @@ pub struct Queue {}
 #[async_trait]
 impl SlashCommand for Queue {
     async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> SlashCommandResult {
-        match services::queue(ctx, command.guild_id.unwrap()).await {
-            Ok(queue) => {
-                let mut embed = CreateEmbed::default();
-                embed.title("List Queue");
-                for (i, val) in queue.iter().enumerate() {
-                    embed.field(
-                        ".",
-                        format!(
-                            "`{}` {}",
-                            i + 1,
-                            val.metadata().title.as_ref().unwrap_or(&String::from(""))
-                        ),
-                        false,
-                    );
-                }
-                SlashCommandResult::Embed(embed)
-            }
+        match services::queue::queue(ctx, command.guild_id.unwrap()).await {
+            Ok(queue) => SlashCommandResult::Embed(services::queue::create_queue_embed(&queue, 0)),
             Err(e) => SlashCommandResult::Simple(Some(e.to_string())),
         }
     }
