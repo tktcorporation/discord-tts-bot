@@ -10,12 +10,12 @@ use serenity::{
 };
 
 use super::super::services;
-use super::SlashCommand;
+use super::{SlashCommand, SlashCommandResult};
 
 pub struct Play {}
 #[async_trait]
 impl SlashCommand for Play {
-    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> Option<String> {
+    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> SlashCommandResult {
         let url_option = command
             .data
             .options
@@ -27,12 +27,14 @@ impl SlashCommand for Play {
         let url = match url_option {
             CommandDataOptionValue::String(url) => url.clone(),
             _ => {
-                return Some("Must provide a URL to a video or audio".to_string());
+                return SlashCommandResult::Simple(Some(
+                    "Must provide a URL to a video or audio".to_string(),
+                ));
             }
         };
         let guild_id = command.guild_id.unwrap();
         match services::play(ctx, guild_id, command.channel_id, &url).await {
-            Ok(_) => Some(format!("Queue {}", url)),
+            Ok(_) => SlashCommandResult::Simple(Some(format!("Queue {}", url))),
             Err(e) => match e {
                 services::error::Error::NotInVoiceChannel => {
                     use crate::handler::usecase::text_to_speech::speech_options;
@@ -46,14 +48,16 @@ impl SlashCommand for Play {
                     .await
                     {
                         Ok(s) => s,
-                        Err(e) => return Some(e.to_string()),
+                        Err(e) => return SlashCommandResult::Simple(Some(e.to_string())),
                     };
                     if let Err(e) = services::play(ctx, guild_id, command.channel_id, &url).await {
-                        return Some(e.to_string());
+                        return SlashCommandResult::Simple(Some(e.to_string()));
                     };
-                    Some(joined_message + format!(" and Queue {}", url).as_str())
+                    SlashCommandResult::Simple(Some(
+                        joined_message + format!(" and Queue {}", url).as_str(),
+                    ))
                 }
-                _ => Some(e.to_string()),
+                _ => SlashCommandResult::Simple(Some(e.to_string())),
             },
         }
     }

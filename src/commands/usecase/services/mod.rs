@@ -9,6 +9,7 @@ mod leave;
 mod mute;
 mod play;
 mod queue;
+mod skip;
 
 pub use clear::clear;
 pub use deafen::deafen;
@@ -18,6 +19,7 @@ pub use leave::leave;
 pub use mute::mute;
 pub use play::play;
 pub use queue::queue;
+pub use skip::skip;
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
 pub fn check_msg(result: SerenityResult<Message>) {

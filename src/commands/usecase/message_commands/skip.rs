@@ -4,7 +4,7 @@ use serenity::{
     model::channel::Message,
 };
 
-use super::services::check_msg;
+use super::services;
 
 #[command]
 #[description = "Skip the current queue."]
@@ -14,31 +14,13 @@ async fn skip(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     let guild = msg.guild(&ctx.cache).unwrap();
     let guild_id = guild.id;
 
-    let manager = songbird::get(ctx)
-        .await
-        .expect("Songbird Voice client placed in at initialisation.")
-        .clone();
-
-    if let Some(handler_lock) = manager.get(guild_id) {
-        let handler = handler_lock.lock().await;
-        let queue = handler.queue();
-        let _ = queue.skip();
-
-        check_msg(
-            msg.channel_id
-                .say(
-                    &ctx.http,
-                    format!("Song skipped: {} in queue.", queue.len()),
-                )
-                .await,
-        );
-    } else {
-        check_msg(
-            msg.channel_id
-                .say(&ctx.http, "Not in a voice channel to play in")
-                .await,
-        );
+    match services::skip(ctx, guild_id).await {
+        Ok(m) => {
+            msg.reply(&ctx.http, m).await?;
+        }
+        Err(e) => {
+            msg.reply(&ctx.http, format!("Error: {:?}", e)).await?;
+        }
     }
-
     Ok(())
 }

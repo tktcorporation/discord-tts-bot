@@ -1,44 +1,11 @@
-use serenity::{client::Context, framework::standard::CommandResult, model::channel::Message};
+use serenity::{client::Context, model};
 
-use super::{check_msg, error::Error};
+use super::error::Error;
 
-pub async fn queue(ctx: &Context, msg: &Message) -> CommandResult {
-    match _queue(ctx, msg).await {
-        Ok(queue) => {
-            msg.channel_id
-                .send_message(ctx.http.clone(), |m| {
-                    m.embed(|e| {
-                        e.title("List Queue");
-                        for (i, val) in queue.iter().enumerate() {
-                            e.field(
-                                ".",
-                                format!(
-                                    "`{}` {}",
-                                    i + 1,
-                                    val.metadata().title.as_ref().unwrap_or(&String::from(""))
-                                ),
-                                false,
-                            );
-                        }
-                        e
-                    });
-                    m
-                })
-                .await
-                .unwrap();
-        }
-        Err(s) => check_msg(msg.channel_id.say(&ctx.http, format!("Error: {}", s)).await),
-    };
-    Ok(())
-}
-
-async fn _queue(
+pub async fn queue(
     ctx: &Context,
-    msg: &Message,
+    guild_id: model::id::GuildId,
 ) -> Result<std::vec::Vec<songbird::tracks::TrackHandle>, Error> {
-    let guild = msg.guild(&ctx.cache).unwrap();
-    let guild_id = guild.id;
-
     let manager = songbird::get(ctx)
         .await
         .expect("Songbird Voice client placed in at initialisation.")
