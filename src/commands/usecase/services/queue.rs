@@ -38,7 +38,7 @@ pub fn create_queue_embed(tracks: &[songbird::tracks::TrackHandle], page: usize)
             "[{}]({}) • `{}`",
             metadata.title.as_ref().unwrap(),
             metadata.source_url.as_ref().unwrap(),
-            super::get_human_readable_timestamp(metadata.duration)
+            super::voice_utils::get_human_readable_timestamp(metadata.duration)
         )
     } else {
         String::from("Nothing is playing!")
@@ -78,7 +78,7 @@ fn build_queue_page(tracks: &[TrackHandle], page: usize) -> String {
     for (i, t) in queue.iter().enumerate() {
         let title = t.metadata().title.as_ref();
         let url = t.metadata().source_url.as_ref();
-        let duration = super::get_human_readable_timestamp(t.metadata().duration);
+        let duration = super::voice_utils::get_human_readable_timestamp(t.metadata().duration);
 
         let _ = writeln!(
             description,

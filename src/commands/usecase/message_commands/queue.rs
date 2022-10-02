@@ -7,7 +7,7 @@ use serenity::{
 use super::services;
 
 #[command]
-#[description = "List of queue."]
+#[description = "List the songs in the queue."]
 #[aliases("q")]
 #[only_in(guilds)]
 async fn queue(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
