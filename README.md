@@ -12,7 +12,7 @@
 ## Get Started
 
 ### Env Vars
-
+optional  
 1. `cp -p .envrc.sample .envrc` and set variables.
 1. Install [direnv](https://github.com/direnv/direnv).
 1. `direnv allow`
@@ -20,49 +20,24 @@
 ### Run
 
 1. Invite your bot to your server.
-1. `docker-compose run app`
-1. Post `~join` in your server.
-1. The bot talk in voice chat.
+1. `docker-compose up`
+1. Type `/` and select `join` command.
+1. The bot talks in your voice chat.
 
 ### Develop
 
 1. `docker-compose run app /bin/bash`
 
-<!-- 1. `docker-compose run app bash -c "RUST_BACKTRACE=1 cargo run"` docker for windows only? -->
-
 #### Test
 
 ```bash
-RUST_BACKTRACE=1 cargo test --all-features
+make test
 ```
 
 #### Linter, Formatter
 
-- Lint
-
 ```bash
-cargo clippy --all
-```
-
-- Format
-
-```bash
-cargo fmt --all
-```
-
-##### Task Runner
-
-[act](https://github.com/nektos/act) can use as a task runner in this project.  
-But, it takes longer than `cargo` commands.
-
-```bash
-# lint, format(check), test
-act
-```
-
-```bash
-# deploy to heroku
-act release
+make watch
 ```
 
 ## Deploying to Heroku
