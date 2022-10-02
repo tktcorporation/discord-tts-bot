@@ -1,13 +1,10 @@
-use std::env;
-
-use crate::infrastructure::SpeechFilePath;
-
+use aws_types::region::{EnvironmentProvider, ProvideRegion};
 use polly::model::{OutputFormat, TextType, VoiceId};
 use polly::{Client, Config, Region};
-
-use aws_types::region::{EnvironmentProvider, ProvideRegion};
-
+use std::env;
 use tokio::io::AsyncWriteExt;
+
+use super::SpeechFilePath;
 
 /// Generate a mp3 file and return the file path str
 ///
@@ -87,6 +84,7 @@ mod tests {
     use super::*;
     use std::path::Path;
 
+    #[ignore]
     #[tokio::test]
     async fn test_generate_sound() {
         let root = env!("CARGO_MANIFEST_DIR");

@@ -1,10 +1,13 @@
-all: fmt lint test
+all: fmt lint test-all
+ci: lint hack test
 fmt:
 	cargo fmt --all
 lint:
 	cargo +nightly clippy --all --all-targets --all-features --fix -Z unstable-options --allow-dirty --allow-staged
 hack:
 	cargo hack check --each-feature --no-dev-deps --all
+test-all:
+	cargo test --all-features -- --include-ignored
 test:
 	cargo test --all-features
 watch:

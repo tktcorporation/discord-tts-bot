@@ -1,4 +1,8 @@
+#[cfg(feature = "aws")]
+mod aws;
 mod path_router;
+#[cfg(feature = "aws")]
+pub use aws::tts;
 
 // root/sounds
 pub use path_router::SharedSoundPath;
