@@ -97,16 +97,16 @@ impl EventHandler for Handler {
                 .create_application_command(|command| SlashCommands::Join.register(command))
                 .create_application_command(|command| SlashCommands::Leave.register(command))
                 .create_application_command(|command| SlashCommands::Ping.register(command))
-                .create_application_command(|command| SlashCommands::Play.register(command))
                 .create_application_command(|command| SlashCommands::Clear.register(command))
                 .create_application_command(|command| SlashCommands::Deafen.register(command))
                 .create_application_command(|command| SlashCommands::Mute.register(command))
                 .create_application_command(|command| SlashCommands::Invite.register(command))
-                .create_application_command(|command| SlashCommands::Skip.register(command))
-                .create_application_command(|command| SlashCommands::Queue.register(command))
-                .create_application_command(|command| SlashCommands::Ojoin.register(command))
-                .create_application_command(|command| SlashCommands::Undeafen.register(command))
-                .create_application_command(|command| SlashCommands::Unmute.register(command))
+                .create_application_command(|command| SlashCommands::Skip.register(command));
+            #[cfg(feature = "music")]
+            commands
+                .create_application_command(|command| SlashCommands::Play.register(command))
+                .create_application_command(|command| SlashCommands::Queue.register(command));
+            commands
         })
         .await
         .unwrap();
