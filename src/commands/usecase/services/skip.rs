@@ -4,7 +4,6 @@ use super::error::Error as ServiceError;
 use serenity::{client::Context, model};
 
 #[derive(Debug)]
-
 pub enum SkipError {
     Error(ServiceError),
     TrackError(songbird::tracks::TrackError),
@@ -27,7 +26,19 @@ pub async fn skip(ctx: &Context, guild_id: model::id::GuildId) -> Result<String,
     if let Some(handler_lock) = manager.get(guild_id) {
         let handler = handler_lock.lock().await;
         let queue = handler.queue();
-        let m = format!("Song skipped: {:?}", queue.current());
+        let m = match queue.current() {
+            Some(track) => {
+                format!(
+                    "Skipped: {}",
+                    track
+                        .metadata()
+                        .title
+                        .as_ref()
+                        .unwrap_or(&"Unknown".to_string())
+                )
+            }
+            None => "Nothing to skip.".to_string(),
+        };
         match queue.skip() {
             Ok(_) => Ok(m),
             Err(e) => Err(SkipError::TrackError(e)),

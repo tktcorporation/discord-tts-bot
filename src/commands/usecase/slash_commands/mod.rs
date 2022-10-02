@@ -6,10 +6,13 @@ mod invite;
 mod join;
 mod leave;
 mod mute;
+mod ojoin;
 mod ping;
 mod play;
 mod queue;
 mod skip;
+mod undeafen;
+mod unmute;
 
 use serenity::builder::{CreateApplicationCommand, CreateEmbed};
 use serenity::client::Context;
@@ -37,6 +40,9 @@ pub enum SlashCommands {
     Invite,
     Skip,
     Queue,
+    Undeafen,
+    Unmute,
+    Ojoin,
 }
 
 impl SlashCommands {
@@ -72,6 +78,9 @@ impl SlashCommands {
             Self::Invite => invite::Invite::run(ctx, command).await,
             Self::Skip => skip::Skip::run(ctx, command).await,
             Self::Queue => queue::Queue::run(ctx, command).await,
+            Self::Undeafen => undeafen::Undeafen::run(ctx, command).await,
+            Self::Unmute => unmute::Unmute::run(ctx, command).await,
+            Self::Ojoin => ojoin::Ojoin::run(ctx, command).await,
         }
     }
 
@@ -90,6 +99,9 @@ impl SlashCommands {
             Self::Invite => invite::Invite::register(command).name("invite"),
             Self::Skip => skip::Skip::register(command).name("skip"),
             Self::Queue => queue::Queue::register(command).name("queue"),
+            Self::Undeafen => undeafen::Undeafen::register(command).name("undeafen"),
+            Self::Unmute => unmute::Unmute::register(command).name("unmute"),
+            Self::Ojoin => ojoin::Ojoin::register(command).name("ojoin"),
         }
     }
 }

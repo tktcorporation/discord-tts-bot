@@ -1,4 +1,4 @@
-use super::super::super::service::{send_track_info_message, TrackTiming};
+use super::{send_track_info_message, TrackTiming};
 use serenity::{async_trait, http::Http, model::prelude::ChannelId};
 use songbird::{Event, EventContext, EventHandler as VoiceEventHandler};
 use std::sync::Arc;

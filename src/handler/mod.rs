@@ -104,6 +104,9 @@ impl EventHandler for Handler {
                 .create_application_command(|command| SlashCommands::Invite.register(command))
                 .create_application_command(|command| SlashCommands::Skip.register(command))
                 .create_application_command(|command| SlashCommands::Queue.register(command))
+                .create_application_command(|command| SlashCommands::Ojoin.register(command))
+                .create_application_command(|command| SlashCommands::Undeafen.register(command))
+                .create_application_command(|command| SlashCommands::Unmute.register(command))
         })
         .await
         .unwrap();
