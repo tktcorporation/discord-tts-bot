@@ -58,6 +58,9 @@ impl SlashCommands {
             "invite" => Some(Self::Invite),
             "skip" => Some(Self::Skip),
             "queue" => Some(Self::Queue),
+            "undeafen" => Some(Self::Undeafen),
+            "unmute" => Some(Self::Unmute),
+            "ojoin" => Some(Self::Ojoin),
             _ => None,
         }
     }

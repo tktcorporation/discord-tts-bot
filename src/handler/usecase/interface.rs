@@ -4,6 +4,7 @@ use serenity::async_trait;
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait Speaker {
+    #[cfg(feature = "aws")]
     async fn speech(&self, msg: SpeechMessage);
     fn guild_id(&self) -> serenity::model::id::GuildId;
 }

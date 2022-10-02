@@ -7,8 +7,9 @@ license = "MIT"
 readme = "README.md"
 
 [features]
-tts = []
-music = []
+tts = ["aws"]
+music = ["aws"]
+aws = []
 
 default = ["tts"]
 

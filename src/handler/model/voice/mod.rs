@@ -1,18 +1,19 @@
 use super::super::usecase::{interface::Speaker, text_to_speech::SpeechMessage};
+#[cfg(feature = "aws")]
+use crate::infrastructure::tts::generate_speech_file;
 use crate::infrastructure::{GuildPath, SoundPath, SpeechFilePath};
 pub use crate::model::{voice::Error, Voice};
 use polly::model::VoiceId;
 use serenity::async_trait;
 use songbird::ffmpeg;
 use songbird::input::Input;
-use std::ffi::OsStr;
-mod tts;
 use songbird::tracks::create_player;
-use tts::generate_speech_file;
+use std::ffi::OsStr;
 
 #[async_trait]
 #[cfg_attr(feature = "mock", mockall::automock)]
 impl Speaker for Voice {
+    #[cfg(feature = "aws")]
     async fn speech(&self, msg: SpeechMessage) {
         match self.handler().await {
             Ok(handler) => {
@@ -54,21 +55,11 @@ async fn play_input(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::Path;
+    use crate::infrastructure::SharedSoundPath;
 
     #[tokio::test]
-    async fn create_tts_file() {
-        let root = env!("CARGO_MANIFEST_DIR");
-        let path = Path::new(root);
-        let file_path: SpeechFilePath = path.join("sounds").join("tts").into();
-        let speech_file = generate_speech_file(
-            "おはようございます".to_string(),
-            VoiceId::Mizuki,
-            file_path,
-            false,
-        )
-        .await
-        .unwrap();
-        get_input_from_local(speech_file).await;
+    async fn test_get_input_from_local() {
+        let file_path = SharedSoundPath::new().welcome_audio_path();
+        get_input_from_local(file_path).await;
     }
 }
