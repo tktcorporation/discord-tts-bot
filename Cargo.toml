@@ -17,7 +17,7 @@ default = ["tts"]
 hyper = "0.14.20"
 polly = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.7-alpha", package = "aws-sdk-polly" }
 aws-types = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.7-alpha", package = "aws-types" }
-tracing-subscriber = { version = "0.3.15", features = ["fmt"] }
+tracing-subscriber = { version = "0.3.16", features = ["fmt"] }
 tiger = "0.2.1"
 rand = "0.8.5"
 serde_json = "1.0.85"
