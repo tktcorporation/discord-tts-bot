@@ -42,7 +42,7 @@ RUN cargo build --release --features "tts"
 
 CMD [ "/bin/sh",  "-c", "cargo run" ]
 
-FROM debian:bullseye-20221004-slim
+FROM debian:bullseye-20221024-slim
 
 RUN apt-get update && \
     apt-get install -y \
