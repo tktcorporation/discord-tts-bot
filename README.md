@@ -52,7 +52,7 @@ make watch
 1. `git pull`
 1. `git switch -c release/vx.x.x`
 1. Bump up to vx.x.x in Cargo.toml
-1. `git commit -m 'vx.x.x'`
+1. `git commit -m ':bookmark: vx.x.x'`
 1. `git push --set-upstream origin release/vx.x.x`
 1. Create Pull Request
 1. Merge Pull Request
