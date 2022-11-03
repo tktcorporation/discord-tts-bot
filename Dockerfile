@@ -62,9 +62,9 @@ RUN apt-get update && \
 
 ENV LC_ALL=C.UTF-8
 
-COPY --from=build-env /target/release/discord-speech-bot /bin/discord-speech-bot
+COPY --from=build-env /target/release/discord-tts-bot /bin/discord-tts-bot
 COPY --from=build-env /sounds /sounds
 COPY --from=build-env /usr/bin/youtube-dl /bin/youtube-dl
 COPY --from=build-env /usr/bin/ojosama /bin/ojosama
 
-CMD [ "/bin/sh",  "-c", "discord-speech-bot" ]
+CMD [ "/bin/sh",  "-c", "discord-tts-bot" ]

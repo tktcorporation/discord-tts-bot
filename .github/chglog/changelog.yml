@@ -2,7 +2,7 @@ style: github
 template: CHANGELOG.tpl.md
 info:
   title: CHANGELOG
-  repository_url: https://github.com/tktcorporation/discord-speech-bot
+  repository_url: https://github.com/tktcorporation/discord-tts-bot
 options:
   commits:
     filters:

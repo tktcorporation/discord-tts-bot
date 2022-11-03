@@ -1,7 +1,7 @@
 style: github
 template: RELEASE.tpl.md
 info:
-  repository_url: https://github.com/tktcorporation/discord-speech-bot
+  repository_url: https://github.com/tktcorporation/discord-tts-bot
 options:
   commits:
     filters:

@@ -1,7 +1,7 @@
-# discord-speech-bot
+# discord-tts-bot
 
-[![Test](https://github.com/tktcorporation/discord-speech-bot/actions/workflows/test.yml/badge.svg)](https://github.com/tktcorporation/discord-speech-bot/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/tktcorporation/discord-speech-bot/branch/master/graph/badge.svg?token=HB6NMTENNZ)](https://codecov.io/gh/tktcorporation/discord-speech-bot)
+[![Test](https://github.com/tktcorporation/discord-tts-bot/actions/workflows/test.yml/badge.svg)](https://github.com/tktcorporation/discord-tts-bot/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/tktcorporation/discord-tts-bot/branch/master/graph/badge.svg?token=HB6NMTENNZ)](https://codecov.io/gh/tktcorporation/discord-tts-bot)
 
 ## Prerequirements
 
