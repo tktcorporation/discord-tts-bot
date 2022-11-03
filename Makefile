@@ -22,3 +22,4 @@ install:
 	rustup component add clippy --toolchain nightly-x86_64-unknown-linux-gnu
 	cargo install cargo-edit
 	cargo install cargo-hack
+	cargo install cargo-audit --features=fix
