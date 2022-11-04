@@ -10,6 +10,7 @@ mod ojoin;
 mod ping;
 mod play;
 mod queue;
+mod select_channel;
 mod skip;
 mod undeafen;
 mod unmute;
@@ -43,6 +44,7 @@ pub enum SlashCommands {
     Undeafen,
     Unmute,
     Ojoin,
+    SelectChannel,
 }
 
 impl SlashCommands {
@@ -61,6 +63,7 @@ impl SlashCommands {
             "undeafen" => Some(Self::Undeafen),
             "unmute" => Some(Self::Unmute),
             "ojoin" => Some(Self::Ojoin),
+            "select_channel" => Some(Self::SelectChannel),
             _ => None,
         }
     }
@@ -84,6 +87,7 @@ impl SlashCommands {
             Self::Undeafen => undeafen::Undeafen::run(ctx, command).await,
             Self::Unmute => unmute::Unmute::run(ctx, command).await,
             Self::Ojoin => ojoin::Ojoin::run(ctx, command).await,
+            Self::SelectChannel => select_channel::SelectChannel::run(ctx, command).await,
         }
     }
 
@@ -105,6 +109,9 @@ impl SlashCommands {
             Self::Undeafen => undeafen::Undeafen::register(command).name("undeafen"),
             Self::Unmute => unmute::Unmute::register(command).name("unmute"),
             Self::Ojoin => ojoin::Ojoin::register(command).name("ojoin"),
+            Self::SelectChannel => {
+                select_channel::SelectChannel::register(command).name("select_channel")
+            }
         }
     }
 }

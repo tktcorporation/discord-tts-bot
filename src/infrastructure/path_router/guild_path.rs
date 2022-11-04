@@ -2,7 +2,7 @@ use serenity::model::id;
 use std::path::PathBuf;
 use tiger::{digest::Digest, Tiger};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct GuildPath {
     value: PathBuf,
 }

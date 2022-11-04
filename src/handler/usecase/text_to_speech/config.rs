@@ -13,14 +13,14 @@ pub mod client {
     }
 
     impl Client {
-        pub fn write(self, config: Config) {
-            let config_path = ConfigFilePath::new(self.guild_path);
+        pub fn write(&self, config: Config) {
+            let config_path = ConfigFilePath::new(self.guild_path.clone());
             let config_str = serde_json::to_string(&config).expect("fail to serialize config");
             std::fs::write(config_path.value, config_str).expect("fail to write config");
         }
 
-        pub fn read(self) -> Result<Option<Config>, String> {
-            let config_path = ConfigFilePath::new(self.guild_path);
+        pub fn read(&self) -> Result<Option<Config>, String> {
+            let config_path = ConfigFilePath::new(self.guild_path.clone());
             // return empty config if config file does not exist
             if !config_path.value.exists() {
                 return Ok(None);
