@@ -5,7 +5,7 @@ on:
       - "v*"
 
 jobs:
-  # Publish discord-speech-bot to Crates.io
+  # Publish discord-tts-bot to Crates.io
   # cargo_publish:
   #   name: Publish Cargo Package
   #   runs-on: ubuntu-latest
@@ -31,47 +31,47 @@ jobs:
         include:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            name: discord-speech-bot-x86_64-unknown-linux-gnu.tar.gz
+            name: discord-tts-bot-x86_64-unknown-linux-gnu.tar.gz
 
           # - target: x86_64-unknown-linux-musl
           #   os: ubuntu-latest
-          #   name: discord-speech-bot-x86_64-unknown-linux-musl.tar.gz
+          #   name: discord-tts-bot-x86_64-unknown-linux-musl.tar.gz
     #
     # - target: i686-unknown-linux-musl
     #   os: ubuntu-latest
-    #   name: discord-speech-bot-i686-unknown-linux-musl.tar.gz
+    #   name: discord-tts-bot-i686-unknown-linux-musl.tar.gz
     #
     # - target: aarch64-unknown-linux-musl
     #   os: ubuntu-latest
-    #   name: discord-speech-bot-aarch64-unknown-linux-musl.tar.gz
+    #   name: discord-tts-bot-aarch64-unknown-linux-musl.tar.gz
     #
     # - target: arm-unknown-linux-musleabihf
     #   os: ubuntu-latest
-    #   name: discord-speech-bot-arm-unknown-linux-musleabihf.tar.gz
+    #   name: discord-tts-bot-arm-unknown-linux-musleabihf.tar.gz
     #
     # - target: x86_64-apple-darwin
     #   os: macOS-latest
-    #   name: discord-speech-bot-x86_64-apple-darwin.tar.gz
+    #   name: discord-tts-bot-x86_64-apple-darwin.tar.gz
     #
     # - target: aarch64-apple-darwin
     #   os: macOS-latest
-    #   name: discord-speech-bot-aarch64-apple-darwin.tar.gz
+    #   name: discord-tts-bot-aarch64-apple-darwin.tar.gz
     #
     # - target: x86_64-pc-windows-msvc
     #   os: windows-latest
-    #   name: discord-speech-bot-x86_64-pc-windows-msvc.zip
+    #   name: discord-tts-bot-x86_64-pc-windows-msvc.zip
     #
     # - target: i686-pc-windows-msvc
     #   os: windows-latest
-    #   name: discord-speech-bot-i686-pc-windows-msvc.zip
+    #   name: discord-tts-bot-i686-pc-windows-msvc.zip
     #
     # - target: aarch64-pc-windows-msvc
     #   os: windows-latest
-    #   name: discord-speech-bot-aarch64-pc-windows-msvc.zip
+    #   name: discord-tts-bot-aarch64-pc-windows-msvc.zip
     #
     # - target: x86_64-unknown-freebsd
     #   os: ubuntu-latest
-    #   name: discord-speech-bot-x86_64-unknown-freebsd.tar.gz
+    #   name: discord-tts-bot-x86_64-unknown-freebsd.tar.gz
 
     runs-on: ${{ matrix.os }}
     continue-on-error: true
@@ -115,16 +115,16 @@ jobs:
       #   if: matrix.os == 'windows-latest'
       #   run: |
       #     cd target/${{ matrix.target }}/release
-      #     strip discord-speech-bot.exe
-      #     7z a ../../../${{ matrix.name }} discord-speech-bot.exe
+      #     strip discord-tts-bot.exe
+      #     7z a ../../../${{ matrix.name }} discord-tts-bot.exe
       #     cd -
       - name: Post Build | Prepare artifacts [-nix]
         if: matrix.os != 'windows-latest'
         run: |
           cd target/${{ matrix.target }}/release
           # TODO: investigate better cross platform stripping
-          strip discord-speech-bot || true
-          tar czvf ../../../${{ matrix.name }} discord-speech-bot
+          strip discord-tts-bot || true
+          tar czvf ../../../${{ matrix.name }} discord-tts-bot
           cd -
       - name: Deploy | Upload artifacts
         uses: actions/upload-artifact@v3
@@ -152,7 +152,7 @@ jobs:
         uses: actions/download-artifact@v3
 
       - name: Setup | Checksums
-        run: for file in discord-speech-bot-*/discord-speech-bot-*; do openssl dgst -sha256 -r "$file" | awk '{print $1}' > "${file}.sha256"; done
+        run: for file in discord-tts-bot-*/discord-tts-bot-*; do openssl dgst -sha256 -r "$file" | awk '{print $1}' > "${file}.sha256"; done
 
       - name: Setup | Release notes
         run: |
@@ -161,7 +161,7 @@ jobs:
       - name: Build | Publish
         uses: softprops/action-gh-release@v1
         with:
-          files: discord-speech-bot-*/discord-speech-bot-*
+          files: discord-tts-bot-*/discord-tts-bot-*
           body_path: RELEASE.md
         env:
           # Use personal token for hook other workflows

@@ -43,7 +43,7 @@ async fn help(ctx: &Context, msg: &Message) -> CommandResult {
                             true,
                         );
                     }
-                    e.footer(|f| f.text("https://github.com/tktcorporation/discord-speech-bot"))
+                    e.footer(|f| f.text("https://github.com/tktcorporation/discord-tts-bot"))
                 })
         })
         .await

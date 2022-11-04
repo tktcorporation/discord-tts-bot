@@ -1,5 +1,5 @@
 [package]
-name = "discord-speech-bot"
+name = "discord-tts-bot"
 version = "1.0.1"
 authors = ["tktcorporation"]
 edition = "2021"
