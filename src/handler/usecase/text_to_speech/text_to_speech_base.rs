@@ -24,7 +24,20 @@ pub async fn text_to_speech(speaker: Box<dyn Speaker + Sync + Send>, msg: Messag
     let speech_options = config
         .map(|config| config.speech_options)
         .unwrap_or_default();
+    if is_ignore_channel(speech_options.read_channel_id, &msg) {
+        return;
+    }
     speaker.speech(msg.to_speech_message(speech_options)).await;
+}
+
+#[cfg(feature = "tts")]
+fn is_ignore_channel(read_channel_id: Option<u64>, msg: &Message) -> bool {
+    if let Some(read_channel_id) = read_channel_id {
+        if u64::from(msg.msg.channel_id) != read_channel_id {
+            return true;
+        };
+    };
+    false
 }
 
 #[cfg(test)]

@@ -191,7 +191,10 @@ mod tests {
             assert_eq!(
                 "url",
                 &message
-                    .to_speech_message(SpeechOptions { is_ojosama: false },)
+                    .to_speech_message(SpeechOptions {
+                        is_ojosama: false,
+                        read_channel_id: None
+                    },)
                     .value
             );
         }
@@ -202,7 +205,10 @@ mod tests {
             assert_eq!(
                 "url",
                 &message
-                    .to_speech_message(SpeechOptions { is_ojosama: false },)
+                    .to_speech_message(SpeechOptions {
+                        is_ojosama: false,
+                        read_channel_id: None
+                    },)
                     .value
             );
         }
@@ -213,7 +219,10 @@ mod tests {
             assert_eq!(
                 "url",
                 &message
-                    .to_speech_message(SpeechOptions { is_ojosama: false },)
+                    .to_speech_message(SpeechOptions {
+                        is_ojosama: false,
+                        read_channel_id: None
+                    },)
                     .value
             );
         }
@@ -224,7 +233,10 @@ mod tests {
             assert_eq!(
                 "おはようsanmaこんにちはでもこちらはbutterですわ",
                 &message
-                    .to_speech_message(SpeechOptions { is_ojosama: true },)
+                    .to_speech_message(SpeechOptions {
+                        is_ojosama: true,
+                        read_channel_id: None
+                    },)
                     .value
             );
         }

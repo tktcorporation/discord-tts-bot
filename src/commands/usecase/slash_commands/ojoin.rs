@@ -17,7 +17,10 @@ impl SlashCommand for Ojoin {
             guild,
             &command.user.id,
             command.channel_id,
-            speech_options::SpeechOptions { is_ojosama: true },
+            speech_options::SpeechOptions {
+                is_ojosama: true,
+                read_channel_id: None,
+            },
         )
         .await
         {

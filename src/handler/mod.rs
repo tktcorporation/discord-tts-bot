@@ -101,7 +101,11 @@ impl EventHandler for Handler {
                 .create_application_command(|command| SlashCommands::Deafen.register(command))
                 .create_application_command(|command| SlashCommands::Mute.register(command))
                 .create_application_command(|command| SlashCommands::Invite.register(command))
+                .create_application_command(|command| {
+                    SlashCommands::SelectChannel.register(command)
+                })
                 .create_application_command(|command| SlashCommands::Skip.register(command));
+
             #[cfg(feature = "music")]
             commands
                 .create_application_command(|command| SlashCommands::Play.register(command))
