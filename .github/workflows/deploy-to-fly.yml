@@ -1,0 +1,30 @@
+name: "FlyIoDeployMusic"
+
+on:
+  release:
+    types: [published]
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: heroku_production
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run:
+          fly secrets set DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN_MUSIC }} \
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }} \
+          AWS_REGION=${{ secrets.AWS_REGION }} \
+          DISCORD_CMD_PREFIX=${{ secrets.DISCORD_CMD_PREFIX_MUSIC }}
+      - run: flyctl deploy --remote-only
