@@ -12,7 +12,7 @@ updates:
     assignees:
       - "tktcorporation"
     commit-message:
-      prefix: "⬆️"
+      prefix: ":arrow_up:"
 
   - package-ecosystem: "docker"
     directory: "/"
@@ -21,7 +21,7 @@ updates:
     assignees:
       - "tktcorporation"
     commit-message:
-      prefix: "⬆️"
+      prefix: ":arrow_up:"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -30,4 +30,4 @@ updates:
     assignees:
       - "tktcorporation"
     commit-message:
-      prefix: "⬆️"
+      prefix: ":arrow_up:"
