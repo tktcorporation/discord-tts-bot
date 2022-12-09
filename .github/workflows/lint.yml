@@ -177,7 +177,7 @@ jobs:
         m4 \
         ffmpeg \
         curl \
-        python \
+        python-is-python3 \
         git
 
         sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/bin/youtube-dl && \
