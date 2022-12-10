@@ -28,7 +28,7 @@ async fn ojoin(ctx: &Context, msg: &Message) -> CommandResult {
             check_msg(msg.reply(&ctx, comment).await);
         }
         Err(e) => {
-            check_msg(msg.reply(&ctx, format!("{:?}", e)).await);
+            check_msg(msg.reply(&ctx, format!("{e:?}")).await);
         }
     }
     Ok(())

@@ -14,7 +14,7 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
     let comment = match services::deafen(ctx, guild_id).await {
         Ok(comment) => comment,
         Err(e) => {
-            format!("{:?}", e)
+            format!("{e:?}")
         }
     };
     check_msg(msg.reply(&ctx, comment).await);

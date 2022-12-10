@@ -61,7 +61,7 @@ async fn play_fade(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let guild = msg.guild(&ctx.cache).unwrap();
     let play_url = args.message();
     if let Err(e) = services::play_fade(ctx, guild.id, msg.channel_id, play_url).await {
-        check_msg(msg.reply(&ctx.http, format!("Error: {:?}", e)).await);
+        check_msg(msg.reply(&ctx.http, format!("Error: {e:?}")).await);
         return Ok(());
     }
     check_msg(msg.reply(&ctx, "Playing song...").await);

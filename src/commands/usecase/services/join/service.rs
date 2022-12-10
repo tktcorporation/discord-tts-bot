@@ -4,6 +4,7 @@ use serenity::{
     model::{id::ChannelId as SerenityChannelId, mention::Mention},
 };
 
+use crate::constants;
 use crate::handler::usecase::text_to_speech::{config, speech_options};
 use crate::infrastructure::SharedSoundPath;
 use crate::model::Voice;
@@ -68,7 +69,7 @@ async fn _queue_join_message(
 
     let input = welcome_audio().await;
     let (mut audio, _audio_handle) = create_player(input);
-    audio.set_volume(1.0);
+    audio.set_volume(constants::volume::VOICE);
     handle.enqueue(audio);
 }
 

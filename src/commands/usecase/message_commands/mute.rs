@@ -16,7 +16,7 @@ async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
     let comment = match services::mute(ctx, guild.id).await {
         Ok(comment) => comment,
         Err(e) => {
-            format!("{:?}", e)
+            format!("{e:?}")
         }
     };
     check_msg(msg.reply(&ctx, comment).await);

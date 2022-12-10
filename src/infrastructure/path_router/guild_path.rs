@@ -11,7 +11,7 @@ impl GuildPath {
     pub fn new(guild_id: &id::GuildId) -> Self {
         let root: std::path::PathBuf = super::tmp_path();
         let digest = Tiger::digest(guild_id.to_string().as_bytes());
-        let guild_id_digest_str = format!("{:X}", digest);
+        let guild_id_digest_str = format!("{digest:X}");
         let guild_path = root.join(guild_id_digest_str);
         std::fs::create_dir_all(&guild_path).expect("fail to create a dir of guild path");
         guild_path.into()

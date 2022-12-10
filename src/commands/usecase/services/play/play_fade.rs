@@ -2,6 +2,8 @@ use serenity::async_trait;
 use serenity::{client::Context, http::Http, model};
 use songbird::{Event, EventContext, EventHandler as VoiceEventHandler, TrackEvent};
 
+use crate::constants;
+
 use super::{check_msg, utils, Error};
 use songbird::tracks::create_player;
 use std::{sync::Arc, time::Duration};
@@ -65,7 +67,7 @@ pub async fn play_fade(
         let source = match utils::source_from_str(url.to_string(), true).await {
             Ok(source) => source,
             Err(why) => {
-                println!("Err starting source: {:?}", why);
+                println!("Err starting source: {why:?}");
                 return Err(Error::ErrorSourcingFfmpeg);
             }
         };
@@ -73,7 +75,7 @@ pub async fn play_fade(
         // This handler object will allow you to, as needed,
         // control the audio track via events and further commands.
         let (mut audio, track_handle) = create_player(source.into());
-        audio.set_volume(0.05);
+        audio.set_volume(constants::volume::MUSIC);
         handler.enqueue(audio);
         let send_http = ctx.http.clone();
 

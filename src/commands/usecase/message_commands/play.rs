@@ -27,7 +27,7 @@ async fn join_and_play(
 ) -> String {
     use services::error::Error;
     match services::play(ctx, guild.id, called_channel_id, play_url).await {
-        Ok(_) => format!("Queue {}", play_url),
+        Ok(_) => format!("Queue {play_url}"),
         Err(e) => match e {
             Error::NotInVoiceChannel => {
                 use crate::handler::usecase::text_to_speech::speech_options;
@@ -46,7 +46,7 @@ async fn join_and_play(
                 if let Err(e) = services::play(ctx, guild.id, called_channel_id, play_url).await {
                     return e.to_string();
                 };
-                joined_message + format!(" and Queue {}", play_url).as_str()
+                joined_message + format!(" and Queue {play_url}").as_str()
             }
             _ => e.to_string(),
         },

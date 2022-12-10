@@ -25,7 +25,7 @@ fn greeting_word(change_of_states: &ChangeOfStates, name: &str) -> Option<Speech
         ChangeOfStates::Join => Some("いらっしゃい"),
     }
     .map(|message_prefix| SpeechMessage {
-        value: format!("{}さん{}", name, message_prefix),
+        value: format!("{name}さん{message_prefix}"),
     })
 }
 

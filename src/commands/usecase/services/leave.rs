@@ -12,7 +12,7 @@ pub async fn leave(
 
     if has_handler {
         if let Err(e) = manager.remove(guild_id).await {
-            return Err(format!("Failed: {:?}", e));
+            return Err(format!("Failed: {e:?}"));
         }
         return Ok("ばいばい".to_string());
     }

@@ -19,7 +19,7 @@ async fn skip(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
             msg.reply(&ctx.http, m).await?;
         }
         Err(e) => {
-            msg.reply(&ctx.http, format!("Error: {:?}", e)).await?;
+            msg.reply(&ctx.http, format!("Error: {e:?}")).await?;
         }
     }
     Ok(())

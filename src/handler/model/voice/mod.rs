@@ -1,4 +1,5 @@
 use super::super::usecase::{interface::Speaker, text_to_speech::SpeechMessage};
+use crate::constants;
 #[cfg(feature = "aws")]
 use crate::infrastructure::tts::generate_speech_file;
 use crate::infrastructure::{GuildPath, SoundPath, SpeechFilePath};
@@ -48,7 +49,7 @@ async fn play_input(
 ) {
     let mut handler = handler_lock.lock().await;
     let (mut audio, _audio_handle) = create_player(input);
-    audio.set_volume(1.0);
+    audio.set_volume(constants::volume::VOICE);
     handler.enqueue(audio);
 }
 

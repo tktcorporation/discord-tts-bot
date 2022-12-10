@@ -28,7 +28,7 @@ pub async fn command_reply(result: Result<String, String>, ctx: &Context, msg: &
             check_msg(msg.reply(&ctx, comment).await);
         }
         Err(e) => {
-            check_msg(msg.reply(&ctx, format!("{:?}", e)).await);
+            check_msg(msg.reply(&ctx, format!("{e:?}")).await);
         }
     }
 }
