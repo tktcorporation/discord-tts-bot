@@ -27,7 +27,7 @@ pub mod client {
             }
             let config_str = match std::fs::read_to_string(config_path.value) {
                 Ok(config_str) => config_str,
-                Err(err) => return Err(format!("fail to read config: {}", err)),
+                Err(err) => return Err(format!("fail to read config: {err}")),
             };
             Ok(serde_json::from_str(&config_str).expect("fail to deserialize config"))
         }

@@ -67,7 +67,7 @@ pub async fn play_fade(
         let source = match utils::source_from_str(url.to_string(), true).await {
             Ok(source) => source,
             Err(why) => {
-                println!("Err starting source: {:?}", why);
+                println!("Err starting source: {why:?}");
                 return Err(Error::ErrorSourcingFfmpeg);
             }
         };

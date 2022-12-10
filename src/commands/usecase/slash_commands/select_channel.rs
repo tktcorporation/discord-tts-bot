@@ -32,7 +32,7 @@ impl SlashCommand for SelectChannel {
         };
         let guild_id = command.guild_id.unwrap();
         services::select_channel(&guild_id, channel_id).await;
-        SlashCommandResult::Simple(Some(format!("Channel selected <#{}>", channel_id)))
+        SlashCommandResult::Simple(Some(format!("Channel selected <#{channel_id}>")))
     }
 
     fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {

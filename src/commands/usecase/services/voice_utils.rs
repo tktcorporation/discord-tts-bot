@@ -16,9 +16,9 @@ pub fn get_human_readable_timestamp(duration: Option<Duration>) -> String {
             let hours = duration.as_secs() / 3600;
 
             if hours < 1 {
-                format!("{:02}:{:02}", minutes, seconds)
+                format!("{minutes:02}:{seconds:02}")
             } else {
-                format!("{}:{:02}:{:02}", hours, minutes, seconds)
+                format!("{hours}:{minutes:02}:{seconds:02}")
             }
         }
         None => "∞".to_string(),

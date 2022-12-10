@@ -21,7 +21,7 @@ pub async fn clear(ctx: &Context, guild_id: GuildId) -> Result<String, Error> {
         Ok(match cleared {
             0 => "There is nothing playing!".into(),
             1 => "Removed **1** title from the queue!".into(),
-            removed => format!("Removed **{}** titles from the queue!", removed),
+            removed => format!("Removed **{removed}** titles from the queue!"),
         })
     } else {
         Err(Error::NotInVoiceChannel)

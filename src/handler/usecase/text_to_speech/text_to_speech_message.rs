@@ -103,7 +103,7 @@ fn translate_to_ojosama(str: &str) -> String {
         .output()
         .expect("failed to translate to ojosama")
         .stdout;
-    println!("{:?}", stdout);
+    println!("{stdout:?}");
     String::from_utf8(stdout).unwrap()
 }
 

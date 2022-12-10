@@ -22,7 +22,7 @@ async fn queue(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
                 .unwrap();
         }
         Err(e) => {
-            msg.reply(&ctx.http, format!("Error: {:?}", e)).await?;
+            msg.reply(&ctx.http, format!("Error: {e:?}")).await?;
         }
     }
     Ok(())

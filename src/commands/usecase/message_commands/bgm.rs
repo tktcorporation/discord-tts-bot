@@ -15,7 +15,7 @@ async fn bgm(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
         match Restartable::ytdl(url, true).await {
             Ok(source) => Ok(source.into()),
             Err(why) => {
-                println!("Err get input source: {:?}", why);
+                println!("Err get input source: {why:?}");
 
                 Err(why)
             }
