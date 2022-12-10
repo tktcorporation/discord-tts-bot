@@ -73,7 +73,7 @@ pub async fn play_fade(
         // This handler object will allow you to, as needed,
         // control the audio track via events and further commands.
         let (mut audio, track_handle) = create_player(source.into());
-        audio.set_volume(0.1);
+        audio.set_volume(0.05);
         handler.enqueue(audio);
         let send_http = ctx.http.clone();
 
