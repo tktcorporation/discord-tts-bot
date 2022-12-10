@@ -13,6 +13,8 @@ mod commands;
 
 mod model;
 
+mod constants;
+
 mod framework;
 use framework::build_framework;
 

@@ -1,5 +1,7 @@
 use serenity::{client::Context, model};
 
+use crate::constants;
+
 use super::utils;
 use super::Error;
 use super::TrackTiming;
@@ -39,7 +41,7 @@ pub async fn play(
         .await;
 
         let (mut audio, _audio_handle) = create_player(input);
-        audio.set_volume(0.1);
+        audio.set_volume(constants::volume::MUSIC);
         handler.enqueue(audio);
 
         Ok(())
