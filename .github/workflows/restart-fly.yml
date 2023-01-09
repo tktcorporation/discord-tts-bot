@@ -1,6 +1,7 @@
 name: "Restart FlyIo"
 
-on: dispatch
+on:
+  workflow_dispatch:
 
 defaults:
   run:
