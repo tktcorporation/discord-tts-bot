@@ -1,4 +1,4 @@
-FROM rust:1.66.0-slim-bullseye AS build-env
+FROM rust:1.66.1-slim-bullseye AS build-env
 
 RUN apt-get update && \
     apt-get install -y \
