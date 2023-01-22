@@ -109,6 +109,7 @@ impl EventHandler for Handler {
             #[cfg(feature = "music")]
             commands
                 .create_application_command(|command| SlashCommands::Play.register(command))
+                .create_application_command(|command| SlashCommands::Repeat.register(command))
                 .create_application_command(|command| SlashCommands::Queue.register(command));
             commands
         })

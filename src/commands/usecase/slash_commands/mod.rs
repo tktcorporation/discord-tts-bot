@@ -10,6 +10,7 @@ mod ojoin;
 mod ping;
 mod play;
 mod queue;
+mod repeat;
 mod select_channel;
 mod skip;
 mod undeafen;
@@ -41,6 +42,7 @@ pub enum SlashCommands {
     Invite,
     Skip,
     Queue,
+    Repeat,
     Undeafen,
     Unmute,
     Ojoin,
@@ -60,6 +62,7 @@ impl SlashCommands {
             "invite" => Some(Self::Invite),
             "skip" => Some(Self::Skip),
             "queue" => Some(Self::Queue),
+            "repeat" => Some(Self::Repeat),
             "undeafen" => Some(Self::Undeafen),
             "unmute" => Some(Self::Unmute),
             "ojoin" => Some(Self::Ojoin),
@@ -84,6 +87,7 @@ impl SlashCommands {
             Self::Invite => invite::Invite::run(ctx, command).await,
             Self::Skip => skip::Skip::run(ctx, command).await,
             Self::Queue => queue::Queue::run(ctx, command).await,
+            Self::Repeat => repeat::Repeat::run(ctx, command).await,
             Self::Undeafen => undeafen::Undeafen::run(ctx, command).await,
             Self::Unmute => unmute::Unmute::run(ctx, command).await,
             Self::Ojoin => ojoin::Ojoin::run(ctx, command).await,
@@ -106,6 +110,7 @@ impl SlashCommands {
             Self::Invite => invite::Invite::register(command).name("invite"),
             Self::Skip => skip::Skip::register(command).name("skip"),
             Self::Queue => queue::Queue::register(command).name("queue"),
+            Self::Repeat => repeat::Repeat::register(command).name("repeat"),
             Self::Undeafen => undeafen::Undeafen::register(command).name("undeafen"),
             Self::Unmute => unmute::Unmute::register(command).name("unmute"),
             Self::Ojoin => ojoin::Ojoin::register(command).name("ojoin"),
