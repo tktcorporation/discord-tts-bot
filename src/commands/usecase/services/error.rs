@@ -1,5 +1,6 @@
 use serenity::Error as SerenityError;
 use songbird::error::JoinError;
+use songbird::tracks::TrackError;
 use std::error::Error as StdError;
 use std::fmt;
 
@@ -11,6 +12,7 @@ pub enum Error {
     ErrorSourcingFfmpeg,
     JoinError(JoinError),
     SerenityError(SerenityError),
+    TrackError(TrackError),
 }
 
 impl fmt::Display for Error {
@@ -20,6 +22,7 @@ impl fmt::Display for Error {
             Error::ErrorSourcingFfmpeg => f.write_str("Error sourcing ffmpeg."),
             Error::JoinError(e) => e.fmt(f),
             Error::SerenityError(e) => e.fmt(f),
+            Error::TrackError(e) => e.fmt(f),
         }
     }
 }
