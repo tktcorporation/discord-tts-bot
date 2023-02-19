@@ -99,7 +99,7 @@ jobs:
       - name: Install musl tools
         if: matrix.target == 'x86_64-unknown-linux-musl'
         # Install libssl-dev for openssl-sys
-        run: sudo apt-get install -y musl-tools libssl-dev libopus-dev build-essential libssl-dev pkg-config autoconf automake libtool m4 ffmpeg curl python
+        run: sudo apt-get install -y musl-tools libssl-dev libopus-dev build-essential libssl-dev pkg-config autoconf automake libtool m4 ffmpeg curl python3
 
       - name: Build | Build
         uses: actions-rs/cargo@v1
