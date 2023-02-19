@@ -4,19 +4,16 @@
 {
 	"name": "discord-tts-bot",
 
-	"dockerFile": "../Dockerfile",
-	"context": "..",
-	"build": {
-		"target": "build-env"
-	},
-
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"redhat.vscode-yaml",
-		"github.copilot",
-		"rust-lang.rust-analyzer"
-	],
-
+	"image": "mcr.microsoft.com/devcontainers/universal2:linux",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"redhat.vscode-yaml",
+				"github.copilot",
+				"rust-lang.rust-analyzer"
+			]
+		}
+	}
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
@@ -29,7 +26,7 @@
 	// "postCreateCommand": "apt-get update && apt-get install -y git",
 
 	// Uncomment the next line to run commands after the container is created - for example installing curl.
-	"onCreateCommand": "make install",
+	// "onCreateCommand": "make install",
 
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode"
