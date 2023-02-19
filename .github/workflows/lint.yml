@@ -177,11 +177,11 @@ jobs:
         m4 \
         ffmpeg \
         curl \
-        python-is-python3 \
+        python3 \
         git
 
-        sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/bin/youtube-dl && \
-        sudo chmod a+rx /usr/bin/youtube-dl
+        sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
+          sudo chmod a+rx /usr/bin/yt-dlp
 
         curl -L https://github.com/jiro4989/ojosama/releases/download/v0.11.0/ojosama_0.11.0_linux_x86_64.tar.gz -o /tmp/ojosama_0.11.0_linux_x86_64.tar.gz && \
         tar -xzf /tmp/ojosama_0.11.0_linux_x86_64.tar.gz -C /usr/local/bin && \

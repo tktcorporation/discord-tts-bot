@@ -29,7 +29,7 @@ serde = "1.0.152"
 
 [dependencies.songbird]
 version = "0.3.0"
-features = ["builtin-queue"]
+features = ["builtin-queue", "yt-dlp"]
 
 [dependencies.serenity]
 version = "0.11.5"
