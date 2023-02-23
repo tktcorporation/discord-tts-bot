@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-      target: build-env
+      target: dev-env
     working_dir: /workspace
     environment:
       - USER=$USER
