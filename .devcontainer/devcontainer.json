@@ -10,7 +10,12 @@
 			"extensions": [
 				"redhat.vscode-yaml",
 				"github.copilot",
-				"rust-lang.rust-analyzer"
+				"rust-lang.rust-analyzer",
+				"ms-azuretools.vscode-docker",
+				"GitHub.copilot",
+				"donjayamanne.githistory",
+				"eamodio.gitlens",
+				"mhutchie.git-graph",
 			]
 		}
 	},
