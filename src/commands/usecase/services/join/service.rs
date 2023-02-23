@@ -7,7 +7,6 @@ use serenity::{
 use crate::constants;
 use crate::handler::usecase::text_to_speech::{config, speech_options};
 use crate::infrastructure::SharedSoundPath;
-use crate::model::Voice;
 
 use songbird::{self, create_player, ffmpeg, Event, TrackEvent};
 
@@ -23,13 +22,9 @@ pub async fn join(
     let manager = songbird::get(ctx)
         .await
         .expect("Songbird Voice client placed in at initialisation.");
-    let voice = Voice {
-        manager,
-        guild_id: guild.clone().id,
-    };
 
     // voice settings
-    let client = config::client::new(crate::infrastructure::GuildPath::new(&voice.guild_id));
+    let client = config::client::new(crate::infrastructure::GuildPath::new(&guild.id));
     client.write(config::Config { speech_options });
 
     let channel_id = guild
@@ -44,7 +39,7 @@ pub async fn join(
         }
     };
 
-    let (handle_lock, success) = voice.join(connect_to).await;
+    let (handle_lock, success) = manager.join(guild.id, connect_to).await;
     match success {
         Ok(()) => {
             _clear(&handle_lock).await;
