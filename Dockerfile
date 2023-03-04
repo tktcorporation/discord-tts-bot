@@ -1,4 +1,4 @@
-FROM rust:1.67.1-slim-bullseye AS build-env
+FROM rust:1.67.1-slim-bullseye AS dev-env
 
 RUN apt-get update && \
     apt-get install -y \
@@ -28,6 +28,8 @@ RUN curl -L https://github.com/jiro4989/ojosama/releases/download/v${ojosama_ver
     rm /tmp/ojosama_${ojosama_version}_linux_x86_64.tar.gz
 
 ENV LC_ALL=C.UTF-8
+
+FROM dev-env AS build-env
 
 COPY Cargo.lock Cargo.lock
 COPY Cargo.toml Cargo.toml

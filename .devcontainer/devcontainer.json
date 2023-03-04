@@ -4,15 +4,23 @@
 {
 	"name": "discord-tts-bot",
 
-	"image": "mcr.microsoft.com/devcontainers/universal2:linux",
+	"image": "mcr.microsoft.com/devcontainers/universal:2",
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"redhat.vscode-yaml",
 				"github.copilot",
-				"rust-lang.rust-analyzer"
+				"rust-lang.rust-analyzer",
+				"ms-azuretools.vscode-docker",
+				"GitHub.copilot",
+				"donjayamanne.githistory",
+				"eamodio.gitlens",
+				"mhutchie.git-graph",
 			]
 		}
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/rust:1": {}
 	}
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],

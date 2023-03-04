@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-      target: build-env
+      target: dev-env
     working_dir: /workspace
     environment:
       - USER=$USER
@@ -17,20 +17,8 @@ services:
       - HEROKU_APP_NAME=$HEROKU_APP_NAME
     volumes:
       - .:/workspace:cached
-      - target:/workspace/target:cached
       - /var/run/docker.sock:/var/run/docker.sock:rw
     tty: true
-  # executer:
-  #   build:
-  #     context: .
-  #     dockerfile: ./Dockerfile
-  #   environment:
-  #     - USER=$USER
-  #     - DISCORD_TOKEN=$DISCORD_TOKEN
-  #     - DISCORD_CMD_PREFIX=$DISCORD_CMD_PREFIX
-  #     - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-  #     - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-  #     - AWS_REGION=$AWS_REGION
   heroku:
     # run `apk add docker` before running heroku commands
     image: sue445/heroku-cli
@@ -38,6 +26,3 @@ services:
     volumes:
       - .:/workspace:cached
       - /var/run/docker.sock:/var/run/docker.sock:rw
-volumes:
-  target:
-  gcloud-config:

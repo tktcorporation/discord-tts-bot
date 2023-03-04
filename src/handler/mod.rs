@@ -30,7 +30,6 @@ pub struct Handler;
 impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::ApplicationCommand(command) = interaction {
-            println!("Received command interaction: {command:#?}");
             command
                 .create_interaction_response(&ctx.http, |response| {
                     response
