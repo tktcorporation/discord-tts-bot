@@ -34,9 +34,7 @@ impl SpeechFilePath {
         let file_name = self.file_name();
 
         SpeechFile {
-            value: File::create(&Path::new(&file_name))
-                .await
-                .expect("failed to create file"),
+            value: File::create(&Path::new(&file_name)).await.unwrap(),
             name: file_name,
         }
     }
