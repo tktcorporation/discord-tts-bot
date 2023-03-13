@@ -14,7 +14,7 @@ aws = []
 default = ["tts"]
 
 [dependencies]
-hyper = "0.14.24"
+hyper = "0.14.25"
 polly = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.7-alpha", package = "aws-sdk-polly" }
 aws-types = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.7-alpha", package = "aws-types" }
 tracing-subscriber = { version = "0.3.16", features = ["fmt"] }
