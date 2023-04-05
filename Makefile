@@ -18,8 +18,7 @@ install:
 	rustup update
 	rustup install nightly
 	rustup component add clippy rustfmt rust-analysis rust-src rls
-	cargo install cargo-watch
 	rustup component add clippy --toolchain nightly-x86_64-unknown-linux-gnu
-	cargo install cargo-edit
-	cargo install cargo-hack
-	cargo install cargo-audit --features=fix
+	cargo install cargo-binstall
+	cargo binstall cargo-watch cargo-edit cargo-hack
+	cargo binstall cargo-audit --features=fix
