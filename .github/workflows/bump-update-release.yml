@@ -2,6 +2,11 @@ name: Bump Update and Release
 
 on:
   workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Bump type (patch or minor)'
+        required: true
+        default: 'patch'
 
 jobs:
   build_and_update_version:
@@ -23,7 +28,7 @@ jobs:
       run: cargo install cargo-edit
 
     - name: Update version in Cargo.toml
-      run: cargo bump
+      run: cargo set-version --bump ${{ github.event.inputs.bump_type }}
 
     - name: Build the project
       run: cargo build --release
