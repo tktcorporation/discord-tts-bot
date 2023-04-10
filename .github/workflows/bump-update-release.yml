@@ -1,0 +1,43 @@
+name: Bump Update and Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_and_update_version:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        components: rustfmt
+        default: true
+
+    - name: Install cargo-edit
+      run: cargo install cargo-edit
+
+    - name: Update version in Cargo.toml
+      run: cargo bump
+
+    - name: Build the project
+      run: cargo build --release
+
+    - name: Configure Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "noreply@github.com"
+
+    - name: Create branch, commit and push
+      run: |
+        VERSION=$(grep '^version =' Cargo.toml | awk -F' = ' '{print $2}' | tr -d '"')
+        BRANCH_NAME="release/v$VERSION"
+        git checkout -b $BRANCH_NAME
+        git add Cargo.toml
+        git commit -m ":bookmark: v$VERSION"
+        git push origin $BRANCH_NAME
