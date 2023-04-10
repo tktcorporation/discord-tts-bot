@@ -18,6 +18,7 @@ options:
         - loop
         - bookmark
         - technologist
+        - arrow_up
   commit_groups:
     title_maps:
       zap: Improve performance
@@ -32,6 +33,7 @@ options:
       loop: Change requirements / dependencies
       bookmark: Release / Version tags
       technologist: Improve developer experience
+      arrow_up: Upgrade dependencies
   merges:
     pattern: "(#\\w+)"
     pattern_maps:
