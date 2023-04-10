@@ -40,7 +40,7 @@ jobs:
 
     - name: Create branch, commit and push
       run: |
-        VERSION=$(grep '^version =' Cargo.toml | awk -F' = ' '{print $2}' | tr -d '"')
+        VERSION=$(grep -oP '(?<=version = ")[^"]*' Cargo.toml | head -1)
         BRANCH_NAME="release/v$VERSION"
         git switch -c $BRANCH_NAME
         git add .
