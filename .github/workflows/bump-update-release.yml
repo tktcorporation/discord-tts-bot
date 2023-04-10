@@ -42,7 +42,7 @@ jobs:
       run: |
         VERSION=$(grep '^version =' Cargo.toml | awk -F' = ' '{print $2}' | tr -d '"')
         BRANCH_NAME="release/v$VERSION"
-        git checkout -b $BRANCH_NAME
-        git add Cargo.toml
+        git switch -c $BRANCH_NAME
+        git add .
         git commit -m ":bookmark: v$VERSION"
-        git push origin $BRANCH_NAME
+        git push --set-upstream origin $BRANCH_NAME
