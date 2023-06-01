@@ -1,0 +1,23 @@
+name: "Restart FlyIo shabe-mo"
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: heroku_production
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl apps restart tts-discord-bot
