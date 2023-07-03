@@ -32,7 +32,7 @@ version = "0.3.2"
 features = ["builtin-queue", "yt-dlp"]
 
 [dependencies.serenity]
-version = "0.11.5"
+version = "0.11.6"
 features = ["cache", "standard_framework", "voice", "rustls_backend"]
 
 [dependencies.tokio]
