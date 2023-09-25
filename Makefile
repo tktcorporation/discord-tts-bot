@@ -20,5 +20,6 @@ install:
 	rustup component add clippy rustfmt rust-analysis rust-src rls
 	rustup component add clippy --toolchain nightly-x86_64-unknown-linux-gnu
 	cargo install cargo-binstall
+	cargo binstall sccache --locked && export RUSTC_WRAPPER=$(which sccache)
 	cargo binstall cargo-watch cargo-edit cargo-hack
-	cargo binstall cargo-audit --features=fix
+	cargo install cargo-audit --features=fix
