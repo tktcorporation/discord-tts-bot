@@ -200,7 +200,7 @@ mod tests {
         fn test_mix() {
             let message = message_factory("<@8379454856049>おはよう<:sanma:872873394570424340>こんにちは<#795680552845443113>でも<@&8379454856049>これは<@&8379454856049><:butter:872873394570424340>です");
             assert_eq!(
-                "おはようsanmaこんにちはでもこちらはbutterですわ",
+                "おはようsanmaこんにちはでもこれはbutterです",
                 &message
                     .to_speech_message(SpeechOptions {
                         read_channel_id: None
