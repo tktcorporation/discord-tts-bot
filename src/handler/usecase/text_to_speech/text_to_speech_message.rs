@@ -4,7 +4,7 @@ pub use crate::model::Message;
 use regex::Regex;
 
 impl Message {
-    pub fn to_speech_message(&self, options: SpeechOptions) -> SpeechMessage {
+    pub fn to_speech_message(&self, _options: SpeechOptions) -> SpeechMessage {
         // urlはそのまま読まない
         let str = if self.msg.content.contains("http") {
             "url".to_string()

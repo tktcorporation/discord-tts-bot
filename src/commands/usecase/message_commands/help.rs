@@ -60,8 +60,8 @@ async fn help(ctx: &Context, msg: &Message) -> CommandResult {
 #[cfg(any(feature = "tts", feature = "music"))]
 #[group]
 #[commands(
-    deafen, join, leave, mute, play_fade, play, queue, skip, clear, ping, undeafen, unmute,
-    bgm, invite
+    deafen, join, leave, mute, play_fade, play, queue, skip, clear, ping, undeafen, unmute, bgm,
+    invite
 )]
 pub(crate) struct Commands;
 
