@@ -10,7 +10,6 @@ mod invite;
 mod join;
 mod leave;
 mod mute;
-mod ojoin;
 mod ping;
 mod play;
 mod play_fade;

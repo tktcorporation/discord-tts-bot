@@ -5,7 +5,6 @@ use super::invite::INVITE_COMMAND;
 use super::join::JOIN_COMMAND;
 use super::leave::LEAVE_COMMAND;
 use super::mute::MUTE_COMMAND;
-use super::ojoin::OJOIN_COMMAND;
 use super::ping::PING_COMMAND;
 use super::play::PLAY_COMMAND;
 use super::play_fade::PLAY_FADE_COMMAND;
@@ -61,7 +60,7 @@ async fn help(ctx: &Context, msg: &Message) -> CommandResult {
 #[cfg(any(feature = "tts", feature = "music"))]
 #[group]
 #[commands(
-    deafen, join, ojoin, leave, mute, play_fade, play, queue, skip, clear, ping, undeafen, unmute,
+    deafen, join, leave, mute, play_fade, play, queue, skip, clear, ping, undeafen, unmute,
     bgm, invite
 )]
 pub(crate) struct Commands;
