@@ -9,7 +9,7 @@ mod tests {
         let root = env!("CARGO_MANIFEST_DIR");
         println!("{root}");
         let path = Path::new(root);
-        let file_path = path.join("sounds").join("2_23_AM_2.mp3");
+        let file_path = path.join("sounds").join("shabeko_dayo.wav");
         println!("{}", file_path.display());
         assert!(file_path.exists());
     }

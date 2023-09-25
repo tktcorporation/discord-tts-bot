@@ -21,12 +21,6 @@ RUN curl https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
     chmod a+rx /usr/bin/yt-dlp
 
-ARG ojosama_version=0.11.0
-
-RUN curl -L https://github.com/jiro4989/ojosama/releases/download/v${ojosama_version}/ojosama_${ojosama_version}_linux_x86_64.tar.gz -o /tmp/ojosama_${ojosama_version}_linux_x86_64.tar.gz && \
-    tar -xzf /tmp/ojosama_${ojosama_version}_linux_x86_64.tar.gz -C /usr/bin && \
-    rm /tmp/ojosama_${ojosama_version}_linux_x86_64.tar.gz
-
 ENV LC_ALL=C.UTF-8
 
 FROM dev-env AS build-env
@@ -68,6 +62,5 @@ ENV LC_ALL=C.UTF-8
 COPY --from=build-env /target/release/discord-tts-bot /bin/discord-tts-bot
 COPY --from=build-env /sounds /sounds
 COPY --from=build-env /usr/bin/yt-dlp /bin/yt-dlp
-COPY --from=build-env /usr/bin/ojosama /bin/ojosama
 
 CMD [ "/bin/sh",  "-c", "discord-tts-bot" ]

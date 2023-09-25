@@ -4,7 +4,7 @@ pub use crate::model::Message;
 use regex::Regex;
 
 impl Message {
-    pub fn to_speech_message(&self, options: SpeechOptions) -> SpeechMessage {
+    pub fn to_speech_message(&self, _options: SpeechOptions) -> SpeechMessage {
         // urlはそのまま読まない
         let str = if self.msg.content.contains("http") {
             "url".to_string()
@@ -13,12 +13,7 @@ impl Message {
         };
         // convert discord styled string for speech
         let converted = convert_discord_string(&str);
-        let message = if options.is_ojosama {
-            // translate ojosama styled string for speech
-            translate_to_ojosama(&converted)
-        } else {
-            converted
-        };
+        let message = converted;
 
         SpeechMessage { value: message }
     }
@@ -95,18 +90,6 @@ fn convert_discord_string(str: &str) -> String {
     convert_discord_string(&convert_type.convert(&re, str))
 }
 
-fn translate_to_ojosama(str: &str) -> String {
-    use std::process::Command;
-    let stdout = Command::new("ojosama")
-        .arg("-t")
-        .arg(str)
-        .output()
-        .expect("failed to translate to ojosama")
-        .stdout;
-    println!("{stdout:?}");
-    String::from_utf8(stdout).unwrap()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -171,17 +154,6 @@ mod tests {
     }
 
     #[cfg(test)]
-    mod translate_to_ojosama_test {
-        use super::*;
-        #[test]
-        fn test_translate_to_ojosama() {
-            let str = "ハーブがありました";
-            let result = translate_to_ojosama(str);
-            assert_eq!("おハーブがありましたわ", result);
-        }
-    }
-
-    #[cfg(test)]
     mod to_speech_message_tests {
         use super::*;
 
@@ -192,7 +164,6 @@ mod tests {
                 "url",
                 &message
                     .to_speech_message(SpeechOptions {
-                        is_ojosama: false,
                         read_channel_id: None
                     },)
                     .value
@@ -206,7 +177,6 @@ mod tests {
                 "url",
                 &message
                     .to_speech_message(SpeechOptions {
-                        is_ojosama: false,
                         read_channel_id: None
                     },)
                     .value
@@ -220,7 +190,6 @@ mod tests {
                 "url",
                 &message
                     .to_speech_message(SpeechOptions {
-                        is_ojosama: false,
                         read_channel_id: None
                     },)
                     .value
@@ -231,10 +200,9 @@ mod tests {
         fn test_mix() {
             let message = message_factory("<@8379454856049>おはよう<:sanma:872873394570424340>こんにちは<#795680552845443113>でも<@&8379454856049>これは<@&8379454856049><:butter:872873394570424340>です");
             assert_eq!(
-                "おはようsanmaこんにちはでもこちらはbutterですわ",
+                "おはようsanmaこんにちはでもこれはbutterです",
                 &message
                     .to_speech_message(SpeechOptions {
-                        is_ojosama: true,
                         read_channel_id: None
                     },)
                     .value
