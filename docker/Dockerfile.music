@@ -1,4 +1,4 @@
-FROM rust:1.64-slim-bullseye AS build-env
+FROM rust:1.72.1-slim-bullseye AS dev-env
 
 RUN apt-get update && \
     apt-get install -y \
@@ -23,6 +23,8 @@ RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o 
 
 ENV LC_ALL=C.UTF-8
 
+FROM dev-env AS build-env
+
 COPY Cargo.lock Cargo.lock
 COPY Cargo.toml Cargo.toml
 
@@ -37,7 +39,7 @@ RUN cargo build --release --no-default-features --features "music"
 
 CMD [ "/bin/sh",  "-c", "cargo run" ]
 
-FROM debian:bullseye-20220418-slim
+FROM debian:bullseye-20230919-slim
 
 RUN apt-get update && \
     apt-get install -y \

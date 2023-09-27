@@ -3,9 +3,11 @@ services:
   app:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./docker/Dockerfile
       target: dev-env
     working_dir: /workspace
+    # sleep
+    command: bash -c "while true; do sleep 1; done"
     environment:
       - USER=$USER
       - DISCORD_TOKEN=$DISCORD_TOKEN
@@ -18,6 +20,8 @@ services:
     volumes:
       - .:/workspace:cached
       - /var/run/docker.sock:/var/run/docker.sock:rw
+      # rust
+      - cargo-cache:/usr/local/cargo/registry:cached
     tty: true
   heroku:
     # run `apk add docker` before running heroku commands
