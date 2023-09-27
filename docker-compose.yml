@@ -21,7 +21,7 @@ services:
       - .:/workspace:cached
       - /var/run/docker.sock:/var/run/docker.sock:rw
       # rust
-      - cargo-cache:/usr/local/cargo/registry:cached
+      - /cargo-cache:/usr/local/cargo/registry:cached
     tty: true
   heroku:
     # run `apk add docker` before running heroku commands
