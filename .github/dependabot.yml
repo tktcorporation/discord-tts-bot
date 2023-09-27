@@ -8,16 +8,16 @@ updates:
   - package-ecosystem: "cargo" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "daily"
+      interval: "weekly"
     assignees:
       - "tktcorporation"
     commit-message:
       prefix: ":arrow_up:"
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/docker/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     assignees:
       - "tktcorporation"
     commit-message:
@@ -26,7 +26,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     assignees:
       - "tktcorporation"
     commit-message:
