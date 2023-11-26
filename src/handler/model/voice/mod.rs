@@ -40,7 +40,7 @@ impl Speaker for Voice {
 async fn get_input_from_local<P: AsRef<OsStr>>(file_path: P) -> Input {
     ffmpeg(file_path)
         .await
-        .expect("This might fail: handle this error!")
+        .expect("This might fail if ffmpeg is not installed")
 }
 
 async fn play_input(
