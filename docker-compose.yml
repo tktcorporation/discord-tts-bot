@@ -23,10 +23,10 @@ services:
       # rust
       - /cargo-cache:/usr/local/cargo/registry:cached
     tty: true
-  heroku:
-    # run `apk add docker` before running heroku commands
-    image: sue445/heroku-cli
-    working_dir: /workspace
-    volumes:
-      - .:/workspace:cached
-      - /var/run/docker.sock:/var/run/docker.sock:rw
+  # heroku:
+  #   # run `apk add docker` before running heroku commands
+  #   image: sue445/heroku-cli
+  #   working_dir: /workspace
+  #   volumes:
+  #     - .:/workspace:cached
+  #     - /var/run/docker.sock:/var/run/docker.sock:rw

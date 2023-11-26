@@ -1,7 +1,7 @@
 use super::services::{self};
 
 mod help;
-pub use help::{COMMANDS_GROUP, COMMANDS_GROUP_OPTIONS};
+pub use help::COMMANDS_GROUP;
 
 mod bgm;
 mod clear;

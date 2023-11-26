@@ -19,7 +19,7 @@ impl SlashCommand for Play {
         let url_option = command
             .data
             .options
-            .get(0)
+            .first()
             .expect("url option is required")
             .resolved
             .clone()

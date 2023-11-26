@@ -31,6 +31,20 @@ impl Message {
 
         false
     }
+    pub fn get_content(&self) -> String {
+        if !self.msg.sticker_items.is_empty() {
+            // ステッカーの名前をすべて結合して返す
+            self.msg
+                .sticker_items
+                .iter()
+                .map(|sticker| sticker.name.clone())
+                .collect::<Vec<String>>()
+                .join(" ")
+        } else {
+            // 通常のメッセージの内容を返す
+            self.msg.content.clone()
+        }
+    }
 }
 
 #[cfg(test)]
@@ -43,20 +57,20 @@ mod tests {
 
         #[test]
         fn test_is_command_msg() {
-            let message = message_factory("a", false);
+            let message = message_factory("a", false, false);
             assert!(!message.is_command());
         }
 
         #[test]
         fn test_is_command_msg_and() {
-            let message = message_factory("hogehoege&sa", false);
+            let message = message_factory("hogehoege&sa", false, false);
             assert!(!message.is_command());
         }
 
         #[test]
         fn test_is_command_msg_cmd_pref() {
             let content = &(env::var("DISCORD_CMD_PREFIX").unwrap() + " hogehoge")[..];
-            let message = message_factory(content, true);
+            let message = message_factory(content, true, false);
             assert!(message.is_command());
         }
     }
@@ -67,21 +81,44 @@ mod tests {
 
         #[test]
         fn test_is_from_bot_msg() {
-            let message = message_factory("a", true);
+            let message = message_factory("a", true, false);
             assert!(message.is_from_bot());
         }
 
         #[test]
         fn test_is_from_bot_msg_and() {
-            let message = message_factory("hogehoege&sa", true);
+            let message = message_factory("hogehoege&sa", true, false);
             assert!(message.is_from_bot());
         }
 
         #[test]
         fn test_is_from_bot_msg_cmd_pref() {
             let content = &(env::var("DISCORD_CMD_PREFIX").unwrap() + " hogehoge")[..];
-            let message = message_factory(content, false);
+            let message = message_factory(content, false, false);
             assert!(!message.is_from_bot());
+        }
+    }
+
+    #[cfg(test)]
+    mod get_content_tests {
+        use super::*;
+
+        #[test]
+        fn test_get_content_msg() {
+            let message = message_factory("a", false, false);
+            assert_eq!("a", message.get_content());
+        }
+
+        #[test]
+        fn test_get_content_msg_and() {
+            let message = message_factory("hogehoege&sa", false, false);
+            assert_eq!("hogehoege&sa", message.get_content());
+        }
+
+        #[test]
+        fn test_get_content_msg_sticker() {
+            let message = message_factory("a", false, true);
+            assert_eq!("hoge", message.get_content());
         }
     }
 
@@ -89,12 +126,12 @@ mod tests {
 
     #[test]
     fn test_factory() {
-        let m = message_factory("message", true);
+        let m = message_factory("message", true, false);
         assert!(m.is_from_bot());
         assert_eq!("message", m.msg.content);
     }
 
-    fn message_factory(content: &str, from_bot: bool) -> Message {
+    fn message_factory(content: &str, from_bot: bool, is_sticker: bool) -> Message {
         let message_json = r#"{
         "id":881482961801842698,
         "attachments":[],
@@ -137,7 +174,7 @@ mod tests {
         "application":null,
         "message_reference":null,
         "flags":0,
-        "stickers":[],
+        "sticker_items":[STICKER],
         "referenced_message":null
     }"#;
         let re_content = Regex::new(r"\[CONTENT\]").unwrap();
@@ -145,6 +182,17 @@ mod tests {
         let re_from_bot = Regex::new(r"\[FROM_BOT\]").unwrap();
         let result = re_from_bot
             .replace(&result, if from_bot { "true" } else { "false" })
+            .to_string();
+        let re_sticker = Regex::new(r"\[STICKER\]").unwrap();
+        let result = re_sticker
+            .replace(
+                &result,
+                if is_sticker {
+                    r#"[{"id":1137185632217747466,"name":"hoge","format_type":1}]"#
+                } else {
+                    "[]"
+                },
+            )
             .to_string();
         let m: SerenityMessage = serde_json::from_str(&result[..]).unwrap();
         Message::new(m)

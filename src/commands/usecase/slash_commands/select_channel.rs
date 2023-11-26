@@ -19,7 +19,7 @@ impl SlashCommand for SelectChannel {
         let channel_id_option = command
             .data
             .options
-            .get(0)
+            .first()
             .expect("channel option is required")
             .resolved
             .clone()
