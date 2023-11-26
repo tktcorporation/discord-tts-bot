@@ -5,11 +5,12 @@ use regex::Regex;
 
 impl Message {
     pub fn to_speech_message(&self, _options: SpeechOptions) -> SpeechMessage {
+        let content = self.get_content();
         // urlはそのまま読まない
-        let str = if self.msg.content.contains("http") {
+        let str = if content.contains("http") {
             "url".to_string()
         } else {
-            self.msg.content.clone()
+            content
         };
         // convert discord styled string for speech
         let converted = convert_discord_string(&str);
@@ -24,6 +25,7 @@ enum DiscordStringType {
     Channel,
     Role,
     Emoji,
+    Animoji,
     Mention,
 }
 impl DiscordStringType {
@@ -32,6 +34,7 @@ impl DiscordStringType {
             DiscordStringType::Channel => Regex::new(r"<#[0-9]+?>").unwrap(),
             DiscordStringType::Role => Regex::new(r"<@&[0-9]+?>").unwrap(),
             DiscordStringType::Emoji => Regex::new(r"<:(.+?):[0-9]+?>").unwrap(),
+            DiscordStringType::Animoji => Regex::new(r"<a:(.+?):[0-9]+?>").unwrap(),
             DiscordStringType::Mention => Regex::new(r"<@[0-9]+?>").unwrap(),
         }
     }
@@ -40,6 +43,7 @@ impl DiscordStringType {
             DiscordStringType::Channel => ConvertType::Empty,
             DiscordStringType::Role => ConvertType::Empty,
             DiscordStringType::Emoji => ConvertType::MatchString,
+            DiscordStringType::Animoji => ConvertType::MatchString,
             DiscordStringType::Mention => ConvertType::Empty,
         }
     }
@@ -53,6 +57,10 @@ impl DiscordStringType {
             return Some(type_);
         }
         let type_ = DiscordStringType::Emoji;
+        if type_.to_regex().is_match(s) {
+            return Some(type_);
+        }
+        let type_ = DiscordStringType::Animoji;
         if type_.to_regex().is_match(s) {
             return Some(type_);
         }
@@ -130,6 +138,13 @@ mod tests {
             let str = "<:butter:872873394570424340>";
             let result = convert_discord_string(str);
             assert_eq!("butter", result);
+        }
+
+        #[test]
+        fn test_remove_animoji_string() {
+            let str = "<a:sanma:872873394570424340>";
+            let result = convert_discord_string(str);
+            assert_eq!("sanma", result);
         }
 
         #[test]
