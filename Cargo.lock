@@ -145,7 +145,7 @@ version = "0.1.0"
 source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.0.7-alpha#1b923f86d5ca897da053661a30bddefb90e08ab4"
 dependencies = [
  "aws-types",
- "http",
+ "http 0.2.9",
  "regex",
  "smithy-http",
 ]
@@ -156,7 +156,7 @@ version = "0.1.0"
 source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.0.7-alpha#1b923f86d5ca897da053661a30bddefb90e08ab4"
 dependencies = [
  "aws-types",
- "http",
+ "http 0.2.9",
  "lazy_static",
  "smithy-http",
  "smithy-types",
@@ -174,9 +174,9 @@ dependencies = [
  "aws-sig-auth",
  "bytes",
  "fastrand",
- "http",
- "http-body",
- "hyper",
+ "http 0.2.9",
+ "http-body 0.4.5",
+ "hyper 0.14.27",
  "hyper-rustls 0.22.1",
  "pin-project",
  "protocol-test-helpers",
@@ -200,7 +200,7 @@ dependencies = [
  "aws-sig-auth",
  "aws-types",
  "bytes",
- "http",
+ "http 0.2.9",
  "serde",
  "serde_json",
  "smithy-http",
@@ -216,7 +216,7 @@ dependencies = [
  "aws-auth",
  "aws-sigv4",
  "aws-types",
- "http",
+ "http 0.2.9",
  "smithy-http",
  "thiserror",
 ]
@@ -229,8 +229,8 @@ dependencies = [
  "bytes",
  "chrono",
  "hex",
- "http",
- "http-body",
+ "http 0.2.9",
+ "http-body 0.4.5",
  "ring",
  "serde",
  "serde_urlencoded",
@@ -513,7 +513,7 @@ dependencies = [
  "aws-sdk-polly",
  "aws-types",
  "html-escape",
- "hyper",
+ "hyper 1.0.1",
  "mockall",
  "mockall_double",
  "rand",
@@ -783,7 +783,7 @@ dependencies = [
  "futures-core",
  "futures-sink",
  "futures-util",
- "http",
+ "http 0.2.9",
  "indexmap",
  "slab",
  "tokio",
@@ -836,14 +836,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "http"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b32afd38673a8016f7c9ae69e5af41a58f81b1d31689040f2f1959594ce194ea"
+dependencies = [
+ "bytes",
+ "fnv",
+ "itoa 1.0.9",
+]
+
+[[package]]
 name = "http-body"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d5f38f16d184e36f2408a55281cd658ecbd3ca05cce6d6510a176eca393e26d1"
 dependencies = [
  "bytes",
- "http",
+ "http 0.2.9",
  "pin-project-lite",
+]
+
+[[package]]
+name = "http-body"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1cac85db508abc24a2e48553ba12a996e87244a0395ce011e62b37158745d643"
+dependencies = [
+ "bytes",
+ "http 1.0.0",
 ]
 
 [[package]]
@@ -869,8 +890,8 @@ dependencies = [
  "futures-core",
  "futures-util",
  "h2",
- "http",
- "http-body",
+ "http 0.2.9",
+ "http-body 0.4.5",
  "httparse",
  "httpdate",
  "itoa 1.0.9",
@@ -883,6 +904,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyper"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "403f9214f3e703236b221f1a9cd88ec8b4adfa5296de01ab96216361f4692f56"
+dependencies = [
+ "bytes",
+ "futures-channel",
+ "futures-util",
+ "http 1.0.0",
+ "http-body 1.0.0",
+ "pin-project-lite",
+ "tokio",
+]
+
+[[package]]
 name = "hyper-rustls"
 version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -890,7 +926,7 @@ checksum = "5f9f7a97316d44c0af9b0301e65010573a853a9fc97046d7331d7f6bc0fd5a64"
 dependencies = [
  "ct-logs",
  "futures-util",
- "hyper",
+ "hyper 0.14.27",
  "log",
  "rustls 0.19.1",
  "rustls-native-certs",
@@ -906,8 +942,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d78e1e73ec14cf7375674f74d7dde185c8206fd9dea6fb6295e8a98098aaa97"
 dependencies = [
  "futures-util",
- "http",
- "hyper",
+ "http 0.2.9",
+ "hyper 0.14.27",
  "rustls 0.21.7",
  "tokio",
  "tokio-rustls 0.24.1",
@@ -1447,7 +1483,7 @@ version = "0.1.0"
 source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.0.7-alpha#1b923f86d5ca897da053661a30bddefb90e08ab4"
 dependencies = [
  "assert-json-diff",
- "http",
+ "http 0.2.9",
  "pretty_assertions",
  "regex",
  "roxmltree",
@@ -1559,9 +1595,9 @@ dependencies = [
  "futures-core",
  "futures-util",
  "h2",
- "http",
- "http-body",
- "hyper",
+ "http 0.2.9",
+ "http-body 0.4.5",
+ "hyper 0.14.27",
  "hyper-rustls 0.24.1",
  "ipnet",
  "js-sys",
@@ -1964,9 +2000,9 @@ dependencies = [
  "bytes",
  "bytes-utils",
  "futures-core",
- "http",
- "http-body",
- "hyper",
+ "http 0.2.9",
+ "http-body 0.4.5",
+ "hyper 0.14.27",
  "percent-encoding",
  "pin-project",
  "smithy-types",
@@ -1982,8 +2018,8 @@ version = "0.1.0"
 source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.0.7-alpha#1b923f86d5ca897da053661a30bddefb90e08ab4"
 dependencies = [
  "bytes",
- "http",
- "http-body",
+ "http 0.2.9",
+ "http-body 0.4.5",
  "pin-project",
  "smithy-http",
  "tower",
@@ -2427,7 +2463,7 @@ dependencies = [
  "base64 0.13.1",
  "byteorder",
  "bytes",
- "http",
+ "http 0.2.9",
  "httparse",
  "log",
  "rand",
