@@ -159,7 +159,7 @@ jobs:
           go install github.com/git-chglog/git-chglog/cmd/git-chglog@latest
           git-chglog -c .github/chglog/release.yml $(git describe --tags) > RELEASE.md
       - name: Build | Publish
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: discord-tts-bot-*/discord-tts-bot-*
           body_path: RELEASE.md
