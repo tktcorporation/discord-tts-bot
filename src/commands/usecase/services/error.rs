@@ -10,6 +10,7 @@ use std::fmt;
 pub enum Error {
     NotInVoiceChannel,
     ErrorSourcingFfmpeg,
+    AlreadyJoined,
     JoinError(JoinError),
     SerenityError(SerenityError),
     TrackError(TrackError),
@@ -20,6 +21,7 @@ impl fmt::Display for Error {
         match self {
             Error::NotInVoiceChannel => f.write_str("Not in a voice channel."),
             Error::ErrorSourcingFfmpeg => f.write_str("Error sourcing ffmpeg."),
+            Error::AlreadyJoined => f.write_str("Already joined. I'm busy!"),
             Error::JoinError(e) => e.fmt(f),
             Error::SerenityError(e) => e.fmt(f),
             Error::TrackError(e) => e.fmt(f),
