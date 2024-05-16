@@ -23,6 +23,11 @@ pub async fn join(
         .await
         .expect("Songbird Voice client placed in at initialisation.");
 
+    let has_handler = manager.get(guild.id).is_some();
+    if has_handler {
+        return Err(Error::AlreadyJoined);
+    }
+
     // voice settings
     let client = config::client::new(crate::infrastructure::GuildPath::new(&guild.id));
     client.write(config::Config { speech_options });
@@ -75,6 +80,7 @@ async fn _clear(handle_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::
 
 async fn welcome_audio() -> songbird::input::Input {
     let file_path = SharedSoundPath::new().welcome_audio_path();
+    print!("file_path: {:?}", file_path);
     ffmpeg(file_path)
         .await
         .expect("This might fail: handle this error!")
