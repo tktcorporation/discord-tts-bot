@@ -39,7 +39,7 @@ RUN cargo build --release --no-default-features --features "music"
 
 CMD [ "/bin/sh",  "-c", "cargo run" ]
 
-FROM debian:bullseye-20231030-slim
+FROM debian:bullseye-20240701-slim
 
 RUN apt-get update && \
     apt-get install -y \
