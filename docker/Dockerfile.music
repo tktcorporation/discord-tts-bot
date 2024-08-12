@@ -1,4 +1,4 @@
-FROM rust:1.74.0-slim-bullseye AS dev-env
+FROM rust:1.80.1-slim-bullseye AS dev-env
 
 RUN apt-get update && \
     apt-get install -y \
