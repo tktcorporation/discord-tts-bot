@@ -27,7 +27,7 @@ pub fn get_human_readable_timestamp(duration: Option<Duration>) -> String {
 
 pub async fn send_track_info_message(
     timing: TrackTiming,
-    metadata: &songbird::input::Metadata,
+    metadata: &songbird::input::AuxMetadata,
     channel_id: ChannelId,
     http: Arc<Http>,
 ) {

@@ -27,12 +27,16 @@ mockall = "0.12.1"
 mockall_double = "0.3.0"
 serde = "1.0.204"
 
+[dependencies.reqwest]
+version = "0.11"
+features = ["stream"]
+
 [dependencies.songbird]
 version = "0.4.1"
 features = ["builtin-queue"]
 
 [dependencies.serenity]
-version = "0.11.7"
+version = "0.12.2"
 features = ["cache", "standard_framework", "voice", "rustls_backend"]
 
 [dependencies.tokio]

@@ -5,8 +5,12 @@ use crate::constants;
 use super::utils;
 use super::Error;
 use super::TrackTiming;
-use songbird::input::Input;
-use songbird::tracks::create_player;
+use reqwest;
+use songbird::{
+    driver::Driver,
+    input::{codecs::*, Compose, Input, MetadataError, YoutubeDl},
+    tracks::Track,
+};
 
 pub async fn play(
     ctx: &Context,
@@ -22,27 +26,20 @@ pub async fn play(
     if let Some(handler_lock) = manager.get(guild_id) {
         let mut handler = handler_lock.lock().await;
 
-        // Here, we use lazy restartable sources to make sure that we don't pay
-        // for decoding, playback on tracks which aren't actually live yet.
-        let source = match utils::source_from_str(url.to_string(), true).await {
-            Ok(source) => source,
+        let mut ytdl = YoutubeDl::new_search(reqwest::Client::new(), url.to_string());
+        let res: songbird::input::AuxMetadata = match ytdl.search(Some(1)).await {
+            Ok(res) => res[0].clone(),
             Err(why) => {
                 println!("Err starting source: {why:?}");
-                return Err(Error::ErrorSourcingFfmpeg);
+                return Err(Error::AudioStreamError(why));
             }
         };
-        let input: Input = source.into();
-        super::send_track_info_message(
-            TrackTiming::Added,
-            input.metadata.as_ref(),
-            channel_id,
-            ctx.http.clone(),
-        )
-        .await;
 
-        let (mut audio, _audio_handle) = create_player(input);
+        super::send_track_info_message(TrackTiming::Added, &res, channel_id, ctx.http.clone())
+            .await;
+
+        let audio = handler.enqueue_input(ytdl.into()).await;
         audio.set_volume(constants::volume::MUSIC);
-        handler.enqueue(audio);
 
         Ok(())
     } else {
