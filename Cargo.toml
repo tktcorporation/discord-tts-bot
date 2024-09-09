@@ -28,8 +28,8 @@ mockall_double = "0.3.0"
 serde = "1.0.204"
 
 [dependencies.songbird]
-version = "0.3.2"
-features = ["builtin-queue", "yt-dlp"]
+version = "0.4.1"
+features = ["builtin-queue"]
 
 [dependencies.serenity]
 version = "0.11.7"
