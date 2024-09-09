@@ -5,7 +5,13 @@ use songbird::{Event, EventContext, EventHandler as VoiceEventHandler, TrackEven
 use crate::constants;
 
 use super::{check_msg, utils, Error};
-use songbird::tracks::create_player;
+use reqwest;
+use songbird::{
+    driver::Driver,
+    input::{codecs::*, Compose, Input, MetadataError, YoutubeDl},
+    tracks::Track,
+};
+
 use std::{sync::Arc, time::Duration};
 
 struct SongEndNotifier {
@@ -64,24 +70,23 @@ pub async fn play_fade(
     if let Some(handler_lock) = manager.get(guild_id) {
         let mut handler = handler_lock.lock().await;
 
-        let source = match utils::source_from_str(url.to_string(), true).await {
-            Ok(source) => source,
-            Err(why) => {
-                println!("Err starting source: {why:?}");
-                return Err(Error::ErrorSourcingFfmpeg);
-            }
-        };
+        let mut ytdl = YoutubeDl::new_search(reqwest::Client::new(), url.to_string());
+        // let res: songbird::input::AuxMetadata = match ytdl.search(Some(1)).await {
+        //     Ok(res) => res[0].clone(),
+        //     Err(why) => {
+        //         println!("Err starting source: {why:?}");
+        //         return Err(Error::AudioStreamError(why));
+        //     }
+        // };
 
-        // This handler object will allow you to, as needed,
-        // control the audio track via events and further commands.
-        let (mut audio, track_handle) = create_player(source.into());
+        let audio = handler.enqueue_input(ytdl.into()).await;
         audio.set_volume(constants::volume::MUSIC);
-        handler.enqueue(audio);
+
         let send_http = ctx.http.clone();
 
         // This shows how to periodically fire an event, in this case to
         // periodically make a track quieter until it can be no longer heard.
-        let _ = track_handle.add_event(
+        let _ = audio.add_event(
             Event::Periodic(Duration::from_secs(5), Some(Duration::from_secs(7))),
             SongFader {
                 channel_id,
@@ -93,7 +98,7 @@ pub async fn play_fade(
 
         // This shows how to fire an event once an audio track completes,
         // either due to hitting the end of the bytestream or stopped by user code.
-        let _ = track_handle.add_event(
+        let _ = audio.add_event(
             Event::Track(TrackEvent::End),
             SongEndNotifier {
                 channel_id,
