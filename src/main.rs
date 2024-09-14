@@ -1,6 +1,8 @@
 use std::env;
 
 use serenity::{client::Client, prelude::GatewayIntents};
+use reqwest::Client as HttpClient;
+use songbird::typemap::TypeMapKey;
 
 use songbird::SerenityInit;
 
@@ -14,6 +16,11 @@ mod commands;
 mod model;
 
 mod constants;
+
+pub struct HttpKey;
+impl TypeMapKey for HttpKey {
+    type Value = HttpClient;
+}
 
 #[tokio::main]
 async fn main() {
@@ -40,6 +47,7 @@ async fn build_client(
     Client::builder(token, intents)
         .event_handler(Handler)
         .register_songbird()
+        .type_map_insert::<HttpKey>(HttpClient::new())
         .await
 }
 

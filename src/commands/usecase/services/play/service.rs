@@ -1,10 +1,10 @@
 use serenity::{client::Context, model};
 
 use crate::constants;
+use crate::HttpKey;
 
 use super::Error;
 use super::TrackTiming;
-use reqwest;
 use songbird::input::YoutubeDl;
 
 pub async fn play(
@@ -21,7 +21,12 @@ pub async fn play(
     if let Some(handler_lock) = manager.get(guild_id) {
         let mut handler = handler_lock.lock().await;
 
-        let mut ytdl = YoutubeDl::new_search(reqwest::Client::new(), url.to_string());
+        let client = {
+            let data = ctx.data.read().await;
+            data.get::<HttpKey>().cloned().unwrap()
+        };
+
+        let mut ytdl = YoutubeDl::new_search(client, url.to_string());
         let res: songbird::input::AuxMetadata = match ytdl.search(Some(1)).await {
             Ok(res) => res[0].clone(),
             Err(why) => {
@@ -39,7 +44,7 @@ pub async fn play(
         .await;
 
         let audio = handler.enqueue_input(ytdl.into()).await;
-        audio.set_volume(constants::volume::MUSIC);
+        audio.set_volume(constants::volume::MUSIC).unwrap();
 
         Ok(())
     } else {
