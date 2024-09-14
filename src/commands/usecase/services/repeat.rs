@@ -28,6 +28,6 @@ pub async fn repeat(ctx: &Context, guild_id: model::id::GuildId) -> Result<bool,
     match toggler(&track) {
         Ok(_) if was_looping => Ok(false),
         Ok(_) => Ok(true),
-        Err(e) => Err(Error::TrackError(e)),
+        Err(e) => Err(Error::ControlError(e)),
     }
 }
