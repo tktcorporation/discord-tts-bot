@@ -35,6 +35,14 @@ impl EventHandler for Handler {
         if let Interaction::Command(command) = interaction {
             println!("Received command interaction: {command:#?}");
 
+            command.create_response(
+                &ctx,
+                CreateInteractionResponse::Message(
+                    CreateInteractionResponseMessage::new().content("Processing..."),
+                ),
+            ).await.unwrap();
+            let message = command.get_response(&ctx).await.unwrap();
+
             let command_result = match SlashCommands::from_str(command.data.name.as_str()) {
                 Some(slash_command) => slash_command.run(&ctx, &command).await,
                 None => {
@@ -48,6 +56,7 @@ impl EventHandler for Handler {
                     return;
                 }
             };
+
             let result = match command_result {
                 SlashCommandResult::Simple(None) => {
                     command.delete_response(&ctx.http).await.unwrap();
@@ -72,11 +81,10 @@ impl EventHandler for Handler {
                 Err(e) => {
                     command
                         .edit_response(
-                            &ctx.http,
-                            EditInteractionResponse::new().content(format!("Error: {e:?}")),
+                            &ctx,
+                            EditInteractionResponse::new().content("format!(")
                         )
-                        .await
-                        .unwrap();
+                        .await.unwrap();
                 }
             }
         }
