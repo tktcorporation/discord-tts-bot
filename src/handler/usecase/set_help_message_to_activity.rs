@@ -1,15 +1,16 @@
 use std::env;
 
 use serenity::{async_trait, model::gateway::Activity};
+use serenity::gateway::ActivityData;
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait ActivityController {
-    async fn set_activity(&self, activity: Activity);
+    async fn set_activity(&self, activity: ActivityData);
 }
 
 pub async fn set_help_message_to_activity(ctx: Box<dyn ActivityController + Send + Sync>) {
-    ctx.set_activity(Activity::playing(
+    ctx.set_activity(ActivityData::playing(
         env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment")
             + "join で呼んでね",
     ))

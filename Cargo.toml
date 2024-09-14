@@ -35,6 +35,10 @@ features = ["stream"]
 version = "0.4.1"
 features = ["builtin-queue"]
 
+[dependencies.symphonia]
+version = "0.5.2"
+features = ["aac", "mp3", "isomp4", "alac"]
+
 [dependencies.serenity]
 version = "0.12.2"
 features = ["cache", "standard_framework", "voice", "rustls_backend", "http"]

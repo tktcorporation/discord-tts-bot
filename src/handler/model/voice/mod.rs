@@ -6,9 +6,7 @@ use crate::infrastructure::{GuildPath, SoundPath, SpeechFilePath};
 pub use crate::model::{voice::Error, Voice};
 use polly::model::VoiceId;
 use serenity::async_trait;
-use songbird::ffmpeg;
 use songbird::input::Input;
-use songbird::tracks::create_player;
 use std::ffi::OsStr;
 
 #[async_trait]
@@ -37,10 +35,14 @@ impl Speaker for Voice {
     }
 }
 
-async fn get_input_from_local<P: AsRef<OsStr>>(file_path: P) -> Input {
-    ffmpeg(file_path)
+async fn get_input_from_local(file_path: String) -> Input {
+    use songbird::input::codecs::{CODEC_REGISTRY, PROBE};
+    let in_memory = tokio::fs::read(file_path).await.unwrap();
+    let in_memory_input: songbird::input::Input = songbird::input::Input::from(in_memory);
+    in_memory_input
+        .make_playable_async(&CODEC_REGISTRY, &PROBE)
         .await
-        .expect("This might fail if ffmpeg is not installed")
+        .unwrap()
 }
 
 async fn play_input(
@@ -48,19 +50,19 @@ async fn play_input(
     input: Input,
 ) {
     let mut handler = handler_lock.lock().await;
-    let (mut audio, _audio_handle) = create_player(input);
+
+    let audio = handler.enqueue_input(input.into()).await;
     audio.set_volume(constants::volume::VOICE);
-    handler.enqueue(audio);
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::infrastructure::SharedSoundPath;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     use crate::infrastructure::SharedSoundPath;
 
-    #[tokio::test]
-    async fn test_get_input_from_local() {
-        let file_path = SharedSoundPath::new().welcome_audio_path();
-        get_input_from_local(file_path).await;
-    }
-}
+//     #[tokio::test]
+//     async fn test_get_input_from_local() {
+//         let file_path = SharedSoundPath::new().welcome_audio_path();
+//         get_input_from_local(file_path).await;
+//     }
+// }

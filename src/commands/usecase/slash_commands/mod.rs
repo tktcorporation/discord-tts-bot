@@ -79,20 +79,19 @@ impl SlashCommands {
 
     pub fn register<'a>(
         &self,
-        command: CreateCommand,
     ) -> CreateCommand {
         match self {
-            Self::Clear => clear::Clear::register(command).name("clear"),
-            Self::Join => join::Join::register(command).name("join"),
-            Self::Leave => leave::Leave::register(command).name("leave"),
-            Self::Ping => ping::Ping::register(command).name("ping"),
-            Self::Play => play::Play::register(command).name("play"),
-            Self::Invite => invite::Invite::register(command).name("invite"),
-            Self::Skip => skip::Skip::register(command).name("skip"),
-            Self::Queue => queue::Queue::register(command).name("queue"),
-            Self::Repeat => repeat::Repeat::register(command).name("repeat"),
+            Self::Clear => clear::Clear::register(CreateCommand::new("clear")),
+            Self::Join => join::Join::register(CreateCommand::new("join")),
+            Self::Leave => leave::Leave::register(CreateCommand::new("leave")),
+            Self::Ping => ping::Ping::register(CreateCommand::new("ping")),
+            Self::Play => play::Play::register(CreateCommand::new("play")),
+            Self::Invite => invite::Invite::register(CreateCommand::new("invite")),
+            Self::Skip => skip::Skip::register(CreateCommand::new("skip")),
+            Self::Queue => queue::Queue::register(CreateCommand::new("queue")),
+            Self::Repeat => repeat::Repeat::register(CreateCommand::new("repeat")),
             Self::SelectChannel => {
-                select_channel::SelectChannel::register(command).name("select_channel")
+                select_channel::SelectChannel::register(CreateCommand::new("select_channel"))
             }
         }
     }

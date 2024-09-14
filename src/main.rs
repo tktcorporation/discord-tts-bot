@@ -15,21 +15,15 @@ mod model;
 
 mod constants;
 
-mod framework;
-use framework::build_framework;
-
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
 
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
-
-    let framework = build_framework();
-
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
 
-    let mut client = build_client(&token, framework, intents)
+    let mut client = build_client(&token, intents)
         .await
         .expect("Err creating client");
 
@@ -41,12 +35,10 @@ async fn main() {
 
 async fn build_client(
     token: &str,
-    framework: serenity::framework::StandardFramework,
     intents: GatewayIntents,
 ) -> Result<serenity::Client, serenity::Error> {
     Client::builder(token, intents)
         .event_handler(Handler)
-        .framework(framework)
         .register_songbird()
         .await
 }

@@ -28,21 +28,26 @@ pub fn get_human_readable_timestamp(duration: Option<Duration>) -> String {
 
 pub async fn send_track_info_message(
     timing: TrackTiming,
-    _metadata: Option<&songbird::input::AuxMetadata>,
+    metadata: Option<&songbird::input::AuxMetadata>,
     channel_id: ChannelId,
     http: Arc<Http>,
 ) {
-    // TODO: 再生曲の情報を埋め込む
-    let builder = CreateMessage::default()
+    if let Some(metadata) = metadata {
+        let title = match &metadata.title {
+            Some(title) => title,
+            None => "Unknown",
+        };
+        let builder = CreateMessage::default()
         .embed(
             CreateEmbed::default()
                 .title(match timing {
-                    TrackTiming::Added => "Added Queue",
-                    TrackTiming::NowPlaying => "Now Playing",
+                    TrackTiming::Added => format!("Added to queue - {}", title),
+                    TrackTiming::NowPlaying => format!("Now playing - {}", title),
                 })
         );
     channel_id
         .send_message(http, builder)
         .await
         .unwrap();
+    }
 }

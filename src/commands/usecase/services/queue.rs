@@ -28,36 +28,17 @@ pub async fn queue(
 }
 
 pub fn create_queue_embed(tracks: &[songbird::tracks::TrackHandle], page: usize) -> CreateEmbed {
-    let mut embed: CreateEmbed = CreateEmbed::default();
-
     let description = if !tracks.is_empty() {
-        let metadata = tracks[0].metadata();
-        embed.thumbnail(tracks[0].metadata().thumbnail.as_ref().unwrap());
-
         format!(
-            "[{}]({}) • `{}`",
-            metadata.title.as_ref().unwrap(),
-            metadata.source_url.as_ref().unwrap(),
-            super::voice_utils::get_human_readable_timestamp(metadata.duration)
+            "TODO: implement queue embed",
         )
     } else {
         String::from("Nothing is playing!")
     };
 
-    embed.field("🔊 Now playing", &description, false);
-    embed.field("⌛ Up next", &build_queue_page(tracks, page), false);
-
-    // embed.footer(|f| {
-    //     f.text(format!(
-    //         "{} {} {} {}",
-    //         QUEUE_PAGE,
-    //         page + 1,
-    //         QUEUE_PAGE_OF,
-    //         calculate_num_pages(tracks),
-    //     ))
-    // });
-
-    embed
+    CreateEmbed::default()
+        .field("🔊 Now playing", &description, false)
+        .field("⌛ Up next", &build_queue_page(tracks, page), false)
 }
 
 fn build_queue_page(tracks: &[TrackHandle], page: usize) -> String {
@@ -76,17 +57,17 @@ fn build_queue_page(tracks: &[TrackHandle], page: usize) -> String {
     let mut description = String::new();
 
     for (i, t) in queue.iter().enumerate() {
-        let title = t.metadata().title.as_ref();
-        let url = t.metadata().source_url.as_ref();
-        let duration = super::voice_utils::get_human_readable_timestamp(t.metadata().duration);
+        // let title = t.metadata().title.as_ref();
+        // let url = t.metadata().source_url.as_ref();
+        // let duration = super::voice_utils::get_human_readable_timestamp(t.metadata().duration);
 
         let _ = writeln!(
             description,
             "`{}.` [{}]({}) • `{}`",
             i + start_idx + 1,
-            title.unwrap_or(&String::from("Unknown")),
-            url.unwrap_or(&String::from("Unknown")),
-            duration
+            &String::from("Unknown"),
+            &String::from("Unknown"),
+            &String::from("Unknown"),
         );
     }
 
