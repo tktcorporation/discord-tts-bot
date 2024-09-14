@@ -2,7 +2,7 @@ use serenity::all::{CommandOptionType, ResolvedOption, ResolvedValue};
 use serenity::async_trait;
 use serenity::builder::{CreateCommand, CreateCommandOption};
 use serenity::client::Context;
-use serenity::model::application::{CommandDataOptionValue, CommandInteraction};
+use serenity::model::application::CommandInteraction;
 
 use super::super::services;
 use super::{SlashCommand, SlashCommandResult};

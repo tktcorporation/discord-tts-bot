@@ -1,4 +1,4 @@
-use serenity::all::{CreateCommand, EditInteractionResponse};
+use serenity::all::EditInteractionResponse;
 use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseMessage};
 use serenity::model::application::{Command, Interaction};
 #[cfg(feature = "tts")]
@@ -10,7 +10,6 @@ use serenity::{
 };
 
 use serenity::model::gateway::Ready;
-use serenity::model::id::GuildId;
 use serenity::prelude::*;
 
 mod model;

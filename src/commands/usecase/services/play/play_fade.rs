@@ -6,11 +6,7 @@ use crate::constants;
 
 use super::{check_msg, Error};
 use reqwest;
-use songbird::{
-    driver::Driver,
-    input::{codecs::*, Compose, Input, MetadataError, YoutubeDl},
-    tracks::Track,
-};
+use songbird::input::YoutubeDl;
 
 use std::{sync::Arc, time::Duration};
 
@@ -70,7 +66,7 @@ pub async fn play_fade(
     if let Some(handler_lock) = manager.get(guild_id) {
         let mut handler = handler_lock.lock().await;
 
-        let mut ytdl = YoutubeDl::new_search(reqwest::Client::new(), url.to_string());
+        let ytdl = YoutubeDl::new_search(reqwest::Client::new(), url.to_string());
         // let res: songbird::input::AuxMetadata = match ytdl.search(Some(1)).await {
         //     Ok(res) => res[0].clone(),
         //     Err(why) => {

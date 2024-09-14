@@ -12,10 +12,10 @@ mod select_channel;
 mod skip;
 
 // use serenity::builder::{CreateCommand, CreateEmbed};
-use serenity::builder::{CreateCommand, CreateCommandOption, CreateEmbed};
+use serenity::builder::{CreateCommand, CreateEmbed};
 use serenity::client::Context;
 // use serenity::model::application::interaction::application_command::CommandInteraction;
-use serenity::model::application::{CommandInteraction, CommandOptionType};
+use serenity::model::application::CommandInteraction;
 
 pub enum SlashCommandResult {
     Simple(Option<String>),

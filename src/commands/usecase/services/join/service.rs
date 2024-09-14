@@ -66,7 +66,7 @@ async fn _queue_join_message(
     );
 
     let input = welcome_audio().await;
-    let audio = handle.enqueue_input(input.into()).await;
+    let audio = handle.enqueue_input(input).await;
     audio.set_volume(constants::volume::VOICE).unwrap();
 }
 

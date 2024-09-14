@@ -7,7 +7,6 @@ pub use crate::model::{voice::Error, Voice};
 use polly::model::VoiceId;
 use serenity::async_trait;
 use songbird::input::Input;
-use std::ffi::OsStr;
 
 #[async_trait]
 #[cfg_attr(feature = "mock", mockall::automock)]
@@ -51,7 +50,7 @@ async fn play_input(
 ) {
     let mut handler = handler_lock.lock().await;
 
-    let audio = handler.enqueue_input(input.into()).await;
+    let audio = handler.enqueue_input(input).await;
     audio.set_volume(constants::volume::VOICE);
 }
 

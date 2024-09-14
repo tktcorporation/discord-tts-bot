@@ -5,11 +5,7 @@ use crate::constants;
 use super::Error;
 use super::TrackTiming;
 use reqwest;
-use songbird::{
-    driver::Driver,
-    input::{codecs::*, Compose, Input, MetadataError, YoutubeDl},
-    tracks::Track,
-};
+use songbird::input::YoutubeDl;
 
 pub async fn play(
     ctx: &Context,

@@ -2,7 +2,7 @@ use serenity::all::{CommandOptionType, ResolvedOption, ResolvedValue};
 use serenity::async_trait;
 use serenity::builder::{CreateCommand, CreateCommandOption};
 use serenity::client::Context;
-use serenity::model::application::{CommandDataOptionValue, CommandInteraction};
+use serenity::model::application::CommandInteraction;
 
 use super::super::services;
 use super::{SlashCommand, SlashCommandResult};
@@ -26,7 +26,7 @@ impl SlashCommand for Play {
         };
         let guild_id = command.guild_id.unwrap();
 
-        match services::play(&ctx, guild_id, command.channel_id, &url).await {
+        match services::play(ctx, guild_id, command.channel_id, url).await {
             Ok(_) => SlashCommandResult::Simple(Some(format!("Queue {}", url))),
             Err(e) => match e {
                 services::error::Error::NotInVoiceChannel => {
@@ -35,7 +35,7 @@ impl SlashCommand for Play {
                     let guild = ctx.cache.guild(guild_id).unwrap().clone();
 
                     let joined_message = match services::join(
-                        &ctx,
+                        ctx,
                         guild,
                         &command.user.id,
                         command.channel_id,
@@ -47,7 +47,7 @@ impl SlashCommand for Play {
                         Err(e) => return SlashCommandResult::Simple(Some(e.to_string())),
                     };
 
-                    if let Err(e) = services::play(&ctx, guild_id, command.channel_id, &url).await {
+                    if let Err(e) = services::play(ctx, guild_id, command.channel_id, url).await {
                         return SlashCommandResult::Simple(Some(e.to_string()));
                     };
 
