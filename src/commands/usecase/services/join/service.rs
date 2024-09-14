@@ -67,7 +67,7 @@ async fn _queue_join_message(
 
     let input = welcome_audio().await;
     let audio = handle.enqueue_input(input.into()).await;
-    audio.set_volume(constants::volume::VOICE);
+    audio.set_volume(constants::volume::VOICE).unwrap();
 }
 
 async fn _clear(handle_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>) {
@@ -80,7 +80,14 @@ async fn welcome_audio() -> songbird::input::Input {
     let file_path = SharedSoundPath::new().welcome_audio_path();
     print!("file_path: {:?}", file_path);
 
-    let in_memory = tokio::fs::read(file_path).await.unwrap();
+    let in_memory = match tokio::fs::read(file_path).await {
+        Ok(in_memory) => in_memory,
+        Err(e) => {
+            println!("Error reading file: {:?}", e);
+            panic!();
+        }
+    };
+
     let in_memory_input: songbird::input::Input = songbird::input::Input::from(in_memory);
     in_memory_input
         .make_playable_async(&CODEC_REGISTRY, &PROBE)

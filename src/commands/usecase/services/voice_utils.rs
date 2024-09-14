@@ -1,7 +1,7 @@
 use std::{sync::Arc, time::Duration};
 
-use serenity::{http::Http, model::prelude::ChannelId};
 use serenity::builder::{CreateEmbed, CreateMessage};
+use serenity::{http::Http, model::prelude::ChannelId};
 
 pub enum TrackTiming {
     Added,
@@ -37,17 +37,10 @@ pub async fn send_track_info_message(
             Some(title) => title,
             None => "Unknown",
         };
-        let builder = CreateMessage::default()
-        .embed(
-            CreateEmbed::default()
-                .title(match timing {
-                    TrackTiming::Added => format!("Added to queue - {}", title),
-                    TrackTiming::NowPlaying => format!("Now playing - {}", title),
-                })
-        );
-    channel_id
-        .send_message(http, builder)
-        .await
-        .unwrap();
+        let builder = CreateMessage::default().embed(CreateEmbed::default().title(match timing {
+            TrackTiming::Added => format!("Added to queue - {}", title),
+            TrackTiming::NowPlaying => format!("Now playing - {}", title),
+        }));
+        channel_id.send_message(http, builder).await.unwrap();
     }
 }

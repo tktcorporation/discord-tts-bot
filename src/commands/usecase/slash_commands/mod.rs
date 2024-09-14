@@ -58,11 +58,7 @@ impl SlashCommands {
         }
     }
 
-    pub async fn run(
-        &self,
-        ctx: &Context,
-        command: &CommandInteraction,
-    ) -> SlashCommandResult {
+    pub async fn run(&self, ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
         match self {
             Self::Clear => clear::Clear::run(ctx, command).await,
             Self::Join => join::Join::run(ctx, command).await,
@@ -77,9 +73,7 @@ impl SlashCommands {
         }
     }
 
-    pub fn register<'a>(
-        &self,
-    ) -> CreateCommand {
+    pub fn register<'a>(&self) -> CreateCommand {
         match self {
             Self::Clear => clear::Clear::register(CreateCommand::new("clear")),
             Self::Join => join::Join::register(CreateCommand::new("join")),

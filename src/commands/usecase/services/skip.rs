@@ -28,9 +28,7 @@ pub async fn skip(ctx: &Context, guild_id: model::id::GuildId) -> Result<String,
         let queue = handler.queue();
         let m = match queue.current() {
             Some(_track) => {
-                format!(
-                    "Skipped",
-                )
+                format!("Skipped",)
             }
             None => "Nothing to skip.".to_string(),
         };

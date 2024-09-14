@@ -1,8 +1,8 @@
 use serenity::all::{CommandOptionType, ResolvedOption, ResolvedValue};
 use serenity::async_trait;
-use serenity::client::Context;
 use serenity::builder::{CreateCommand, CreateCommandOption};
-use serenity::model::application::{CommandInteraction, CommandDataOptionValue};
+use serenity::client::Context;
+use serenity::model::application::{CommandDataOptionValue, CommandInteraction};
 
 use super::super::services;
 use super::{SlashCommand, SlashCommandResult};
@@ -18,10 +18,14 @@ impl SlashCommand for Play {
                 value: ResolvedValue::String(url),
                 ..
             } => url.clone(),
-            _ => return SlashCommandResult::Simple(Some("Must provide a URL to a video or audio".to_string())),
+            _ => {
+                return SlashCommandResult::Simple(Some(
+                    "Must provide a URL to a video or audio".to_string(),
+                ))
+            }
         };
         let guild_id = command.guild_id.unwrap();
-    
+
         match services::play(&ctx, guild_id, command.channel_id, &url).await {
             Ok(_) => SlashCommandResult::Simple(Some(format!("Queue {}", url))),
             Err(e) => match e {
@@ -29,7 +33,7 @@ impl SlashCommand for Play {
                     use crate::handler::usecase::text_to_speech::speech_options;
                     // Clone the Guild to avoid holding a reference across await
                     let guild = ctx.cache.guild(guild_id).unwrap().clone();
-                    
+
                     let joined_message = match services::join(
                         &ctx,
                         guild,
@@ -42,14 +46,15 @@ impl SlashCommand for Play {
                         Ok(s) => s,
                         Err(e) => return SlashCommandResult::Simple(Some(e.to_string())),
                     };
-                    
+
                     if let Err(e) = services::play(&ctx, guild_id, command.channel_id, &url).await {
                         return SlashCommandResult::Simple(Some(e.to_string()));
                     };
-                    
-                    SlashCommandResult::Simple(Some(
-                        format!("{} and Queue {}", joined_message, url),
-                    ))
+
+                    SlashCommandResult::Simple(Some(format!(
+                        "{} and Queue {}",
+                        joined_message, url
+                    )))
                 }
                 _ => SlashCommandResult::Simple(Some(e.to_string())),
             },
@@ -58,12 +63,8 @@ impl SlashCommand for Play {
 
     fn register(command: CreateCommand) -> CreateCommand {
         command.description("play music").add_option(
-            CreateCommandOption::new(
-                CommandOptionType::String,
-                "url",
-                "url or search query",
-            )
-            .required(true),
+            CreateCommandOption::new(CommandOptionType::String, "url", "url or search query")
+                .required(true),
         )
     }
 }

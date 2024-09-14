@@ -1,6 +1,6 @@
 use serenity::async_trait;
-use serenity::client::Context;
 use serenity::builder::CreateCommand;
+use serenity::client::Context;
 use serenity::model::application::CommandInteraction;
 
 use super::{SlashCommand, SlashCommandResult};

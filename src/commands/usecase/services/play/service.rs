@@ -34,8 +34,13 @@ pub async fn play(
             }
         };
 
-        super::send_track_info_message(TrackTiming::Added, Some(&res), channel_id, ctx.http.clone())
-            .await;
+        super::send_track_info_message(
+            TrackTiming::Added,
+            Some(&res),
+            channel_id,
+            ctx.http.clone(),
+        )
+        .await;
 
         let audio = handler.enqueue_input(ytdl.into()).await;
         audio.set_volume(constants::volume::MUSIC);

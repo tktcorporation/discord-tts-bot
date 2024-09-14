@@ -29,9 +29,7 @@ pub async fn queue(
 
 pub fn create_queue_embed(tracks: &[songbird::tracks::TrackHandle], page: usize) -> CreateEmbed {
     let description = if !tracks.is_empty() {
-        format!(
-            "TODO: implement queue embed",
-        )
+        format!("TODO: implement queue embed",)
     } else {
         String::from("Nothing is playing!")
     };

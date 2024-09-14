@@ -1,6 +1,6 @@
 use serenity::async_trait;
-use serenity::client::Context;
 use serenity::builder::CreateCommand;
+use serenity::client::Context;
 use serenity::model::application::CommandInteraction;
 
 use super::super::services;
@@ -10,7 +10,12 @@ pub struct Join {}
 #[async_trait]
 impl SlashCommand for Join {
     async fn run(ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
-        let guild = command.guild_id.unwrap().to_guild_cached(ctx).unwrap().clone();
+        let guild = command
+            .guild_id
+            .unwrap()
+            .to_guild_cached(ctx)
+            .unwrap()
+            .clone();
         use crate::handler::usecase::text_to_speech::speech_options;
         match services::join(
             ctx,

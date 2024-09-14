@@ -6,7 +6,8 @@ use serenity::model::channel::Message as SerenityMessage;
 use serenity::model::voice;
 use serenity::{
     async_trait,
-    client::{Context, EventHandler},};
+    client::{Context, EventHandler},
+};
 
 use serenity::model::gateway::Ready;
 use serenity::model::id::GuildId;
@@ -38,8 +39,9 @@ impl EventHandler for Handler {
                 Some(slash_command) => slash_command.run(&ctx, &command).await,
                 None => {
                     command
-                        .edit_response(&ctx.http, 
-                            EditInteractionResponse::default().content("Unknown command")
+                        .edit_response(
+                            &ctx.http,
+                            EditInteractionResponse::default().content("Unknown command"),
                         )
                         .await
                         .unwrap();
@@ -48,15 +50,15 @@ impl EventHandler for Handler {
             };
             let result = match command_result {
                 SlashCommandResult::Simple(None) => {
-                    command
-                        .delete_response(&ctx.http)
-                        .await
-                        .unwrap();
+                    command.delete_response(&ctx.http).await.unwrap();
                     return;
                 }
                 SlashCommandResult::Simple(Some(message)) => {
                     command
-                        .edit_response(&ctx.http, EditInteractionResponse::default().content(message))
+                        .edit_response(
+                            &ctx.http,
+                            EditInteractionResponse::default().content(message),
+                        )
                         .await
                 }
                 SlashCommandResult::Embed(embed) => {
@@ -69,7 +71,10 @@ impl EventHandler for Handler {
                 Ok(_) => (),
                 Err(e) => {
                     command
-                        .edit_response(&ctx.http, EditInteractionResponse::default().content(format!("Error: {e:?}")))
+                        .edit_response(
+                            &ctx.http,
+                            EditInteractionResponse::new().content(format!("Error: {e:?}")),
+                        )
                         .await
                         .unwrap();
                 }
@@ -94,8 +99,10 @@ impl EventHandler for Handler {
                 SlashCommands::Play.register(),
                 SlashCommands::Repeat.register(),
                 SlashCommands::Queue.register(),
-            ]
-        ).await;
+            ],
+        )
+        .await
+        .unwrap();
 
         let cont = Ctx::new(ctx);
         set_help_message_to_activity(Box::new(cont)).await;
