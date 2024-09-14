@@ -34,12 +34,15 @@ impl EventHandler for Handler {
         if let Interaction::Command(command) = interaction {
             println!("Received command interaction: {command:#?}");
 
-            command.create_response(
-                &ctx,
-                CreateInteractionResponse::Message(
-                    CreateInteractionResponseMessage::new().content("Processing..."),
-                ),
-            ).await.unwrap();
+            command
+                .create_response(
+                    &ctx,
+                    CreateInteractionResponse::Message(
+                        CreateInteractionResponseMessage::new().content("Processing..."),
+                    ),
+                )
+                .await
+                .unwrap();
             let message = command.get_response(&ctx).await.unwrap();
 
             let command_result = match SlashCommands::from_str(command.data.name.as_str()) {
@@ -79,11 +82,9 @@ impl EventHandler for Handler {
                 Ok(_) => (),
                 Err(e) => {
                     command
-                        .edit_response(
-                            &ctx,
-                            EditInteractionResponse::new().content("format!(")
-                        )
-                        .await.unwrap();
+                        .edit_response(&ctx, EditInteractionResponse::new().content("format!("))
+                        .await
+                        .unwrap();
                 }
             }
         }

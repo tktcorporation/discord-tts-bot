@@ -1,7 +1,7 @@
 use std::env;
 
-use serenity::gateway::ActivityData;
 use serenity::async_trait;
+use serenity::gateway::ActivityData;
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]

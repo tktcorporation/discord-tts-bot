@@ -1,7 +1,7 @@
 use std::env;
 
-use serenity::{client::Client, prelude::GatewayIntents};
 use reqwest::Client as HttpClient;
+use serenity::{client::Client, prelude::GatewayIntents};
 use songbird::typemap::TypeMapKey;
 
 use songbird::SerenityInit;
