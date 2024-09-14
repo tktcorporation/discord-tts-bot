@@ -10,12 +10,9 @@ RUN apt-get update && \
     automake \
     libtool \
     m4 \
-    ffmpeg \
     curl \
     python3 \
     git
-
-RUN curl https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
 
 # install yt-dlp
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
@@ -51,7 +48,6 @@ RUN apt-get update && \
     automake \
     libtool \
     m4 \
-    ffmpeg \
     curl \
     python3 \
  && apt-get -y clean \
