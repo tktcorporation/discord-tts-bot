@@ -1,6 +1,5 @@
 mod play_fade;
 mod service;
-mod utils;
 
 use super::check_msg;
 use super::error::Error;

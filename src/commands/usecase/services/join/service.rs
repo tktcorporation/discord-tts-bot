@@ -97,19 +97,3 @@ mod tests {
         welcome_audio().await;
     }
 }
-
-// #[async_trait]
-// pub trait Joiner {
-//     async fn join(
-//         &self,
-//         connect_to: id::ChannelId,
-//     ) -> (
-//         std::sync::Arc<tokio::sync::Mutex<songbird::Call>>,
-//         songbird::error::JoinResult<()>,
-//     );
-//     async fn piin(
-//         &self,
-//     ) -> (String,
-//         String
-//     );
-// }

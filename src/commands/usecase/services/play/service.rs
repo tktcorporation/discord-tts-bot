@@ -2,7 +2,6 @@ use serenity::{client::Context, model};
 
 use crate::constants;
 
-use super::utils;
 use super::Error;
 use super::TrackTiming;
 use reqwest;

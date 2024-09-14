@@ -4,7 +4,7 @@ use songbird::{Event, EventContext, EventHandler as VoiceEventHandler, TrackEven
 
 use crate::constants;
 
-use super::{check_msg, utils, Error};
+use super::{check_msg, Error};
 use reqwest;
 use songbird::{
     driver::Driver,

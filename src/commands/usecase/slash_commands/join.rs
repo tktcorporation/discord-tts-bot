@@ -1,7 +1,7 @@
 use serenity::async_trait;
-use serenity::builder::CreateApplicationCommand;
 use serenity::client::Context;
-use serenity::model::application::interaction::application_command::ApplicationCommandInteraction;
+use serenity::builder::CreateCommand;
+use serenity::model::application::CommandInteraction;
 
 use super::super::services;
 use super::{SlashCommand, SlashCommandResult};
@@ -9,8 +9,8 @@ use super::{SlashCommand, SlashCommandResult};
 pub struct Join {}
 #[async_trait]
 impl SlashCommand for Join {
-    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> SlashCommandResult {
-        let guild = ctx.cache.guild(command.guild_id.unwrap()).unwrap();
+    async fn run(ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
+        let guild = command.guild_id.unwrap().to_guild_cached(ctx).unwrap().clone();
         use crate::handler::usecase::text_to_speech::speech_options;
         match services::join(
             ctx,
@@ -26,7 +26,7 @@ impl SlashCommand for Join {
         }
     }
 
-    fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
+    fn register(command: CreateCommand) -> CreateCommand {
         command.description("Join your voice channel to use tts.")
     }
 }

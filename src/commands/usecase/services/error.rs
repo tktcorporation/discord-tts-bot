@@ -1,7 +1,6 @@
 use serenity::Error as SerenityError;
 use songbird::error::JoinError;
 use songbird::input::AudioStreamError;
-use songbird::tracks::TrackError;
 use std::error::Error as StdError;
 use std::fmt;
 
@@ -14,7 +13,6 @@ pub enum Error {
     AlreadyJoined,
     JoinError(JoinError),
     SerenityError(SerenityError),
-    TrackError(TrackError),
     AudioStreamError(AudioStreamError),
 }
 
@@ -27,6 +25,7 @@ impl fmt::Display for Error {
             Error::JoinError(e) => e.fmt(f),
             Error::SerenityError(e) => e.fmt(f),
             Error::TrackError(e) => e.fmt(f),
+            Error::AudioStreamError(e) => e.fmt(f),
         }
     }
 }
