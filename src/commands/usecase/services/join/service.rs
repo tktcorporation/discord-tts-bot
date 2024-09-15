@@ -8,7 +8,7 @@ use crate::constants;
 use crate::handler::usecase::text_to_speech::{config, speech_options};
 use crate::infrastructure::SharedSoundPath;
 
-use songbird::{self, create_player, ffmpeg, Event, TrackEvent};
+use songbird::{self, Event, TrackEvent};
 
 use super::{voice_event_handler::TrackPlayNotifier, Error};
 
@@ -44,14 +44,12 @@ pub async fn join(
         }
     };
 
-    let (handle_lock, success) = manager.join(guild.id, connect_to).await;
-    match success {
-        Ok(()) => {
-            _clear(&handle_lock).await;
-            _queue_join_message(handle_lock, ctx.http.clone(), called_channnel_id).await;
-            Ok(format!("Joined {}", Mention::from(connect_to)))
-        }
-        Err(e) => Err(Error::JoinError(e)),
+    if let Ok(handle_lock) = manager.join(guild.id, connect_to).await {
+        _clear(&handle_lock).await;
+        _queue_join_message(handle_lock, ctx.http.clone(), called_channnel_id).await;
+        Ok(format!("Joined {}", Mention::from(connect_to)))
+    } else {
+        Err(Error::JoinError(songbird::error::JoinError::NoCall))
     }
 }
 
@@ -68,9 +66,8 @@ async fn _queue_join_message(
     );
 
     let input = welcome_audio().await;
-    let (mut audio, _audio_handle) = create_player(input);
-    audio.set_volume(constants::volume::VOICE);
-    handle.enqueue(audio);
+    let audio = handle.enqueue_input(input).await;
+    audio.set_volume(constants::volume::VOICE).unwrap();
 }
 
 async fn _clear(handle_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>) {
@@ -79,11 +76,23 @@ async fn _clear(handle_lock: &std::sync::Arc<serenity::prelude::Mutex<songbird::
 }
 
 async fn welcome_audio() -> songbird::input::Input {
+    use songbird::input::codecs::{CODEC_REGISTRY, PROBE};
     let file_path = SharedSoundPath::new().welcome_audio_path();
     print!("file_path: {:?}", file_path);
-    ffmpeg(file_path)
+
+    let in_memory = match tokio::fs::read(file_path).await {
+        Ok(in_memory) => in_memory,
+        Err(e) => {
+            println!("Error reading file: {:?}", e);
+            panic!();
+        }
+    };
+
+    let in_memory_input: songbird::input::Input = songbird::input::Input::from(in_memory);
+    in_memory_input
+        .make_playable_async(&CODEC_REGISTRY, &PROBE)
         .await
-        .expect("This might fail: handle this error!")
+        .unwrap()
 }
 
 #[cfg(test)]
@@ -95,19 +104,3 @@ mod tests {
         welcome_audio().await;
     }
 }
-
-// #[async_trait]
-// pub trait Joiner {
-//     async fn join(
-//         &self,
-//         connect_to: id::ChannelId,
-//     ) -> (
-//         std::sync::Arc<tokio::sync::Mutex<songbird::Call>>,
-//         songbird::error::JoinResult<()>,
-//     );
-//     async fn piin(
-//         &self,
-//     ) -> (String,
-//         String
-//     );
-// }

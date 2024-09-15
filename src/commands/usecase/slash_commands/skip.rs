@@ -1,7 +1,7 @@
 use serenity::async_trait;
-use serenity::builder::CreateApplicationCommand;
+use serenity::builder::CreateCommand;
 use serenity::client::Context;
-use serenity::model::application::interaction::application_command::ApplicationCommandInteraction;
+use serenity::model::application::CommandInteraction;
 
 use super::super::services;
 use super::{SlashCommand, SlashCommandResult};
@@ -9,13 +9,13 @@ use super::{SlashCommand, SlashCommandResult};
 pub struct Skip {}
 #[async_trait]
 impl SlashCommand for Skip {
-    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> SlashCommandResult {
+    async fn run(ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
         match services::skip(ctx, command.guild_id.unwrap()).await {
             Ok(s) => SlashCommandResult::Simple(Some(s)),
             Err(e) => SlashCommandResult::Simple(Some(e.to_string())),
         }
     }
-    fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
+    fn register(command: CreateCommand) -> CreateCommand {
         command.description("Skip the current queue.")
     }
 }

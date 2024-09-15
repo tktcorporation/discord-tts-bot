@@ -16,7 +16,7 @@ pub struct VoiceMember {
 
 impl VoiceMember {
     pub async fn role(&self, ctx: &Context) -> Role {
-        let current_user_id = ctx.cache.current_user_id();
+        let current_user_id = ctx.cache.current_user().id;
         if current_user_id == self.user.id {
             return Role::Me;
         }

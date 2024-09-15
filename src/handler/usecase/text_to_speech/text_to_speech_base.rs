@@ -53,7 +53,10 @@ mod tests {
         let mut speaker = MockSpeaker::new();
         let msg = message_factory("some message");
         speaker.expect_speech().times(1).return_const(());
-        speaker.expect_guild_id().times(1).return_const(GuildId(1));
+        speaker
+            .expect_guild_id()
+            .times(1)
+            .return_const(GuildId::new(1));
         assert!(!msg.is_command());
         assert!(!msg.is_from_bot());
         text_to_speech(Box::new(speaker), msg).await;

@@ -1,7 +1,7 @@
 use serenity::async_trait;
-use serenity::builder::CreateApplicationCommand;
+use serenity::builder::CreateCommand;
 use serenity::client::Context;
-use serenity::model::application::interaction::application_command::ApplicationCommandInteraction;
+use serenity::model::application::CommandInteraction;
 
 use super::super::services;
 use super::{SlashCommand, SlashCommandResult};
@@ -9,7 +9,7 @@ use super::{SlashCommand, SlashCommandResult};
 pub struct Repeat {}
 #[async_trait]
 impl SlashCommand for Repeat {
-    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> SlashCommandResult {
+    async fn run(ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
         match services::repeat(ctx, command.guild_id.unwrap()).await {
             Ok(is_looping) => SlashCommandResult::Simple(Some(format!(
                 "Repeat is now {}",
@@ -18,7 +18,7 @@ impl SlashCommand for Repeat {
             Err(e) => SlashCommandResult::Simple(Some(e.to_string())),
         }
     }
-    fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
+    fn register(command: CreateCommand) -> CreateCommand {
         command.description("Repeating the current queue.")
     }
 }

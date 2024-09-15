@@ -1,12 +1,11 @@
 use serenity::{client::Context, model};
 
 use crate::constants;
+use crate::HttpKey;
 
-use super::utils;
 use super::Error;
 use super::TrackTiming;
-use songbird::input::Input;
-use songbird::tracks::create_player;
+use songbird::input::YoutubeDl;
 
 pub async fn play(
     ctx: &Context,
@@ -22,27 +21,30 @@ pub async fn play(
     if let Some(handler_lock) = manager.get(guild_id) {
         let mut handler = handler_lock.lock().await;
 
-        // Here, we use lazy restartable sources to make sure that we don't pay
-        // for decoding, playback on tracks which aren't actually live yet.
-        let source = match utils::source_from_str(url.to_string(), true).await {
-            Ok(source) => source,
+        let client = {
+            let data = ctx.data.read().await;
+            data.get::<HttpKey>().cloned().unwrap()
+        };
+
+        let mut ytdl = YoutubeDl::new_search(client, url.to_string());
+        let res: songbird::input::AuxMetadata = match ytdl.search(Some(1)).await {
+            Ok(res) => res[0].clone(),
             Err(why) => {
                 println!("Err starting source: {why:?}");
-                return Err(Error::ErrorSourcingFfmpeg);
+                return Err(Error::AudioStreamError(why));
             }
         };
-        let input: Input = source.into();
+
         super::send_track_info_message(
             TrackTiming::Added,
-            input.metadata.as_ref(),
+            Some(&res),
             channel_id,
             ctx.http.clone(),
         )
         .await;
 
-        let (mut audio, _audio_handle) = create_player(input);
-        audio.set_volume(constants::volume::MUSIC);
-        handler.enqueue(audio);
+        let audio = handler.enqueue_input(ytdl.into()).await;
+        audio.set_volume(constants::volume::MUSIC).unwrap();
 
         Ok(())
     } else {
