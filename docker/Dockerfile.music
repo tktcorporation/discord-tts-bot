@@ -1,4 +1,4 @@
-FROM rust:1.74.0-slim-bullseye AS dev-env
+FROM rust:1.81.0-slim-bullseye AS dev-env
 
 RUN apt-get update && \
     apt-get install -y \
@@ -10,12 +10,9 @@ RUN apt-get update && \
     automake \
     libtool \
     m4 \
-    ffmpeg \
     curl \
     python3 \
     git
-
-RUN curl https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
 
 # install yt-dlp
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
@@ -39,7 +36,7 @@ RUN cargo build --release --no-default-features --features "music"
 
 CMD [ "/bin/sh",  "-c", "cargo run" ]
 
-FROM debian:bullseye-20231030-slim
+FROM debian:bullseye-20240904-slim
 
 RUN apt-get update && \
     apt-get install -y \
@@ -51,7 +48,6 @@ RUN apt-get update && \
     automake \
     libtool \
     m4 \
-    ffmpeg \
     curl \
     python3 \
  && apt-get -y clean \

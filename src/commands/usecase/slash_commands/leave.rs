@@ -1,7 +1,7 @@
 use serenity::async_trait;
-use serenity::builder::CreateApplicationCommand;
+use serenity::builder::CreateCommand;
 use serenity::client::Context;
-use serenity::model::application::interaction::application_command::ApplicationCommandInteraction;
+use serenity::model::application::CommandInteraction;
 
 use super::super::services;
 use super::{SlashCommand, SlashCommandResult};
@@ -9,7 +9,7 @@ use super::{SlashCommand, SlashCommandResult};
 pub struct Leave {}
 #[async_trait]
 impl SlashCommand for Leave {
-    async fn run(ctx: &Context, command: &ApplicationCommandInteraction) -> SlashCommandResult {
+    async fn run(ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
         SlashCommandResult::Simple(
             services::leave(ctx, command.guild_id.unwrap())
                 .await
@@ -17,7 +17,7 @@ impl SlashCommand for Leave {
                 .into(),
         )
     }
-    fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
+    fn register(command: CreateCommand) -> CreateCommand {
         command.description("Leave the voice channel.")
     }
 }

@@ -92,7 +92,7 @@ async fn _members(
     let channel_id = id::ChannelId::from(channel_id.0);
     let channels = guild_id.channels(&ctx.http.as_ref()).await.unwrap();
     let guild_channel = channels.get(&channel_id).unwrap();
-    guild_channel.members(&ctx.cache).await.unwrap()
+    guild_channel.members(&ctx.cache).unwrap()
 }
 
 async fn get_guild_id_and_channel_id(

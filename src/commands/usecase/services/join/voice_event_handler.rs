@@ -23,7 +23,10 @@ impl VoiceEventHandler for TrackPlayNotifier {
         if let EventContext::Track([(_current_track_state, current_track_handle)]) = ctx {
             send_track_info_message(
                 TrackTiming::NowPlaying,
-                current_track_handle.metadata(),
+                // current_track_handle.action(
+                //     |track| track.meta
+                // ),
+                None,
                 self.chan_id,
                 self.http.clone(),
             )

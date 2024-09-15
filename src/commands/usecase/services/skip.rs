@@ -6,13 +6,13 @@ use serenity::{client::Context, model};
 #[derive(Debug)]
 pub enum SkipError {
     Error(ServiceError),
-    TrackError(songbird::tracks::TrackError),
+    ControlError(songbird::error::ControlError),
 }
 impl Display for SkipError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             SkipError::Error(e) => e.fmt(f),
-            SkipError::TrackError(e) => e.fmt(f),
+            SkipError::ControlError(e) => e.fmt(f),
         }
     }
 }
@@ -27,21 +27,12 @@ pub async fn skip(ctx: &Context, guild_id: model::id::GuildId) -> Result<String,
         let handler = handler_lock.lock().await;
         let queue = handler.queue();
         let m = match queue.current() {
-            Some(track) => {
-                format!(
-                    "Skipped: {}",
-                    track
-                        .metadata()
-                        .title
-                        .as_ref()
-                        .unwrap_or(&"Unknown".to_string())
-                )
-            }
+            Some(_track) => "Skipped".to_string(),
             None => "Nothing to skip.".to_string(),
         };
         match queue.skip() {
             Ok(_) => Ok(m),
-            Err(e) => Err(SkipError::TrackError(e)),
+            Err(e) => Err(SkipError::ControlError(e)),
         }
     } else {
         Err(SkipError::Error(ServiceError::NotInVoiceChannel))

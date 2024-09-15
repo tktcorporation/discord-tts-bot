@@ -1,6 +1,6 @@
 [package]
 name = "discord-tts-bot"
-version = "1.5.0"
+version = "2.0.0"
 authors = ["tktcorporation"]
 edition = "2021"
 license = "MIT"
@@ -27,13 +27,21 @@ mockall = "0.12.1"
 mockall_double = "0.3.0"
 serde = "1.0.204"
 
+[dependencies.reqwest]
+version = "0.11"
+features = ["stream"]
+
 [dependencies.songbird]
-version = "0.3.2"
-features = ["builtin-queue", "yt-dlp"]
+version = "0.4.1"
+features = ["builtin-queue"]
+
+[dependencies.symphonia]
+version = "0.5.2"
+features = ["aac", "mp3", "isomp4", "alac"]
 
 [dependencies.serenity]
-version = "0.11.7"
-features = ["cache", "standard_framework", "voice", "rustls_backend"]
+version = "0.12.2"
+features = ["client", "gateway", "cache", "standard_framework", "voice", "rustls_backend", "http"]
 
 [dependencies.tokio]
 version = "1.36.0"

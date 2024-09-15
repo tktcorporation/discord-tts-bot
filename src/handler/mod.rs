@@ -1,13 +1,15 @@
-use serenity::model::application::command::Command;
-use serenity::model::application::interaction::{Interaction, InteractionResponseType};
+use serenity::all::EditInteractionResponse;
+use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseMessage};
+use serenity::model::application::{Command, Interaction};
 #[cfg(feature = "tts")]
 use serenity::model::channel::Message as SerenityMessage;
 use serenity::model::voice;
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
-    model::gateway::Ready,
 };
+
+use serenity::model::gateway::Ready;
 
 mod model;
 use model::context::Context as Ctx;
@@ -26,16 +28,18 @@ use usecase::{speech_welcome_see_you::speech_greeting, text_to_speech::text_to_s
 pub struct Handler;
 
 #[async_trait]
-#[cfg_attr(feature = "mock", mockall::automock)]
 impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        if let Interaction::ApplicationCommand(command) = interaction {
+        if let Interaction::Command(command) = interaction {
+            println!("Received command interaction: {command:#?}");
+
             command
-                .create_interaction_response(&ctx.http, |response| {
-                    response
-                        .kind(InteractionResponseType::DeferredChannelMessageWithSource)
-                        .interaction_response_data(|message| message.content("Processing..."))
-                })
+                .create_response(
+                    &ctx,
+                    CreateInteractionResponse::Message(
+                        CreateInteractionResponseMessage::new().content("Processing..."),
+                    ),
+                )
                 .await
                 .unwrap();
 
@@ -43,34 +47,32 @@ impl EventHandler for Handler {
                 Some(slash_command) => slash_command.run(&ctx, &command).await,
                 None => {
                     command
-                        .edit_original_interaction_response(&ctx.http, |response| {
-                            response.content("Unknown command")
-                        })
+                        .edit_response(
+                            &ctx.http,
+                            EditInteractionResponse::default().content("Unknown command"),
+                        )
                         .await
                         .unwrap();
                     return;
                 }
             };
+
             let result = match command_result {
                 SlashCommandResult::Simple(None) => {
-                    command
-                        .delete_original_interaction_response(&ctx.http)
-                        .await
-                        .unwrap();
+                    command.delete_response(&ctx.http).await.unwrap();
                     return;
                 }
                 SlashCommandResult::Simple(Some(message)) => {
                     command
-                        .edit_original_interaction_response(&ctx.http, |response| {
-                            response.content(message)
-                        })
+                        .edit_response(
+                            &ctx.http,
+                            EditInteractionResponse::default().content(message),
+                        )
                         .await
                 }
                 SlashCommandResult::Embed(embed) => {
                     command
-                        .edit_original_interaction_response(&ctx.http, |response| {
-                            response.set_embed(embed)
-                        })
+                        .edit_response(&ctx.http, EditInteractionResponse::default().embed(embed))
                         .await
                 }
             };
@@ -78,9 +80,10 @@ impl EventHandler for Handler {
                 Ok(_) => (),
                 Err(e) => {
                     command
-                        .edit_original_interaction_response(&ctx.http, |response| {
-                            response.content(format!("Error: {e:?}"))
-                        })
+                        .edit_response(
+                            &ctx,
+                            EditInteractionResponse::new().content(format!("{:?}", e)),
+                        )
                         .await
                         .unwrap();
                 }
@@ -91,27 +94,22 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
 
-        Command::set_global_application_commands(&ctx.http, |commands| {
-            commands
-                .create_application_command(|command| SlashCommands::Join.register(command))
-                .create_application_command(|command| SlashCommands::Leave.register(command))
-                .create_application_command(|command| SlashCommands::Ping.register(command))
-                .create_application_command(|command| SlashCommands::Clear.register(command))
-                .create_application_command(|command| SlashCommands::Deafen.register(command))
-                .create_application_command(|command| SlashCommands::Mute.register(command))
-                .create_application_command(|command| SlashCommands::Invite.register(command))
-                .create_application_command(|command| {
-                    SlashCommands::SelectChannel.register(command)
-                })
-                .create_application_command(|command| SlashCommands::Skip.register(command));
-
-            #[cfg(feature = "music")]
-            commands
-                .create_application_command(|command| SlashCommands::Play.register(command))
-                .create_application_command(|command| SlashCommands::Repeat.register(command))
-                .create_application_command(|command| SlashCommands::Queue.register(command));
-            commands
-        })
+        Command::set_global_commands(
+            &ctx.http,
+            vec![
+                SlashCommands::Join.register(),
+                SlashCommands::Leave.register(),
+                SlashCommands::Ping.register(),
+                SlashCommands::Clear.register(),
+                SlashCommands::Invite.register(),
+                SlashCommands::SelectChannel.register(),
+                SlashCommands::Skip.register(),
+                #[cfg(feature = "music")]
+                SlashCommands::Play.register(),
+                SlashCommands::Repeat.register(),
+                SlashCommands::Queue.register(),
+            ],
+        )
         .await
         .unwrap();
 

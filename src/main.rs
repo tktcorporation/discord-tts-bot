@@ -1,6 +1,8 @@
 use std::env;
 
+use reqwest::Client as HttpClient;
 use serenity::{client::Client, prelude::GatewayIntents};
+use songbird::typemap::TypeMapKey;
 
 use songbird::SerenityInit;
 
@@ -15,8 +17,10 @@ mod model;
 
 mod constants;
 
-mod framework;
-use framework::build_framework;
+pub struct HttpKey;
+impl TypeMapKey for HttpKey {
+    type Value = HttpClient;
+}
 
 #[tokio::main]
 async fn main() {
@@ -24,12 +28,9 @@ async fn main() {
 
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
-
-    let framework = build_framework();
-
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
 
-    let mut client = build_client(&token, framework, intents)
+    let mut client = build_client(&token, intents)
         .await
         .expect("Err creating client");
 
@@ -41,13 +42,12 @@ async fn main() {
 
 async fn build_client(
     token: &str,
-    framework: serenity::framework::StandardFramework,
     intents: GatewayIntents,
 ) -> Result<serenity::Client, serenity::Error> {
     Client::builder(token, intents)
         .event_handler(Handler)
-        .framework(framework)
         .register_songbird()
+        .type_map_insert::<HttpKey>(HttpClient::new())
         .await
 }
 
