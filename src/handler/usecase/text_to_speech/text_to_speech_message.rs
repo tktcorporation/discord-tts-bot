@@ -6,15 +6,24 @@ use regex::Regex;
 impl Message {
     pub fn to_speech_message(&self, _options: SpeechOptions) -> SpeechMessage {
         let content = self.get_content();
-        // urlはそのまま読まない
-        let str = if content.contains("http") {
-            "url".to_string()
-        } else {
-            content
-        };
+
+        // urlをスキップ
+        let str = content
+            .split_whitespace()
+            .filter(|word| !word.starts_with("http"))
+            .collect::<Vec<&str>>()
+            .join(" ");
+
         // convert discord styled string for speech
         let converted = convert_discord_string(&str);
-        let message = converted;
+
+        // 100文字を超えた場合は、トリムして語尾に「うぬんかんぬんうんぬんかんぬん」を追加
+        let message = if converted.chars().count() > 100 {
+            let trimmed = converted.chars().take(100).collect::<String>();
+            format!("{}うぬんかんぬんうんぬんかんぬん", trimmed)
+        } else {
+            converted
+        };
 
         SpeechMessage { value: message }
     }
@@ -171,16 +180,15 @@ mod tests {
     #[cfg(test)]
     mod to_speech_message_tests {
         use super::*;
-
         #[test]
         fn test_message() {
             let message = message_factory("https://example.com");
             assert_eq!(
-                "url",
+                "",
                 &message
                     .to_speech_message(SpeechOptions {
                         read_channel_id: None
-                    },)
+                    })
                     .value
             );
         }
@@ -189,24 +197,24 @@ mod tests {
         fn test_not_ssl() {
             let message = message_factory("http://example.com");
             assert_eq!(
-                "url",
+                "",
                 &message
                     .to_speech_message(SpeechOptions {
                         read_channel_id: None
-                    },)
+                    })
                     .value
             );
         }
 
         #[test]
-        fn test_url() {
-            let message = message_factory("おはようhttps://example.comこんにちは");
+        fn test_url_in_text() {
+            let message = message_factory("おはよう https://example.com こんにちは");
             assert_eq!(
-                "url",
+                "おはよう こんにちは",
                 &message
                     .to_speech_message(SpeechOptions {
                         read_channel_id: None
-                    },)
+                    })
                     .value
             );
         }
@@ -219,7 +227,21 @@ mod tests {
                 &message
                     .to_speech_message(SpeechOptions {
                         read_channel_id: None
-                    },)
+                    })
+                    .value
+            );
+        }
+
+        #[test]
+        fn test_trimmed_message() {
+            let long_text = "あ".repeat(100);
+            let message = message_factory(format!("{}いいいい", long_text).as_str());
+            assert_eq!(
+                format!("{}うぬんかんぬんうんぬんかんぬん", long_text),
+                message
+                    .to_speech_message(SpeechOptions {
+                        read_channel_id: None
+                    })
                     .value
             );
         }
