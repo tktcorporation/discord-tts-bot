@@ -32,8 +32,8 @@ jobs:
           apt-get update && apt-get install -y docker docker-compose
 
       - name: Build containers
-        run: docker-compose build app
+        run: docker compose build app
 
       - name: Test
         run: |
-          docker-compose run app /bin/bash -c "RUST_BACKTRACE=1 cargo test --all-features"
+          docker compose run app /bin/bash -c "RUST_BACKTRACE=1 cargo test --all-features"
