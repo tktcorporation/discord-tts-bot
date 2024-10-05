@@ -1,22 +1,33 @@
-app = "shabeko-discord-bot"
-kill_signal = "SIGINT"
-kill_timeout = 5
-processes = []
+# fly.toml app configuration file generated for shabeko-discord-bot on 2024-10-05T15:32:02Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-[build]
-  dockerfile = "docker/Dockerfile"
+app = 'shabeko-discord-bot'
+primary_region = 'sin'
+kill_signal = 'SIGINT'
+kill_timeout = '5s'
 
 [env]
 
 [experimental]
-  allowed_public_ports = []
   auto_rollback = true
 
+[build]
+  dockerfile = 'docker/Dockerfile'
+
 [[services]]
-  http_checks = []
-  processes = ["app"]
-  script_checks = []
+  protocol = ''
+  internal_port = 0
+  ports = []
+  processes = ['app']
+
   [services.concurrency]
+    type = 'connections'
     hard_limit = 25
     soft_limit = 20
-    type = "connections"
+
+[[vm]]
+  memory = '256'
+  cpu_kind = 'shared'
+  cpus = 1
