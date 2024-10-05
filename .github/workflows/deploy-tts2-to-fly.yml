@@ -1,0 +1,31 @@
+name: "FlyIoDeployTTS-2"
+
+on:
+  release:
+    types: [published]
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: heroku_production
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: |
+          flyctl secrets set -c fly-tts-2.toml \
+          DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} \
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+          AWS_REGION=${{ secrets.AWS_REGION }} \
+          DISCORD_CMD_PREFIX=${{ secrets.DISCORD_CMD_PREFIX }}
+      - run: flyctl deploy --remote-only -c fly-tts-2.toml

@@ -23,22 +23,22 @@ jobs:
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
 
-      - name: Set Env Vars on Heroku
-        env: 
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku config:set DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} DISCORD_CMD_PREFIX=${{ secrets.DISCORD_CMD_PREFIX }} AWS_REGION=${{ secrets.AWS_REGION }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -a ${{ secrets.HEROKU_APP_NAME }}
+      # - name: Set Env Vars on Heroku
+      #   env: 
+      #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      #   run: heroku config:set DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} DISCORD_CMD_PREFIX=${{ secrets.DISCORD_CMD_PREFIX }} AWS_REGION=${{ secrets.AWS_REGION }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -a ${{ secrets.HEROKU_APP_NAME }}
 
-      - name: Login to Heroku Container registry
-        env: 
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:login
+      # - name: Login to Heroku Container registry
+      #   env: 
+      #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      #   run: heroku container:login
 
-      - name: Build and push
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: cd ./docker && heroku container:push -a ${{ secrets.HEROKU_APP_NAME }} app --context-path ../
+      # - name: Build and push
+      #   env:
+      #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      #   run: cd ./docker && heroku container:push -a ${{ secrets.HEROKU_APP_NAME }} app --context-path ../
 
-      - name: Release
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:release -a ${{ secrets.HEROKU_APP_NAME }} app
+      # - name: Release
+      #   env:
+      #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      #   run: heroku container:release -a ${{ secrets.HEROKU_APP_NAME }} app
