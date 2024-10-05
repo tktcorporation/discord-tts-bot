@@ -1,12 +1,10 @@
-# fly.toml file generated for utako-discord-bot on 2022-11-23T11:40:29Z
-
-app = "utako-discord-bot"
+app = "shabeko-discord-bot"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
 
 [build]
-  dockerfile = "docker/Dockerfile.music"
+  dockerfile = "docker/Dockerfile"
 
 [env]
 
@@ -22,7 +20,3 @@ processes = []
     hard_limit = 25
     soft_limit = 20
     type = "connections"
-
-[scale]
-  min = 0
-  max = 0
