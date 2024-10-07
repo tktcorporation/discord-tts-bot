@@ -137,7 +137,7 @@ name = "aws-endpoint"
 version = "0.1.0"
 source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.0.7-alpha#1b923f86d5ca897da053661a30bddefb90e08ab4"
 dependencies = [
- "aws-types",
+ "aws-types 0.1.0",
  "http 0.2.12",
  "regex",
  "smithy-http",
@@ -148,7 +148,7 @@ name = "aws-http"
 version = "0.1.0"
 source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.0.7-alpha#1b923f86d5ca897da053661a30bddefb90e08ab4"
 dependencies = [
- "aws-types",
+ "aws-types 0.1.0",
  "http 0.2.12",
  "lazy_static",
  "smithy-http",
@@ -191,7 +191,7 @@ dependencies = [
  "aws-http",
  "aws-hyper",
  "aws-sig-auth",
- "aws-types",
+ "aws-types 0.1.0",
  "bytes",
  "http 0.2.12",
  "serde",
@@ -208,7 +208,7 @@ source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.0.7-alpha#1b923f86d
 dependencies = [
  "aws-auth",
  "aws-sigv4",
- "aws-types",
+ "aws-types 0.1.0",
  "http 0.2.12",
  "smithy-http",
  "thiserror",
@@ -230,12 +230,100 @@ dependencies = [
 ]
 
 [[package]]
+name = "aws-smithy-async"
+version = "0.45.0"
+source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.15.0#5e652cce1d6f1c92bafd8e33388b6fdca55506ad"
+dependencies = [
+ "futures-util",
+ "pin-project-lite",
+ "tokio",
+ "tokio-stream",
+]
+
+[[package]]
+name = "aws-smithy-client"
+version = "0.45.0"
+source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.15.0#5e652cce1d6f1c92bafd8e33388b6fdca55506ad"
+dependencies = [
+ "aws-smithy-async",
+ "aws-smithy-http",
+ "aws-smithy-http-tower",
+ "aws-smithy-types",
+ "bytes",
+ "fastrand 1.9.0",
+ "http 0.2.12",
+ "http-body 0.4.6",
+ "pin-project-lite",
+ "tokio",
+ "tower",
+ "tracing",
+]
+
+[[package]]
+name = "aws-smithy-http"
+version = "0.45.0"
+source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.15.0#5e652cce1d6f1c92bafd8e33388b6fdca55506ad"
+dependencies = [
+ "aws-smithy-types",
+ "bytes",
+ "bytes-utils",
+ "futures-core",
+ "http 0.2.12",
+ "http-body 0.4.6",
+ "hyper 0.14.30",
+ "once_cell",
+ "percent-encoding",
+ "pin-project-lite",
+ "tracing",
+]
+
+[[package]]
+name = "aws-smithy-http-tower"
+version = "0.45.0"
+source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.15.0#5e652cce1d6f1c92bafd8e33388b6fdca55506ad"
+dependencies = [
+ "aws-smithy-http",
+ "bytes",
+ "http 0.2.12",
+ "http-body 0.4.6",
+ "pin-project-lite",
+ "tower",
+ "tracing",
+]
+
+[[package]]
+name = "aws-smithy-types"
+version = "0.45.0"
+source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.15.0#5e652cce1d6f1c92bafd8e33388b6fdca55506ad"
+dependencies = [
+ "itoa 1.0.11",
+ "num-integer",
+ "ryu",
+ "time",
+]
+
+[[package]]
 name = "aws-types"
 version = "0.1.0"
 source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.0.7-alpha#1b923f86d5ca897da053661a30bddefb90e08ab4"
 dependencies = [
  "lazy_static",
  "rustc_version 0.3.3",
+]
+
+[[package]]
+name = "aws-types"
+version = "0.15.0"
+source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.15.0#5e652cce1d6f1c92bafd8e33388b6fdca55506ad"
+dependencies = [
+ "aws-smithy-async",
+ "aws-smithy-client",
+ "aws-smithy-http",
+ "aws-smithy-types",
+ "http 0.2.12",
+ "rustc_version 0.4.1",
+ "tracing",
+ "zeroize",
 ]
 
 [[package]]
@@ -657,7 +745,7 @@ name = "discord-tts-bot"
 version = "2.1.1"
 dependencies = [
  "aws-sdk-polly",
- "aws-types",
+ "aws-types 0.15.0",
  "html-escape",
  "hyper 1.4.1",
  "mockall",
@@ -3238,6 +3326,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-stream"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f4e6ce100d0eb49a2734f8c0812bcd324cf357d21810932c5df6b96ef2b86f1"
+dependencies = [
+ "futures-core",
+ "pin-project-lite",
+ "tokio",
+]
+
+[[package]]
 name = "tokio-tungstenite"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3837,7 +3936,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
