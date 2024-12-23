@@ -72,7 +72,7 @@ impl EventHandler for Handler {
                 }
                 SlashCommandResult::Embed(embed) => {
                     command
-                        .edit_response(&ctx.http, EditInteractionResponse::default().embed(embed))
+                        .edit_response(&ctx.http, EditInteractionResponse::default().embed(*embed))
                         .await
                 }
             };

@@ -8,6 +8,7 @@ pub enum TrackTiming {
     NowPlaying,
 }
 
+#[allow(dead_code)]
 pub fn get_human_readable_timestamp(duration: Option<Duration>) -> String {
     match duration {
         Some(duration) if duration == Duration::MAX => "∞".to_string(),

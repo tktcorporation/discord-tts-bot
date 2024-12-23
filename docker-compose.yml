@@ -14,8 +14,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
       - AWS_REGION=$AWS_REGION
       - DISCORD_CMD_PREFIX=${DISCORD_CMD_PREFIX:-!}
-      - HEROKU_API_KEY=$HEROKU_API_KEY
-      - HEROKU_APP_NAME=$HEROKU_APP_NAME
+      - SENTRY_DSN=$SENTRY_DSN
     volumes:
       - .:/workspace:cached
       - /var/run/docker.sock:/var/run/docker.sock:rw

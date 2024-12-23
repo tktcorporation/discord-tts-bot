@@ -2,6 +2,7 @@ FROM rust:1.81.0-slim-bullseye AS dev-env
 
 RUN apt-get update && \
     apt-get install -y \
+    cmake \
     libopus-dev \
     build-essential \
     libssl-dev \

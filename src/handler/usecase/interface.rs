@@ -11,6 +11,7 @@ pub trait Speaker {
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
+#[allow(dead_code)]
 pub trait FilePath {
     async fn path(&self);
 }

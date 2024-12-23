@@ -3,30 +3,29 @@ use crate::constants;
 #[cfg(feature = "aws")]
 use crate::infrastructure::tts::generate_speech_file;
 use crate::infrastructure::{GuildPath, SoundPath, SpeechFilePath};
-pub use crate::model::{voice::Error, Voice};
-use polly::model::VoiceId;
+pub use crate::model::Voice;
+use polly::types::VoiceId;
 use serenity::async_trait;
 use songbird::input::Input;
+use tracing;
 
 #[async_trait]
 #[cfg_attr(feature = "mock", mockall::automock)]
 impl Speaker for Voice {
     #[cfg(feature = "aws")]
     async fn speech(&self, msg: SpeechMessage) {
-        match self.handler().await {
-            Ok(handler) => {
-                let file_path = SpeechFilePath::new(SoundPath::new(GuildPath::new(&self.guild_id)));
-                let speech_file =
-                    generate_speech_file(msg.value, VoiceId::Mizuki, file_path, false)
-                        .await
-                        .unwrap();
-                let input = get_input_from_local(speech_file).await;
-                play_input(&handler, input).await;
-            }
-            Err(e) => match e {
-                Error::ConnectionNotFound => (),
-                Error::NotInVoiceChannel => (),
-            },
+        if let Ok(handler) = self.handler().await {
+            let file_path = SpeechFilePath::new(SoundPath::new(GuildPath::new(&self.guild_id)));
+            let speech_file =
+                match generate_speech_file(&msg.value, VoiceId::Mizuki, &file_path, false).await {
+                    Ok(file) => file,
+                    Err(e) => {
+                        tracing::error!("Failed to generate speech file: {:?}", e);
+                        return;
+                    }
+                };
+            let input = get_input_from_local(speech_file).await;
+            play_input(&handler, input).await;
         }
     }
     fn guild_id(&self) -> serenity::model::id::GuildId {

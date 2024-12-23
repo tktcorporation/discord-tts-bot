@@ -6,6 +6,7 @@ use std::fmt;
 
 #[allow(clippy::enum_variant_names)]
 #[derive(Debug)]
+#[allow(dead_code)]
 #[non_exhaustive]
 pub enum Error {
     NotInVoiceChannel,

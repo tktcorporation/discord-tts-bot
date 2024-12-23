@@ -12,6 +12,8 @@ target/
 .env
 tmp/
 
+*.env
+
 # Sound data
 /sounds/*
 !/sounds/shabeko_dayo.wav

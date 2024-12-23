@@ -54,7 +54,7 @@ fn build_queue_page(tracks: &[TrackHandle], page: usize) -> String {
 
     let mut description = String::new();
 
-    for (i, t) in queue.iter().enumerate() {
+    for (i, _t) in queue.iter().enumerate() {
         // let title = t.metadata().title.as_ref();
         // let url = t.metadata().source_url.as_ref();
         // let duration = super::voice_utils::get_human_readable_timestamp(t.metadata().duration);
