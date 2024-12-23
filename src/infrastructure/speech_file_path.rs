@@ -30,7 +30,7 @@ impl SpeechFilePath {
             .into()
     }
 
-    pub async fn file(self) -> SpeechFile {
+    pub async fn file(&self) -> SpeechFile {
         let file_name = self.file_name();
 
         SpeechFile {
