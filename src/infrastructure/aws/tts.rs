@@ -1,6 +1,7 @@
-use aws_types::region::{EnvironmentProvider, ProvideRegion};
-use polly::model::{OutputFormat, TextType, VoiceId};
-use polly::{Client, Config, Region};
+use aws_types::region::Region;
+use aws_types::SdkConfig;
+use polly::types::{OutputFormat, TextType, VoiceId};
+use polly::Client;
 use std::env;
 use tokio::io::AsyncWriteExt;
 
@@ -26,24 +27,19 @@ pub async fn generate_speech_file(
     file_path: SpeechFilePath,
     verbose: bool,
 ) -> Result<String, Box<dyn std::error::Error>> {
-    let region = EnvironmentProvider::new().region().unwrap_or_else(|| {
-        Region::new(env::var("AWS_REGION").expect("Expected a region string in the environment"))
-    });
+    let region = Region::new(
+        env::var("AWS_REGION").expect("AWS_REGION must be set in environment variables")
+    );
+    let config = SdkConfig::builder()
+        .region(region.clone())
+        .build();
 
     if verbose {
-        println!("polly client version: {}\n", polly::PKG_VERSION);
+        println!("polly client version: {}\n", polly::meta::PKG_VERSION);
         println!("Region:   {:?}", &region);
-        // println!("Filename: {}", file_path.into().to_str().unwrap());
-
-        // SubscriberBuilder::default()
-        //     .with_env_filter("info")
-        //     .with_span_events(FmtSpan::CLOSE)
-        //     .init();
     }
 
-    let config = Config::builder().region(region).build();
-
-    let client = Client::from_conf(config);
+    let client = Client::new(&config);
 
     let mut ssml_text = String::new();
     // 声質の変更と最大再生秒数の設定
@@ -54,7 +50,7 @@ pub async fn generate_speech_file(
 
     let resp = client
         .synthesize_speech()
-        .set_text_type(Option::Some(TextType::Ssml))
+        .text_type(TextType::Ssml)
         .output_format(OutputFormat::Mp3)
         .text(ssml_text)
         .voice_id(voice_id)

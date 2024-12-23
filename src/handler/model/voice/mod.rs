@@ -4,7 +4,7 @@ use crate::constants;
 use crate::infrastructure::tts::generate_speech_file;
 use crate::infrastructure::{GuildPath, SoundPath, SpeechFilePath};
 pub use crate::model::{voice::Error, Voice};
-use polly::model::VoiceId;
+use polly::types::VoiceId;
 use serenity::async_trait;
 use songbird::input::Input;
 
