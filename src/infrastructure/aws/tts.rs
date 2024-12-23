@@ -28,11 +28,9 @@ pub async fn generate_speech_file(
     verbose: bool,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let region = Region::new(
-        env::var("AWS_REGION").expect("AWS_REGION must be set in environment variables")
+        env::var("AWS_REGION").expect("AWS_REGION must be set in environment variables"),
     );
-    let config = SdkConfig::builder()
-        .region(region.clone())
-        .build();
+    let config = SdkConfig::builder().region(region.clone()).build();
 
     if verbose {
         println!("polly client version: {}\n", polly::meta::PKG_VERSION);
