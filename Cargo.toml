@@ -20,7 +20,7 @@ aws-types = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.7-alp
 tracing-subscriber = { version = "0.3.18", features = ["fmt"] }
 tiger = "0.2.1"
 rand = "0.8.5"
-serde_json = "1.0.108"
+serde_json = "1.0.134"
 regex = "1.11.0"
 html-escape = "0.2.13"
 mockall = "0.13.0"
