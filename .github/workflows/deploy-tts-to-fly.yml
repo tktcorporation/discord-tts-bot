@@ -28,4 +28,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
           AWS_REGION=${{ secrets.AWS_REGION }} \
           DISCORD_CMD_PREFIX=${{ secrets.DISCORD_CMD_PREFIX_TTS_II }}
+          SENTRY_DSN=${{ secrets.SENTRY_DSN }}
       - run: flyctl deploy --remote-only -c fly-tts.toml

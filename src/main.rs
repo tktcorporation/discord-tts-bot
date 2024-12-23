@@ -24,6 +24,15 @@ impl TypeMapKey for HttpKey {
 
 #[tokio::main]
 async fn main() {
+    let _guard = sentry::init(sentry::ClientOptions {
+        dsn: env::var("SENTRY_DSN")
+            .ok()
+            .and_then(|dsn| dsn.parse().ok()),
+        release: sentry::release_name!(),
+        traces_sample_rate: 1.0,
+        ..Default::default()
+    });
+
     tracing_subscriber::fmt::init();
 
     // Configure the client with your Discord bot token in the environment.
