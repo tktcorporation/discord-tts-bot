@@ -26,6 +26,8 @@
 			"enableNonRootDocker": "true",
 			"moby": "true"
 		},
+		// github-cli
+		"ghcr.io/devcontainers/features/github-cli:1": {},
 		"ghcr.io/devcontainers/features/rust:1": {}
 	},
 
