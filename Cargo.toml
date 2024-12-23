@@ -10,6 +10,7 @@ readme = "README.md"
 tts = ["aws"]
 music = ["aws"]
 aws = []
+mock = []
 
 default = ["tts"]
 

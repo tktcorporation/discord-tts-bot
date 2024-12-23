@@ -4,6 +4,7 @@ use songbird::{Event, EventContext, EventHandler as VoiceEventHandler};
 
 use std::sync::Arc;
 
+#[allow(dead_code)]
 struct SongEndNotifier {
     channel_id: model::id::ChannelId,
     http: Arc<Http>,
@@ -20,6 +21,7 @@ impl VoiceEventHandler for SongEndNotifier {
     }
 }
 
+#[allow(dead_code)]
 struct SongFader {
     channel_id: model::id::ChannelId,
     http: Arc<Http>,

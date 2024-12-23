@@ -19,7 +19,7 @@ use serenity::model::application::CommandInteraction;
 
 pub enum SlashCommandResult {
     Simple(Option<String>),
-    Embed(CreateEmbed),
+    Embed(Box<CreateEmbed>),
 }
 
 #[async_trait]
@@ -73,7 +73,7 @@ impl SlashCommands {
         }
     }
 
-    pub fn register<'a>(&self) -> CreateCommand {
+    pub fn register(&self) -> CreateCommand {
         match self {
             Self::Clear => clear::Clear::register(CreateCommand::new("clear")),
             Self::Join => join::Join::register(CreateCommand::new("join")),
