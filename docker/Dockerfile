@@ -21,6 +21,9 @@ RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o 
 
 ENV LC_ALL=C.UTF-8
 
+COPY Makefile Makefile
+RUN make install
+
 FROM dev-env AS build-env
 
 COPY Cargo.lock Cargo.lock
