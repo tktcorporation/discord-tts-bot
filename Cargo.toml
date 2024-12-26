@@ -6,6 +6,9 @@ edition = "2021"
 license = "MIT"
 readme = "README.md"
 
+[profile.release]
+debug = true
+
 [features]
 tts = ["aws"]
 music = ["aws"]
