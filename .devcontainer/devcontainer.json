@@ -4,7 +4,11 @@
 	"name": "discord-tts-bot",
 
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
+	"build": {
+		"dockerfile": "../docker/Dockerfile",
+		"context": "..",
+		"target": "dev-env"
+	},
 
 	"customizations": {
 		"vscode": {
