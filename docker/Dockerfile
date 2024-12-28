@@ -1,4 +1,4 @@
-FROM rust:1.81.0-slim-bullseye AS dev-env
+FROM mcr.microsoft.com/devcontainers/rust:1-bookworm AS dev-env
 
 RUN apt-get update && \
     apt-get install -y \
@@ -20,6 +20,9 @@ RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o 
     chmod a+rx /usr/bin/yt-dlp
 
 ENV LC_ALL=C.UTF-8
+
+COPY Makefile Makefile
+RUN make install
 
 FROM dev-env AS build-env
 
