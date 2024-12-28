@@ -1,0 +1,39 @@
+name: Docker Application Test
+
+on:
+  pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t discord-tts-bot -f docker/Dockerfile .
+
+      - name: Test application startup
+        run: |
+          # アプリケーションを起動し、バックグラウンドで実行
+          container_id=$(docker run -d discord-tts-bot)
+          
+          # 5秒待機してプロセスの状態を確認
+          sleep 5
+          
+          # コンテナの状態を確認
+          container_status=$(docker inspect $container_id --format='{{.State.Status}}')
+          if [ "$container_status" != "running" ]; then
+            echo "Container is not running. Status: $container_status"
+            docker logs $container_id
+            exit 1
+          fi
+          
+          # プロセスの存在確認
+          if ! docker exec $container_id pgrep discord-tts-bot > /dev/null; then
+            echo "discord-tts-bot process is not running"
+            docker logs $container_id
+            exit 1
+          fi
+          
+          echo "Application startup test passed successfully"
+          docker stop $container_id 
