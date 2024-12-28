@@ -4,30 +4,24 @@
 #
 
 app = 'shabeko-discord-bot'
-primary_region = 'sin'
-kill_signal = 'SIGINT'
-kill_timeout = '5s'
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[build]
+  dockerfile = "docker/Dockerfile"
 
 [env]
 
 [experimental]
+  allowed_public_ports = []
   auto_rollback = true
 
-[build]
-  dockerfile = 'docker/Dockerfile'
-
 [[services]]
-  protocol = ''
-  internal_port = 0
-  ports = []
-  processes = ['app']
-
+  http_checks = []
+  processes = ["app"]
+  script_checks = []
   [services.concurrency]
-    type = 'connections'
     hard_limit = 25
     soft_limit = 20
-
-[[vm]]
-  memory = '256'
-  cpu_kind = 'shared'
-  cpus = 1
+    type = "connections"
