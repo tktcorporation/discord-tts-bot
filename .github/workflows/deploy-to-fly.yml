@@ -1,8 +1,9 @@
 name: "FlyIoDeployMusic"
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - stopped
 
 defaults:
   run:
