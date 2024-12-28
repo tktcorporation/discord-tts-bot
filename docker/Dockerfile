@@ -19,6 +19,13 @@ RUN apt-get update && \
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
     chmod a+rx /usr/bin/yt-dlp
 
+# install flyctl
+RUN curl -L https://fly.io/install.sh | sh
+
+# setup flyctl environment
+ENV FLYCTL_INSTALL="/home/vscode/.fly"
+ENV PATH="$FLYCTL_INSTALL/bin:$PATH"
+
 ENV LC_ALL=C.UTF-8
 
 COPY Makefile Makefile
@@ -40,7 +47,7 @@ RUN cargo build --release --features "tts"
 
 CMD [ "/bin/sh",  "-c", "cargo run" ]
 
-FROM debian:bullseye-20240926-slim
+FROM debian:bookworm-20241223-slim
 
 RUN apt-get update && \
     apt-get install -y \
