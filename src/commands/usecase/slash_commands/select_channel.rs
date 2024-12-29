@@ -12,14 +12,14 @@ pub struct SelectChannel {}
 impl SlashCommand for SelectChannel {
     async fn run(_ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
         let resolved_options = command.data.options();
-        let channel = match resolved_options.first().unwrap() {
-            ResolvedOption {
+        let channel_id = match resolved_options.first() {
+            Some(ResolvedOption {
                 value: ResolvedValue::Channel(channel),
                 ..
-            } => channel,
-            _ => return SlashCommandResult::Simple(Some("Must provide a channel".to_string())),
+            }) => channel.id,
+            None => command.channel_id,
+            _ => return SlashCommandResult::Simple(Some("Invalid channel provided".to_string())),
         };
-        let channel_id = channel.id;
 
         let guild_id = command.guild_id.unwrap();
         services::select_channel(&guild_id, channel_id).await;
@@ -33,9 +33,9 @@ impl SlashCommand for SelectChannel {
                 CreateCommandOption::new(
                     CommandOptionType::Channel,
                     "channel",
-                    "channel to speech",
+                    "channel to speech (defaults to current channel if not specified)",
                 )
-                .required(true),
+                .required(false),
             )
     }
 }
