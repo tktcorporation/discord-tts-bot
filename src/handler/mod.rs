@@ -106,6 +106,7 @@ impl EventHandler for Handler {
             }
         });
 
+        // 新しいコマンドを登録
         Command::set_global_commands(&ctx.http, SlashCommands::get_commands())
             .await
             .expect("Failed to set global commands");
