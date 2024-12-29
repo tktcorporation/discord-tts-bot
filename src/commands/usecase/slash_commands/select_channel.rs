@@ -28,7 +28,7 @@ impl SlashCommand for SelectChannel {
 
     fn register(command: CreateCommand) -> CreateCommand {
         command
-            .description("select a channel to speech")
+            .description("select a channel to speech (optional)")
             .add_option(
                 CreateCommandOption::new(
                     CommandOptionType::Channel,
