@@ -42,6 +42,21 @@ pub enum SlashCommands {
 }
 
 impl SlashCommands {
+    pub fn get_commands() -> Vec<CreateCommand> {
+        vec![
+            Self::Clear.register(),
+            Self::Join.register(),
+            Self::Leave.register(),
+            Self::Ping.register(),
+            Self::Play.register(),
+            Self::Invite.register(),
+            Self::Skip.register(),
+            Self::Queue.register(),
+            Self::Repeat.register(),
+            Self::SelectChannel.register(),
+        ]
+    }
+
     pub fn from_str(command: &str) -> Option<Self> {
         match command {
             "clear" => Some(Self::Clear),

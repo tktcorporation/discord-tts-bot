@@ -14,7 +14,6 @@ use serenity::model::gateway::Ready;
 mod error;
 mod model;
 use error::{format_err, report_error};
-use model::context::Context as Ctx;
 
 use crate::commands::slash_commands::{SlashCommandResult, SlashCommands};
 use model::{
@@ -28,6 +27,10 @@ use usecase::text_to_speech::SpeechMessage;
 
 #[cfg(feature = "tts")]
 use usecase::{speech_welcome_see_you::speech_greeting, text_to_speech::text_to_speech};
+
+use crate::infrastructure::tmp_path;
+use std::fs;
+use tokio::time::{interval, Duration};
 
 pub struct Handler;
 
@@ -87,27 +90,25 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
 
-        Command::set_global_commands(
-            &ctx.http,
-            vec![
-                SlashCommands::Join.register(),
-                SlashCommands::Leave.register(),
-                SlashCommands::Ping.register(),
-                SlashCommands::Clear.register(),
-                SlashCommands::Invite.register(),
-                SlashCommands::SelectChannel.register(),
-                SlashCommands::Skip.register(),
-                #[cfg(feature = "music")]
-                SlashCommands::Play.register(),
-                SlashCommands::Repeat.register(),
-                SlashCommands::Queue.register(),
-            ],
-        )
-        .await
-        .unwrap();
+        let ctx_clone = ctx.clone();
+        tokio::spawn(async move {
+            let mut interval = interval(Duration::from_secs(300));
+            loop {
+                interval.tick().await;
+                if let Ok(entries) = fs::read_dir(tmp_path()) {
+                    let guild_count = entries
+                        .filter(|e| e.is_ok())
+                        .filter(|e| e.as_ref().unwrap().path().is_dir())
+                        .count();
+                    let activity = format!("{} サーバーで稼働中 | /help", guild_count);
+                    set_help_message_to_activity(&ctx_clone, &activity).await;
+                }
+            }
+        });
 
-        let cont = Ctx::new(ctx);
-        set_help_message_to_activity(Box::new(cont)).await;
+        Command::set_global_commands(&ctx.http, SlashCommands::get_commands())
+            .await
+            .expect("Failed to set global commands");
     }
 
     #[cfg(feature = "tts")]
