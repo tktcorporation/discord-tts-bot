@@ -49,11 +49,14 @@ impl CurrentVoiceState {
             Some(prev_state) => {
                 if self.state.channel_id.is_none() {
                     ChangeOfStates::Leave
-                } else if let (Some(prev_channel), Some(curr_channel)) = (prev_state.channel_id, self.state.channel_id) {
+                } else if let (Some(prev_channel), Some(curr_channel)) =
+                    (prev_state.channel_id, self.state.channel_id)
+                {
                     if prev_channel == curr_channel {
                         ChangeOfStates::Stay
                     } else if let Some(guild_id) = self.state.guild_id {
-                        let afk_channel_id = ctx.cache
+                        let afk_channel_id = ctx
+                            .cache
                             .guild(guild_id)
                             .and_then(|g| g.afk_metadata.clone())
                             .map(|m| m.afk_channel_id);
@@ -61,7 +64,9 @@ impl CurrentVoiceState {
                         if let Some(afk_channel_id) = afk_channel_id {
                             if prev_channel != afk_channel_id && curr_channel == afk_channel_id {
                                 ChangeOfStates::EnterAFK
-                            } else if prev_channel == afk_channel_id && curr_channel != afk_channel_id {
+                            } else if prev_channel == afk_channel_id
+                                && curr_channel != afk_channel_id
+                            {
                                 ChangeOfStates::LeaveAFK
                             } else {
                                 ChangeOfStates::Stay

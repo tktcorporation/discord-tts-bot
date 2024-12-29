@@ -5,7 +5,7 @@ use serenity::async_trait;
 #[async_trait]
 pub trait Speaker {
     #[cfg(feature = "aws")]
-    async fn speech(&self, msg: SpeechMessage);
+    async fn speech(&self, msg: SpeechMessage) -> Result<(), String>;
     fn guild_id(&self) -> serenity::model::id::GuildId;
 }
 

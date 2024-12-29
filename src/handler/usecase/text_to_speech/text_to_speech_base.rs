@@ -27,7 +27,12 @@ pub async fn text_to_speech(speaker: Box<dyn Speaker + Sync + Send>, msg: Messag
     if is_ignore_channel(speech_options.read_channel_id, &msg) {
         return;
     }
-    speaker.speech(msg.to_speech_message(speech_options)).await;
+    if let Err(e) = speaker.speech(msg.to_speech_message(speech_options)).await {
+        sentry::capture_message(
+            &format!("Failed to speech message: {:?}", e),
+            sentry::Level::Error,
+        );
+    }
 }
 
 #[cfg(feature = "tts")]
@@ -52,7 +57,7 @@ mod tests {
     async fn test_text_to_speech() {
         let mut speaker = MockSpeaker::new();
         let msg = message_factory("some message");
-        speaker.expect_speech().times(1).return_const(());
+        speaker.expect_speech().times(1).return_const(Ok(()));
         speaker
             .expect_guild_id()
             .times(1)

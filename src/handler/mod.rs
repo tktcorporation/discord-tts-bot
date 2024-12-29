@@ -20,14 +20,13 @@ use model::{
     voice::Voice,
 };
 pub mod usecase;
-use usecase::{
-    interface::Speaker,
-    set_help_message_to_activity::set_help_message_to_activity,
-    text_to_speech::SpeechMessage,
-};
+use usecase::set_help_message_to_activity::set_help_message_to_activity;
+#[cfg(test)]
+use usecase::text_to_speech::SpeechMessage;
 
 #[cfg(feature = "tts")]
 use usecase::{speech_welcome_see_you::speech_greeting, text_to_speech::text_to_speech};
+
 
 pub struct Handler;
 
@@ -61,10 +60,9 @@ impl EventHandler for Handler {
                 }
             };
 
-            let result = match command_result {
+            match command_result {
                 SlashCommandResult::Simple(None) => {
                     command.delete_response(&ctx.http).await.unwrap();
-                    return;
                 }
                 SlashCommandResult::Simple(Some(message)) => {
                     command
@@ -73,21 +71,11 @@ impl EventHandler for Handler {
                             EditInteractionResponse::default().content(message),
                         )
                         .await
+                        .unwrap();
                 }
                 SlashCommandResult::Embed(embed) => {
                     command
                         .edit_response(&ctx.http, EditInteractionResponse::default().embed(*embed))
-                        .await
-                }
-            };
-            match result {
-                Ok(_) => (),
-                Err(e) => {
-                    command
-                        .edit_response(
-                            &ctx,
-                            EditInteractionResponse::new().content(format!("{:?}", e)),
-                        )
                         .await
                         .unwrap();
                 }
@@ -140,7 +128,10 @@ impl EventHandler for Handler {
         let member = match state.voice_member().await {
             Ok(m) => m,
             Err(e) => {
-                println!("Error getting member: {:?}", e);
+                sentry::capture_message(
+                    &format!("Failed to get voice member: {:?}", e),
+                    sentry::Level::Error,
+                );
                 return;
             }
         };
@@ -149,7 +140,10 @@ impl EventHandler for Handler {
         let role = match member.role(&ctx).await {
             Ok(r) => r,
             Err(e) => {
-                println!("Error getting role: {:?}", e);
+                sentry::capture_message(
+                    &format!("Failed to get member role: {:?}", e),
+                    sentry::Level::Error,
+                );
                 return;
             }
         };
@@ -157,7 +151,10 @@ impl EventHandler for Handler {
         if let Role::Me = role {
             if let ChangeOfStates::Leave = change {
                 if let Err(e) = voice.remove().await {
-                    println!("Error removing voice: {:?}", e);
+                    sentry::capture_message(
+                        &format!("Failed to remove voice: {:?}", e),
+                        sentry::Level::Error,
+                    );
                 }
                 println!("removed");
             };
@@ -168,19 +165,35 @@ impl EventHandler for Handler {
         println!("new_voice_state: {:?}", new_voice_state);
 
         #[cfg(feature = "tts")]
-        let _ = speech_greeting(&ctx, &voice, &change, &member.user).await;
-        let _ = leave_if_alone(&ctx, &voice).await;
+        if let Err(e) = speech_greeting(&ctx, &voice, &change, &member.user).await {
+            sentry::capture_message(
+                &format!("Failed to speech greeting: {:?}", e),
+                sentry::Level::Error,
+            );
+        }
+        if let Err(e) = leave_if_alone(&ctx, &voice).await {
+            sentry::capture_message(
+                &format!("Failed to check/handle leave if alone: {:?}", e),
+                sentry::Level::Error,
+            );
+        }
     }
 }
 
-async fn leave_if_alone(ctx: &Context, voice: &Voice) {
+async fn leave_if_alone(ctx: &Context, voice: &Voice) -> Result<(), String> {
     use crate::model::voice::Error;
     match voice.is_alone(ctx).await {
-        Ok(true) => voice.remove().await.unwrap(),
-        Ok(false) => (),
+        Ok(true) => {
+            voice
+                .remove()
+                .await
+                .map_err(|e| format!("Failed to remove voice: {:?}", e))?;
+            Ok(())
+        }
+        Ok(false) => Ok(()),
         Err(e) => match e {
-            Error::ConnectionNotFound => (),
-            Error::NotInVoiceChannel => (),
+            Error::ConnectionNotFound => Ok(()),
+            Error::NotInVoiceChannel => Ok(()),
         },
     }
 }
@@ -188,12 +201,12 @@ async fn leave_if_alone(ctx: &Context, voice: &Voice) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use mockall::predicate::*;
     use mockall::mock;
+    use mockall::predicate::*;
 
     mock! {
         pub Voice {
-            async fn speech(&self, msg: SpeechMessage);
+            async fn speech(&self, msg: SpeechMessage) -> Result<(), String>;
         }
     }
 
@@ -218,10 +231,7 @@ mod tests {
         // 最初からAFKの状態のケース
         let old_deaf = true;
         let new_deaf = true;
-        assert!(
-            !(!old_deaf && new_deaf),
-            "既にAFKの状態で誤検知しています"
-        );
+        assert!(!(!old_deaf && new_deaf), "既にAFKの状態で誤検知しています");
     }
 
     #[tokio::test]
@@ -235,7 +245,7 @@ mod tests {
                 value: "おやすみなさい".to_string(),
             }))
             .times(1)
-            .return_once(|_| ());
+            .return_once(|_| Ok(()));
 
         // おはようございますのテスト
         mock_voice
@@ -244,17 +254,17 @@ mod tests {
                 value: "おはようございます".to_string(),
             }))
             .times(1)
-            .return_once(|_| ());
+            .return_once(|_| Ok(()));
 
         // メッセージの内容を確認
         let goodnight_msg = SpeechMessage {
             value: "おやすみなさい".to_string(),
         };
-        mock_voice.speech(goodnight_msg).await;
+        mock_voice.speech(goodnight_msg).await.unwrap();
 
         let morning_msg = SpeechMessage {
             value: "おはようございます".to_string(),
         };
-        mock_voice.speech(morning_msg).await;
+        mock_voice.speech(morning_msg).await.unwrap();
     }
 }
