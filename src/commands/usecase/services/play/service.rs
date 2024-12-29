@@ -1,7 +1,7 @@
 use serenity::{client::Context, model};
 
 use crate::constants;
-use crate::HttpKey;
+use crate::model::HttpKey;
 
 use super::Error;
 use super::TrackTiming;

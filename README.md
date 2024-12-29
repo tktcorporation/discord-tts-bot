@@ -10,6 +10,12 @@ Welcome to `discord-tts-bot`! This innovative Discord bot uses text-to-speech (T
 - **High Precision Text-to-Speech:** Utilizes AWS Polly for high accuracy in reading both Kanji and English text, providing a natural voice experience across diverse language environments.
 - **Text-to-Speech in Voice Channels:** Simply type, and the bot speaks in your voice channel.
 - **Easy to Set Up:** A few steps and your bot is ready on your server.
+- **Smart Voice Channel Interactions:** 
+  - Welcomes users with "いらっしゃい" when they join
+  - Says "いってらっしゃい" when users leave
+  - Says "おやすみなさい" when users move to AFK channel
+  - Says "おはようございます" when users return from AFK channel
+  - All messages include the user's nickname or username for a personalized experience
 
 ## Getting Started
 

@@ -15,12 +15,12 @@ pub struct VoiceMember {
 }
 
 impl VoiceMember {
-    pub async fn role(&self, ctx: &Context) -> Role {
+    pub async fn role(&self, ctx: &Context) -> Result<Role, String> {
         let current_user_id = ctx.cache.current_user().id;
         if current_user_id == self.user.id {
-            return Role::Me;
+            return Ok(Role::Me);
         }
-        Role::Other
+        Ok(Role::Other)
     }
 }
 
@@ -43,12 +43,40 @@ impl CurrentVoiceState {
     pub fn change_of_states(
         &self,
         previous_voice_state: Option<&voice::VoiceState>,
+        ctx: &Context,
     ) -> ChangeOfStates {
         match previous_voice_state {
-            // 他サーバーに反応しないように
-            Some(_) => {
+            Some(prev_state) => {
                 if self.state.channel_id.is_none() {
                     ChangeOfStates::Leave
+                } else if let (Some(prev_channel), Some(curr_channel)) =
+                    (prev_state.channel_id, self.state.channel_id)
+                {
+                    if prev_channel == curr_channel {
+                        ChangeOfStates::Stay
+                    } else if let Some(guild_id) = self.state.guild_id {
+                        let afk_channel_id = ctx
+                            .cache
+                            .guild(guild_id)
+                            .and_then(|g| g.afk_metadata.clone())
+                            .map(|m| m.afk_channel_id);
+
+                        if let Some(afk_channel_id) = afk_channel_id {
+                            if prev_channel != afk_channel_id && curr_channel == afk_channel_id {
+                                ChangeOfStates::EnterAFK
+                            } else if prev_channel == afk_channel_id
+                                && curr_channel != afk_channel_id
+                            {
+                                ChangeOfStates::LeaveAFK
+                            } else {
+                                ChangeOfStates::Stay
+                            }
+                        } else {
+                            ChangeOfStates::Stay
+                        }
+                    } else {
+                        ChangeOfStates::Stay
+                    }
                 } else {
                     ChangeOfStates::Stay
                 }
@@ -62,6 +90,8 @@ pub enum ChangeOfStates {
     Join,
     Leave,
     Stay,
+    EnterAFK,
+    LeaveAFK,
 }
 
 pub enum Role {

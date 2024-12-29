@@ -901,6 +901,7 @@ dependencies = [
  "aws-config",
  "aws-sdk-polly",
  "aws-types",
+ "futures",
  "html-escape",
  "hyper 1.5.2",
  "mockall",

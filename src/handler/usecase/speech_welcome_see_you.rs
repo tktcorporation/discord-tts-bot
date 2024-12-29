@@ -7,14 +7,20 @@ use serenity::model::prelude::User;
 use serenity::client::Context;
 
 #[cfg(feature = "tts")]
-pub async fn speech_greeting(ctx: &Context, voice: &Voice, change: &ChangeOfStates, user: &User) {
+pub async fn speech_greeting(
+    ctx: &Context,
+    voice: &Voice,
+    change: &ChangeOfStates,
+    user: &User,
+) -> Result<(), String> {
     let name = match user.nick_in(ctx, voice.guild_id()).await {
         Some(n) => n,
         None => user.name.clone(),
     };
     if let Some(message) = greeting_word(change, &name) {
-        voice.speech(message).await
+        voice.speech(message).await?;
     }
+    Ok(())
 }
 
 #[cfg(feature = "tts")]
@@ -23,6 +29,8 @@ fn greeting_word(change_of_states: &ChangeOfStates, name: &str) -> Option<Speech
         ChangeOfStates::Stay => None,
         ChangeOfStates::Leave => Some("いってらっしゃい"),
         ChangeOfStates::Join => Some("いらっしゃい"),
+        ChangeOfStates::EnterAFK => Some("おやすみなさい"),
+        ChangeOfStates::LeaveAFK => Some("おはようございます"),
     }
     .map(|message_prefix| SpeechMessage {
         value: format!("{name}さん{message_prefix}"),
