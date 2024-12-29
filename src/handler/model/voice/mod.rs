@@ -25,6 +25,7 @@ impl Speaker for Voice {
                     }
                 };
             let input = get_input_from_local(speech_file).await;
+            println!("play_input: {:?}", msg.value);
             play_input(&handler, input).await;
         }
     }
