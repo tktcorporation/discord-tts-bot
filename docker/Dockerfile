@@ -6,6 +6,7 @@ RUN apt-get update && \
     libopus-dev \
     build-essential \
     libssl-dev \
+    libssl3 \
     pkg-config \
     autoconf \
     automake \
@@ -54,6 +55,7 @@ RUN apt-get update && \
     libopus-dev \
     build-essential \
     libssl-dev \
+    libssl3 \
     pkg-config \
     autoconf \
     automake \

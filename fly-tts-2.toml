@@ -1,8 +1,3 @@
-# fly.toml app configuration file generated for shabeko-discord-bot on 2024-10-05T15:32:02Z
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
 app = 'shabeko-discord-bot'
 kill_signal = "SIGINT"
 kill_timeout = 5
