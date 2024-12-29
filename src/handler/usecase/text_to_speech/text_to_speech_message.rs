@@ -36,6 +36,7 @@ enum DiscordStringType {
     Emoji,
     Animoji,
     Mention,
+    Spoiler,
 }
 impl DiscordStringType {
     fn to_regex(&self) -> Regex {
@@ -45,6 +46,7 @@ impl DiscordStringType {
             DiscordStringType::Emoji => Regex::new(r"<:(.+?):[0-9]+?>").unwrap(),
             DiscordStringType::Animoji => Regex::new(r"<a:(.+?):[0-9]+?>").unwrap(),
             DiscordStringType::Mention => Regex::new(r"<@[0-9]+?>").unwrap(),
+            DiscordStringType::Spoiler => Regex::new(r"\|\|.+?\|\|").unwrap(),
         }
     }
     fn to_convert_type(&self) -> ConvertType {
@@ -54,6 +56,7 @@ impl DiscordStringType {
             DiscordStringType::Emoji => ConvertType::MatchString,
             DiscordStringType::Animoji => ConvertType::MatchString,
             DiscordStringType::Mention => ConvertType::Empty,
+            DiscordStringType::Spoiler => ConvertType::Empty,
         }
     }
     fn from_str(s: &str) -> Option<DiscordStringType> {
@@ -77,6 +80,10 @@ impl DiscordStringType {
         if type_.to_regex().is_match(s) {
             return Some(type_);
         }
+        let type_ = DiscordStringType::Spoiler;
+        if type_.to_regex().is_match(s) {
+            return Some(type_);
+        }
         None
     }
 }
@@ -89,11 +96,10 @@ impl ConvertType {
     fn convert(&self, regex: &Regex, str: &str) -> String {
         match self {
             ConvertType::Empty => regex.replace_all(str, "").to_string(),
-            ConvertType::MatchString => regex
-                .captures_iter(str)
-                .collect::<Vec<_>>()
-                .iter()
-                .fold(str.to_string(), |acc, cap| acc.replace(&cap[0], &cap[1])),
+            ConvertType::MatchString => {
+                let replacement = |cap: &regex::Captures| cap[1].to_string();
+                regex.replace_all(str, replacement).to_string()
+            }
         }
     }
 }
@@ -174,6 +180,20 @@ mod tests {
             let str = "aaa<#795680552845443113>rrr<#795680552845443113>sss";
             let result = convert_discord_string(str);
             assert_eq!("aaarrrsss", result);
+        }
+
+        #[test]
+        fn test_spoiler_string() {
+            let str = "これは||ネタバレ内容||です";
+            let result = convert_discord_string(str);
+            assert_eq!("これはです", result);
+        }
+
+        #[test]
+        fn test_multiple_spoiler_string() {
+            let str = "これは||ネタバレ1||と||ネタバレ2||です";
+            let result = convert_discord_string(str);
+            assert_eq!("これはとです", result);
         }
     }
 

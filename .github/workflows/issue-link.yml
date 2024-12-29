@@ -10,6 +10,6 @@ jobs:
       - uses: tkt-actions/add-issue-links@v1.8.2
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
-          branch-prefix: '/'
+          branch-prefix: ''
           resolve: 'false'
           link-style: 'comment'
