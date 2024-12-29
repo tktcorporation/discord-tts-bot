@@ -12,14 +12,23 @@ use super::SpeechFilePath;
 /// ## Examples
 ///
 /// ```no_run
+/// use polly::types::VoiceId;
+/// use std::path::{Path, PathBuf};
+/// use discord_tts_bot::infrastructure::tts::generate_speech_file;
+/// use discord_tts_bot::infrastructure::SpeechFilePath;
+///
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// let path = PathBuf::from("sample");
+/// let file_path = SpeechFilePath::from(path);
 /// let result = generate_speech_file(
-///   String::from("おはようございます"),
-///   VoiceId::Mizuki,
-///   "sample",
-///   true,
-/// )
-/// .await;
-/// Path::new(result.unwrap()).exists(); // true or false
+///     "おはようございます",
+///     VoiceId::Mizuki,
+///     &file_path,
+///     true,
+/// ).await?;
+/// assert!(Path::new(&result).exists());
+/// # Ok(())
+/// # }
 /// ```
 pub async fn generate_speech_file(
     content: &str,

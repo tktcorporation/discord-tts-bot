@@ -2,25 +2,16 @@ use std::env;
 
 use reqwest::Client as HttpClient;
 use serenity::{client::Client, prelude::GatewayIntents};
-use songbird::typemap::TypeMapKey;
-
 use songbird::SerenityInit;
 
-mod handler;
-use handler::Handler;
-
-mod infrastructure;
+use discord_tts_bot::handler::Handler;
+use discord_tts_bot::model::HttpKey;
 
 mod commands;
-
-mod model;
-
 mod constants;
-
-pub struct HttpKey;
-impl TypeMapKey for HttpKey {
-    type Value = HttpClient;
-}
+mod handler;
+mod infrastructure;
+mod model;
 
 #[tokio::main]
 async fn main() {

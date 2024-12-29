@@ -5,6 +5,8 @@ use super::config;
 #[cfg(feature = "tts")]
 use super::text_to_speech_message::Message;
 #[cfg(feature = "tts")]
+use crate::handler::error::{format_err, report_error};
+#[cfg(feature = "tts")]
 use crate::infrastructure::GuildPath;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -28,10 +30,7 @@ pub async fn text_to_speech(speaker: Box<dyn Speaker + Sync + Send>, msg: Messag
         return;
     }
     if let Err(e) = speaker.speech(msg.to_speech_message(speech_options)).await {
-        sentry::capture_message(
-            &format!("Failed to speech message: {:?}", e),
-            sentry::Level::Error,
-        );
+        report_error(&format_err("Failed to speech message", e));
     }
 }
 
@@ -47,9 +46,8 @@ fn is_ignore_channel(read_channel_id: Option<u64>, msg: &Message) -> bool {
 
 #[cfg(test)]
 mod tests {
-    #[cfg(test)]
-    use super::super::super::interface::MockSpeaker;
     use super::*;
+    use crate::handler::usecase::interface::MockSpeaker;
     use regex::Regex;
     use serenity::model::{channel::Message as SerenityMessage, id::GuildId};
 

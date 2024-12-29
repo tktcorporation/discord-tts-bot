@@ -11,7 +11,9 @@ use serenity::{
 
 use serenity::model::gateway::Ready;
 
+mod error;
 mod model;
+use error::{format_err, report_error};
 use model::context::Context as Ctx;
 
 use crate::commands::slash_commands::{SlashCommandResult, SlashCommands};
@@ -26,7 +28,6 @@ use usecase::text_to_speech::SpeechMessage;
 
 #[cfg(feature = "tts")]
 use usecase::{speech_welcome_see_you::speech_greeting, text_to_speech::text_to_speech};
-
 
 pub struct Handler;
 
@@ -128,10 +129,7 @@ impl EventHandler for Handler {
         let member = match state.voice_member().await {
             Ok(m) => m,
             Err(e) => {
-                sentry::capture_message(
-                    &format!("Failed to get voice member: {:?}", e),
-                    sentry::Level::Error,
-                );
+                report_error(&format_err("Failed to get voice member", e));
                 return;
             }
         };
@@ -140,10 +138,7 @@ impl EventHandler for Handler {
         let role = match member.role(&ctx).await {
             Ok(r) => r,
             Err(e) => {
-                sentry::capture_message(
-                    &format!("Failed to get member role: {:?}", e),
-                    sentry::Level::Error,
-                );
+                report_error(&format_err("Failed to get member role", e));
                 return;
             }
         };
@@ -151,10 +146,7 @@ impl EventHandler for Handler {
         if let Role::Me = role {
             if let ChangeOfStates::Leave = change {
                 if let Err(e) = voice.remove().await {
-                    sentry::capture_message(
-                        &format!("Failed to remove voice: {:?}", e),
-                        sentry::Level::Error,
-                    );
+                    report_error(&format_err("Failed to remove voice", e));
                 }
                 println!("removed");
             };
@@ -166,16 +158,10 @@ impl EventHandler for Handler {
 
         #[cfg(feature = "tts")]
         if let Err(e) = speech_greeting(&ctx, &voice, &change, &member.user).await {
-            sentry::capture_message(
-                &format!("Failed to speech greeting: {:?}", e),
-                sentry::Level::Error,
-            );
+            report_error(&format_err("Failed to speech greeting", e));
         }
         if let Err(e) = leave_if_alone(&ctx, &voice).await {
-            sentry::capture_message(
-                &format!("Failed to check/handle leave if alone: {:?}", e),
-                sentry::Level::Error,
-            );
+            report_error(&format_err("Failed to check/handle leave if alone", e));
         }
     }
 }
@@ -231,7 +217,7 @@ mod tests {
         // 最初からAFKの状態のケース
         let old_deaf = true;
         let new_deaf = true;
-        assert!(!(!old_deaf && new_deaf), "既にAFKの状態で誤検知しています");
+        assert!(old_deaf || !new_deaf, "既にAFKの状態で誤検知しています");
     }
 
     #[tokio::test]

@@ -1,5 +1,6 @@
 use super::super::usecase::{interface::Speaker, text_to_speech::SpeechMessage};
 use crate::constants;
+use crate::handler::error::{format_err, report_error};
 #[cfg(feature = "aws")]
 use crate::infrastructure::tts::generate_speech_file;
 use crate::infrastructure::{GuildPath, SoundPath, SpeechFilePath};
@@ -11,7 +12,7 @@ use songbird::input::Input;
 #[async_trait]
 #[cfg_attr(feature = "mock", mockall::automock)]
 impl Speaker for Voice {
-    #[cfg(feature = "aws")]
+    #[cfg(feature = "tts")]
     async fn speech(&self, msg: SpeechMessage) -> Result<(), String> {
         if let Ok(handler) = self.handler().await {
             let file_path = SpeechFilePath::new(SoundPath::new(GuildPath::new(&self.guild_id)));
@@ -19,8 +20,8 @@ impl Speaker for Voice {
                 match generate_speech_file(&msg.value, VoiceId::Mizuki, &file_path, false).await {
                     Ok(file) => file,
                     Err(e) => {
-                        let err = format!("Failed to generate speech file: {:?}", e);
-                        sentry::capture_message(&err, sentry::Level::Error);
+                        let err = format_err("Failed to generate speech file", e);
+                        report_error(&err);
                         return Err(err);
                     }
                 };
@@ -29,21 +30,21 @@ impl Speaker for Voice {
                 Ok(input) => {
                     println!("play_input: {:?}", msg.value);
                     if let Err(e) = play_input(&handler, input).await {
-                        let err = format!("Failed to play input: {:?}", e);
-                        sentry::capture_message(&err, sentry::Level::Error);
+                        let err = format_err("Failed to play input", e);
+                        report_error(&err);
                         return Err(err);
                     }
                     Ok(())
                 }
                 Err(e) => {
-                    let err = format!("Failed to get input from local: {:?}", e);
-                    sentry::capture_message(&err, sentry::Level::Error);
+                    let err = format_err("Failed to get input from local", e);
+                    report_error(&err);
                     Err(err)
                 }
             }
         } else {
             let err = "Failed to get voice handler".to_string();
-            sentry::capture_message(&err, sentry::Level::Error);
+            report_error(&err);
             Err(err)
         }
     }
