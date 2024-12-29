@@ -1,6 +1,6 @@
 [package]
 name = "discord-tts-bot"
-version = "2.1.5"
+version = "2.2.0"
 authors = ["tktcorporation"]
 edition = "2021"
 license = "MIT"
