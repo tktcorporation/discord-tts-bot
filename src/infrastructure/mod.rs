@@ -8,7 +8,9 @@ pub use aws::tts;
 pub use path_router::SharedSoundPath;
 
 // root/tmp/guild_id
+pub use path_router::tmp_path;
 pub use path_router::GuildPath;
+
 mod sound_path;
 // root/tmp/guild_id/sounds
 pub use sound_path::SoundPath;

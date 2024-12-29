@@ -9,6 +9,7 @@ fn root_path() -> PathBuf {
     let base = env!("CARGO_MANIFEST_DIR");
     Path::new(base).into()
 }
-fn tmp_path() -> PathBuf {
+
+pub fn tmp_path() -> PathBuf {
     root_path().join("tmp")
 }
