@@ -18,7 +18,8 @@ async fn main() {
     let _guard = sentry::init(sentry::ClientOptions {
         dsn: env::var("SENTRY_DSN").ok().and_then(|dsn| dsn.parse().ok()),
         release: sentry::release_name!(),
-        traces_sample_rate: 1.0,
+        auto_session_tracking: true,
+        debug: true,
         ..Default::default()
     });
 
