@@ -36,7 +36,7 @@ sentry = { version = "0.35.0", features = ["tracing"] }
 futures = "0.3"
 
 [dependencies.reqwest]
-version = "0.11"
+version = "0.12"
 features = ["stream"]
 
 [dependencies.songbird]
