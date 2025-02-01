@@ -32,7 +32,7 @@ html-escape = "0.2.13"
 mockall = "0.13.0"
 mockall_double = "0.3.0"
 serde = "1.0.217"
-sentry = { version = "0.35.0", features = ["tracing"] }
+sentry = { version = "0.36.0", features = ["tracing"] }
 futures = "0.3"
 
 [dependencies.reqwest]
@@ -52,5 +52,5 @@ version = "0.12.4"
 features = ["client", "gateway", "cache", "standard_framework", "voice", "rustls_backend", "http"]
 
 [dependencies.tokio]
-version = "1.36.0"
+version = "1.43.0"
 features = ["macros", "rt-multi-thread"]
