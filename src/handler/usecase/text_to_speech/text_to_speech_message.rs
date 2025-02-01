@@ -17,10 +17,10 @@ impl Message {
         // convert discord styled string for speech
         let converted = convert_discord_string(&str);
 
-        // 100文字を超えた場合は、トリムして語尾に「うぬんかんぬんうんぬんかんぬん」を追加
-        let message = if converted.chars().count() > 100 {
-            let trimmed = converted.chars().take(100).collect::<String>();
-            format!("{}うぬんかんぬんうんぬんかんぬん", trimmed)
+        // 50文字を超えた場合は、トリムして語尾に「うぬんかんぬん」を追加
+        let message = if converted.chars().count() > 50 {
+            let trimmed = converted.chars().take(50).collect::<String>();
+            format!("{}うぬんかんぬん", trimmed)
         } else {
             converted
         };
@@ -257,7 +257,7 @@ mod tests {
             let long_text = "あ".repeat(100);
             let message = message_factory(format!("{}いいいい", long_text).as_str());
             assert_eq!(
-                format!("{}うぬんかんぬんうんぬんかんぬん", long_text),
+                format!("ああああああああああああああああああああああああああああああああああああああああああああああああああうぬんかんぬん"),
                 message
                     .to_speech_message(SpeechOptions {
                         read_channel_id: None
