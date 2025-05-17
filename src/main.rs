@@ -20,12 +20,12 @@ async fn main() {
         release: sentry::release_name!(),
         auto_session_tracking: true,
         debug: true,
+        sample_rate: 0.005,
         ..Default::default()
     });
 
     tracing_subscriber::fmt::init();
 
-    // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
 
