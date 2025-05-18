@@ -3,10 +3,10 @@
 install:
 	# Rustupの更新とインストール
 	rustup update
-	rustup install nightly
+	rustup install stable
 	# 必要なコンポーネントの追加
 	rustup component add clippy rustfmt rust-analysis rust-src rls
-	rustup component add clippy --toolchain nightly-$(shell rustup show active-toolchain | awk '{print $$1}' | cut -d '-' -f2-)
+	rustup component add clippy
 	# cargo-binstallのインストール
 	cargo install cargo-binstall
 	# sccacheのインストールと環境変数の設定
@@ -36,7 +36,7 @@ ci: lint hack test
 fmt:
 	cargo fmt --all
 lint:
-	cargo +nightly clippy --all --all-targets --all-features --fix -Z unstable-options --allow-dirty --allow-staged
+	cargo clippy --all --all-targets --all-features --fix -Z unstable-options --allow-dirty --allow-staged
 hack:
 	cargo hack check --each-feature --no-dev-deps --all
 test-all:
@@ -47,12 +47,3 @@ watch:
 	cargo watch --features tts,music -x fmt -x clippy
 run:
 	cargo run --all-features
-# install:
-# 	rustup update
-# 	rustup install nightly
-# 	rustup component add clippy rustfmt rust-analysis rust-src rls
-# 	rustup component add clippy --toolchain nightly-x86_64-unknown-linux-gnu
-# 	cargo install cargo-binstall
-# 	cargo binstall sccache --locked && export RUSTC_WRAPPER=$(which sccache)
-# 	cargo binstall cargo-watch cargo-edit cargo-hack
-# 	cargo install cargo-audit --features=fix
