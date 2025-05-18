@@ -36,7 +36,7 @@ ci: lint hack test
 fmt:
 	cargo fmt --all
 lint:
-	cargo clippy --all --all-targets --all-features --fix -Z unstable-options --allow-dirty --allow-staged
+	cargo clippy --all --all-targets --all-features --fix --allow-dirty --allow-staged
 hack:
 	cargo hack check --each-feature --no-dev-deps --all
 test-all:
