@@ -50,9 +50,9 @@ impl EventHandler for Handler {
                 .await
                 .unwrap();
 
-            let command_result = match SlashCommands::from_str(command.data.name.as_str()) {
-                Some(slash_command) => slash_command.run(&ctx, &command).await,
-                None => {
+            let command_result = match command.data.name.as_str().parse::<SlashCommands>() {
+                Ok(slash_command) => slash_command.run(&ctx, &command).await,
+                Err(_) => {
                     command
                         .edit_response(
                             &ctx.http,
