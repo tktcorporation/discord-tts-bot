@@ -1,13 +1,6 @@
-use serenity::async_trait;
 use serenity::client::Context;
 use serenity::gateway::ActivityData;
 use serenity::model::user::OnlineStatus;
-
-#[cfg_attr(test, mockall::automock)]
-#[async_trait]
-pub trait ActivityController {
-    async fn set_activity(&self, activity: ActivityData);
-}
 
 pub async fn set_help_message_to_activity(ctx: &Context, message: &str) {
     let activity = ActivityData::playing(message);

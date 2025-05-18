@@ -1,4 +1,5 @@
 use serenity::async_trait;
+use std::str::FromStr;
 
 mod clear;
 mod invite;
@@ -57,22 +58,6 @@ impl SlashCommands {
         ]
     }
 
-    pub fn from_str(command: &str) -> Option<Self> {
-        match command {
-            "clear" => Some(Self::Clear),
-            "join" => Some(Self::Join),
-            "leave" => Some(Self::Leave),
-            "ping" => Some(Self::Ping),
-            "play" => Some(Self::Play),
-            "invite" => Some(Self::Invite),
-            "skip" => Some(Self::Skip),
-            "queue" => Some(Self::Queue),
-            "repeat" => Some(Self::Repeat),
-            "select_channel" => Some(Self::SelectChannel),
-            _ => None,
-        }
-    }
-
     pub async fn run(&self, ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
         match self {
             Self::Clear => clear::Clear::run(ctx, command).await,
@@ -102,6 +87,26 @@ impl SlashCommands {
             Self::SelectChannel => {
                 select_channel::SelectChannel::register(CreateCommand::new("select_channel"))
             }
+        }
+    }
+}
+
+impl FromStr for SlashCommands {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "clear" => Ok(Self::Clear),
+            "join" => Ok(Self::Join),
+            "leave" => Ok(Self::Leave),
+            "ping" => Ok(Self::Ping),
+            "play" => Ok(Self::Play),
+            "invite" => Ok(Self::Invite),
+            "skip" => Ok(Self::Skip),
+            "queue" => Ok(Self::Queue),
+            "repeat" => Ok(Self::Repeat),
+            "select_channel" => Ok(Self::SelectChannel),
+            _ => Err(()),
         }
     }
 }

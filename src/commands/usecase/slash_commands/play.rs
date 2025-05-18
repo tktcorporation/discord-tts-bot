@@ -27,7 +27,7 @@ impl SlashCommand for Play {
         let guild_id = command.guild_id.unwrap();
 
         match services::play(ctx, guild_id, command.channel_id, url).await {
-            Ok(_) => SlashCommandResult::Simple(Some(format!("Queue {}", url))),
+            Ok(_) => SlashCommandResult::Simple(Some(format!("Queue {url}"))),
             Err(e) => match e {
                 services::error::Error::NotInVoiceChannel => {
                     use crate::handler::usecase::text_to_speech::speech_options;
@@ -51,10 +51,7 @@ impl SlashCommand for Play {
                         return SlashCommandResult::Simple(Some(e.to_string()));
                     };
 
-                    SlashCommandResult::Simple(Some(format!(
-                        "{} and Queue {}",
-                        joined_message, url
-                    )))
+                    SlashCommandResult::Simple(Some(format!("{joined_message} and Queue {url}")))
                 }
                 _ => SlashCommandResult::Simple(Some(e.to_string())),
             },

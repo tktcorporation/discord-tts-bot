@@ -39,8 +39,8 @@ pub async fn send_track_info_message(
             None => "Unknown",
         };
         let builder = CreateMessage::default().embed(CreateEmbed::default().title(match timing {
-            TrackTiming::Added => format!("Added to queue - {}", title),
-            TrackTiming::NowPlaying => format!("Now playing - {}", title),
+            TrackTiming::Added => format!("Added to queue - {title}"),
+            TrackTiming::NowPlaying => format!("Now playing - {title}"),
         }));
         channel_id.send_message(http, builder).await.unwrap();
     }

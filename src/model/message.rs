@@ -1,7 +1,5 @@
 #[cfg(feature = "tts")]
 use serenity::model::channel::Message as SerenityMessage;
-#[cfg(feature = "tts")]
-use std::env;
 
 #[cfg(feature = "tts")]
 pub struct Message {
@@ -12,17 +10,6 @@ pub struct Message {
 impl Message {
     pub fn new(msg: SerenityMessage) -> Message {
         Message { msg }
-    }
-    pub fn is_command(&self) -> bool {
-        if self.msg.content.starts_with(
-            (env::var("DISCORD_CMD_PREFIX").expect("Expected a command prefix in the environment")
-                + " ")
-                .as_str(),
-        ) {
-            return true;
-        };
-
-        false
     }
     pub fn is_from_bot(&self) -> bool {
         if self.msg.author.bot {
@@ -52,30 +39,6 @@ mod tests {
     use super::*;
 
     #[cfg(test)]
-    mod is_command_tests {
-        use super::*;
-
-        #[test]
-        fn test_is_command_msg() {
-            let message = message_factory("a", false, false);
-            assert!(!message.is_command());
-        }
-
-        #[test]
-        fn test_is_command_msg_and() {
-            let message = message_factory("hogehoege&sa", false, false);
-            assert!(!message.is_command());
-        }
-
-        #[test]
-        fn test_is_command_msg_cmd_pref() {
-            let content = &(env::var("DISCORD_CMD_PREFIX").unwrap() + " hogehoge")[..];
-            let message = message_factory(content, true, false);
-            assert!(message.is_command());
-        }
-    }
-
-    #[cfg(test)]
     mod is_from_bot_tests {
         use super::*;
 
@@ -89,13 +52,6 @@ mod tests {
         fn test_is_from_bot_msg_and() {
             let message = message_factory("hogehoege&sa", true, false);
             assert!(message.is_from_bot());
-        }
-
-        #[test]
-        fn test_is_from_bot_msg_cmd_pref() {
-            let content = &(env::var("DISCORD_CMD_PREFIX").unwrap() + " hogehoge")[..];
-            let message = message_factory(content, false, false);
-            assert!(!message.is_from_bot());
         }
     }
 

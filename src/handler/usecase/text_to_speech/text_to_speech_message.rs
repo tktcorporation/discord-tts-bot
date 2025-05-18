@@ -20,7 +20,7 @@ impl Message {
         // 50文字を超えた場合は、トリムして語尾に「うぬんかんぬん」を追加
         let message = if converted.chars().count() > 50 {
             let trimmed = converted.chars().take(50).collect::<String>();
-            format!("{}うぬんかんぬん", trimmed)
+            format!("{trimmed}うぬんかんぬん")
         } else {
             converted
         };
@@ -255,7 +255,7 @@ mod tests {
         #[test]
         fn test_trimmed_message() {
             let long_text = "あ".repeat(100);
-            let message = message_factory(format!("{}いいいい", long_text).as_str());
+            let message = message_factory(format!("{long_text}いいいい").as_str());
             assert_eq!(
                 format!("ああああああああああああああああああああああああああああああああああああああああああああああああああうぬんかんぬん"),
                 message

@@ -16,6 +16,7 @@ pub enum Error {
     SerenityError(SerenityError),
     AudioStreamError(AudioStreamError),
     ControlError(songbird::error::ControlError),
+    PlayError(String),
 }
 
 impl fmt::Display for Error {
@@ -28,6 +29,7 @@ impl fmt::Display for Error {
             Error::SerenityError(e) => e.fmt(f),
             Error::AudioStreamError(e) => e.fmt(f),
             Error::ControlError(e) => e.fmt(f),
+            Error::PlayError(s) => f.write_str(s),
         }
     }
 }

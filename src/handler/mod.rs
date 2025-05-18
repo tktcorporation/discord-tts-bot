@@ -38,7 +38,7 @@ pub struct Handler;
 impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {
-            println!("Received command interaction: {command:#?}");
+            println!("Received command interaction: {}", command.data.name);
 
             command
                 .create_response(
@@ -50,9 +50,9 @@ impl EventHandler for Handler {
                 .await
                 .unwrap();
 
-            let command_result = match SlashCommands::from_str(command.data.name.as_str()) {
-                Some(slash_command) => slash_command.run(&ctx, &command).await,
-                None => {
+            let command_result = match command.data.name.as_str().parse::<SlashCommands>() {
+                Ok(slash_command) => slash_command.run(&ctx, &command).await,
+                Err(_) => {
                     command
                         .edit_response(
                             &ctx.http,
@@ -100,7 +100,7 @@ impl EventHandler for Handler {
                         .filter(|e| e.is_ok())
                         .filter(|e| e.as_ref().unwrap().path().is_dir())
                         .count();
-                    let activity = format!("{} サーバーで稼働中 | /help", guild_count);
+                    let activity = format!("{guild_count} サーバーで稼働中 | /help");
                     set_help_message_to_activity(&ctx_clone, &activity).await;
                 }
             }
@@ -155,8 +155,8 @@ impl EventHandler for Handler {
             return println!("This is me(bot). My entering is ignored.");
         }
 
-        println!("old_voice_state: {:?}", old_voice_state);
-        println!("new_voice_state: {:?}", new_voice_state);
+        println!("old_voice_state: {old_voice_state:?}");
+        println!("new_voice_state: {new_voice_state:?}");
 
         #[cfg(feature = "tts")]
         if let Err(e) = speech_greeting(&ctx, &voice, &change, &member.user).await {
@@ -175,7 +175,7 @@ async fn leave_if_alone(ctx: &Context, voice: &Voice) -> Result<(), String> {
             voice
                 .remove()
                 .await
-                .map_err(|e| format!("Failed to remove voice: {:?}", e))?;
+                .map_err(|e| format!("Failed to remove voice: {e:?}"))?;
             Ok(())
         }
         Ok(false) => Ok(()),

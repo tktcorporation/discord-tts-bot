@@ -33,7 +33,6 @@ To set up your `discord-tts-bot`, configure the following environment variables:
    - **`AWS_ACCESS_KEY_ID`**
    - **`AWS_SECRET_ACCESS_KEY`**
    - **`AWS_REGION`**: Set these to integrate AWS Polly for high-quality text-to-speech conversion.
-3. **`DISCORD_CMD_PREFIX`**: This is the prefix used for calling the bot commands in Discord. It can be any character or sequence of your choice.
 
 ### Running the Bot
 1. Invite the bot to your Discord server.

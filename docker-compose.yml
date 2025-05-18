@@ -13,7 +13,6 @@ services:
       - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
       - AWS_REGION=$AWS_REGION
-      - DISCORD_CMD_PREFIX=${DISCORD_CMD_PREFIX:-!}
       - SENTRY_DSN=$SENTRY_DSN
     volumes:
       - .:/workspace:cached

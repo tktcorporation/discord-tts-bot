@@ -36,12 +36,12 @@ sentry = { version = "0.36.0", features = ["tracing"] }
 futures = "0.3"
 
 [dependencies.reqwest]
-version = "0.11"
+version = "0.12"
 features = ["stream"]
 
 [dependencies.songbird]
-version = "0.4.6"
-features = ["builtin-queue"]
+version = "0.5.0"
+features = ["builtin-queue", "driver", "gateway"]
 
 [dependencies.symphonia]
 version = "0.5.2"
