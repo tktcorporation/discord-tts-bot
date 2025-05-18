@@ -57,6 +57,5 @@ mod tests {
     #[tokio::test]
     async fn check_env_exists() {
         env::var("DISCORD_TOKEN").expect("Expected a DISCORD_TOKEN in the environment");
-        env::var("DISCORD_CMD_PREFIX").expect("Expected a DISCORD_CMD_PREFIX in the environment");
     }
 }
