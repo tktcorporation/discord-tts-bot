@@ -17,7 +17,7 @@ pub struct SpeechMessage {
 #[cfg(feature = "tts")]
 pub async fn text_to_speech(speaker: Box<dyn Speaker + Sync + Send>, msg: Message) {
     // If it's a bot message or command, ignore it.
-    if msg.is_from_bot() || msg.is_command() {
+    if msg.is_from_bot() {
         return;
     };
     let config = config::client::new(GuildPath::new(&speaker.guild_id()))

@@ -54,13 +54,13 @@ impl Speaker for Voice {
 }
 
 async fn get_input_from_local(file_path: String) -> Result<Input, std::io::Error> {
-    use songbird::input::codecs::{CODEC_REGISTRY, PROBE};
+    use songbird::input::codecs;
     let in_memory = tokio::fs::read(file_path).await?;
     let in_memory_input: songbird::input::Input = songbird::input::Input::from(in_memory);
     in_memory_input
-        .make_playable_async(&CODEC_REGISTRY, &PROBE)
+        .make_playable_async(codecs::get_codec_registry(), codecs::get_probe())
         .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
+        .map_err(std::io::Error::other)
 }
 
 async fn play_input(
@@ -71,7 +71,7 @@ async fn play_input(
     let audio = handler.enqueue_input(input).await;
     audio
         .set_volume(constants::volume::VOICE)
-        .map_err(|e| format!("Failed to set volume: {:?}", e))?;
+        .map_err(|e| format!("Failed to set volume: {e:?}"))?;
     Ok(())
 }
 
