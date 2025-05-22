@@ -921,7 +921,7 @@ dependencies = [
  "hyper 1.6.0",
  "mockall",
  "mockall_double",
- "rand 0.8.5",
+ "rand 0.9.1",
  "regex",
  "reqwest 0.12.15",
  "sentry",
