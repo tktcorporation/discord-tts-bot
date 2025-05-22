@@ -2,6 +2,7 @@ use super::speech_options::SpeechOptions;
 use super::SpeechMessage;
 pub use crate::model::Message;
 use regex::Regex;
+use regex::RegexBuilder;
 
 impl Message {
     /// Discordのメッセージを読み上げ用のメッセージに変換します。
@@ -13,22 +14,23 @@ impl Message {
     pub fn to_speech_message(&self, _options: SpeechOptions) -> SpeechMessage {
         let content = self.get_content();
 
-        // urlをスキップ
-        let str = content
+        // 最初にDiscord特有表現（スポイラーを含む）を処理
+        let converted_content = convert_discord_string(&content);
+
+        // 次にURLをスキップ
+        let str_after_url_skip = converted_content
             .split_whitespace()
             .filter(|word| !word.starts_with("http"))
             .collect::<Vec<&str>>()
             .join(" ");
 
-        // convert discord styled string for speech
-        let converted = convert_discord_string(&str);
-
+        // 最後に50文字制限
         // 50文字を超えた場合は、トリムして語尾に「うぬんかんぬん」を追加
-        let message = if converted.chars().count() > 50 {
-            let trimmed = converted.chars().take(50).collect::<String>();
+        let message = if str_after_url_skip.chars().count() > 50 {
+            let trimmed = str_after_url_skip.chars().take(50).collect::<String>();
             format!("{trimmed}うぬんかんぬん")
         } else {
-            converted
+            str_after_url_skip
         };
 
         SpeechMessage { value: message }
@@ -54,7 +56,10 @@ impl DiscordStringType {
             DiscordStringType::Emoji => Regex::new(r"<:(.+?):[0-9]+?>").unwrap(),
             DiscordStringType::Animoji => Regex::new(r"<a:(.+?):[0-9]+?>").unwrap(),
             DiscordStringType::Mention => Regex::new(r"<@[0-9]+?>").unwrap(),
-            DiscordStringType::Spoiler => Regex::new(r"\|\|.+?\|\|").unwrap(),
+            DiscordStringType::Spoiler => RegexBuilder::new(r"\|\|.*?\|\|")
+                .dot_matches_new_line(true)
+                .build()
+                .unwrap(),
         }
     }
     /// 各Discord文字列の種類に対応する変換方法を返します。
@@ -154,12 +159,14 @@ mod tests {
     mod convert_discord_string_test {
         use super::*;
 
+        /// メンション文字列が正しく除去されるかテストします。
         #[test]
         fn test_remove_mention_string() {
             let str = "aaa<@8379454856049>eeee";
             let result = convert_discord_string(str);
             assert_eq!("aaaeeee", result);
         }
+        /// 複数のメンション文字列が正しく除去されるかテストします。
         #[test]
         fn test_remove_double_mention_string() {
             let str = "aaa<@8379454856049>eeee<@8379454856049>uuu";
@@ -167,12 +174,14 @@ mod tests {
             assert_eq!("aaaeeeeuuu", result);
         }
 
+        /// ロールメンション文字列が正しく除去されるかテストします。
         #[test]
         fn test_remove_role_string() {
             let str = "aaa<@&8379454856049>eeee";
             let result = convert_discord_string(str);
             assert_eq!("aaaeeee", result);
         }
+        /// 複数のロールメンション文字列が正しく除去されるかテストします。
         #[test]
         fn test_remove_double_role_string() {
             let str = "aaa<@&8379454856049>eeee<@&8379454856049>uuu";
@@ -180,6 +189,7 @@ mod tests {
             assert_eq!("aaaeeeeuuu", result);
         }
 
+        /// 絵文字文字列が絵文字名に正しく置換されるかテストします。
         #[test]
         fn test_remove_emoji_string() {
             let str = "<:butter:872873394570424340>";
@@ -187,6 +197,7 @@ mod tests {
             assert_eq!("butter", result);
         }
 
+        /// アニメーション絵文字文字列が絵文字名に正しく置換されるかテストします。
         #[test]
         fn test_remove_animoji_string() {
             let str = "<a:sanma:872873394570424340>";
@@ -194,6 +205,7 @@ mod tests {
             assert_eq!("sanma", result);
         }
 
+        /// 複数の絵文字文字列が絵文字名に正しく置換されるかテストします。
         #[test]
         fn test_remove_double_emoji_string() {
             let content = "<:butter:872873394570424340>さんま<:sanma:872873394570424340>";
@@ -201,12 +213,14 @@ mod tests {
             assert_eq!("butterさんまsanma", result);
         }
 
+        /// チャンネルリンク文字列が正しく除去されるかテストします。
         #[test]
         fn test_replace_channel_string() {
             let str = "aaa<#795680552845443113>rrr";
             let result = convert_discord_string(str);
             assert_eq!("aaarrr", result);
         }
+        /// 複数のチャンネルリンク文字列が正しく除去されるかテストします。
         #[test]
         fn test_replace_double_channel_string() {
             let str = "aaa<#795680552845443113>rrr<#795680552845443113>sss";
@@ -214,6 +228,7 @@ mod tests {
             assert_eq!("aaarrrsss", result);
         }
 
+        /// スポイラー文字列が正しく除去されるかテストします。
         #[test]
         fn test_spoiler_string() {
             let str = "これは||ネタバレ内容||です";
@@ -221,6 +236,7 @@ mod tests {
             assert_eq!("これはです", result);
         }
 
+        /// 複数のスポイラー文字列が正しく除去されるかテストします。
         #[test]
         fn test_multiple_spoiler_string() {
             let str = "これは||ネタバレ1||と||ネタバレ2||です";
@@ -228,13 +244,15 @@ mod tests {
             assert_eq!("これはとです", result);
         }
 
+        /// スポイラー内にURLとテキストが含まれる場合に正しく除去されるかテストします。
         #[test]
         fn test_spoiler_with_url_and_text() {
-            let str = "これは||https://example.com ネタバレ内容||です";
+            let str = "これは||ネタバレ内容 https://example.com||です";
             let result = convert_discord_string(str);
             assert_eq!("これはです", result);
         }
 
+        /// スポイラー内にURLのみが含まれる場合に正しく除去されるかテストします。
         #[test]
         fn test_spoiler_with_url_only() {
             let str = "これは||https://example.com||です";
@@ -242,6 +260,15 @@ mod tests {
             assert_eq!("これはです", result);
         }
 
+        /// スポイラー内に改行とURLが含まれる場合に正しく除去されるかテストします。
+        #[test]
+        fn test_spoiler_with_url_only_with_new_line() {
+            let str = "||改行の次にURLが含まれてる場合、URL以外の部分を読み上げてしまうあわあわあわあわあわあわあわあわあわあわあわあわ。\nhttps://x.com/tktcorporation/status/1925197887820140825||";
+            let result = convert_discord_string(str);
+            assert_eq!("", result);
+        }
+
+        /// スポイラー内にテキストとURLが含まれる場合に正しく除去されるかテストします。
         #[test]
         fn test_spoiler_with_text_and_url() {
             let str = "これは||ネタバレ内容 https://example.com||です";
@@ -249,6 +276,7 @@ mod tests {
             assert_eq!("これはです", result);
         }
 
+        /// メッセージ先頭のスポイラー内にURLとテキストが含まれる場合に正しく除去されるかテストします。
         #[test]
         fn test_spoiler_at_beginning_with_url_and_text() {
             let str = "||https://example.com ネタバレ内容||です";
@@ -256,6 +284,7 @@ mod tests {
             assert_eq!("です", result);
         }
 
+        /// メッセージ末尾のスポイラー内にURLとテキストが含まれる場合に正しく除去されるかテストします。
         #[test]
         fn test_spoiler_at_end_with_url_and_text() {
             let str = "これは||https://example.com ネタバレ内容||";
@@ -267,12 +296,13 @@ mod tests {
     #[cfg(test)]
     mod to_speech_message_tests {
         use super::*;
+        /// URLのみのメッセージが空文字列に変換されるかテストします。
         #[test]
         fn test_message() {
             let message = message_factory("https://example.com");
             assert_eq!(
                 "",
-                &message
+                message
                     .to_speech_message(SpeechOptions {
                         read_channel_id: None
                     })
@@ -280,12 +310,13 @@ mod tests {
             );
         }
 
+        /// http形式のURLのみのメッセージが空文字列に変換されるかテストします。
         #[test]
         fn test_not_ssl() {
             let message = message_factory("http://example.com");
             assert_eq!(
                 "",
-                &message
+                message
                     .to_speech_message(SpeechOptions {
                         read_channel_id: None
                     })
@@ -293,12 +324,13 @@ mod tests {
             );
         }
 
+        /// テキスト中のURLが正しく除去されるかテストします。
         #[test]
         fn test_url_in_text() {
             let message = message_factory("おはよう https://example.com こんにちは");
             assert_eq!(
                 "おはよう こんにちは",
-                &message
+                message
                     .to_speech_message(SpeechOptions {
                         read_channel_id: None
                     })
@@ -306,12 +338,13 @@ mod tests {
             );
         }
 
+        /// 様々なDiscord特有文字列が混在する場合に正しく変換されるかテストします。
         #[test]
         fn test_mix() {
             let message = message_factory("<@8379454856049>おはよう<:sanma:872873394570424340>こんにちは<#795680552845443113>でも<@&8379454856049>これは<@&8379454856049><:butter:872873394570424340>です");
             assert_eq!(
                 "おはようsanmaこんにちはでもこれはbutterです",
-                &message
+                message
                     .to_speech_message(SpeechOptions {
                         read_channel_id: None
                     })
@@ -319,6 +352,7 @@ mod tests {
             );
         }
 
+        /// 50文字を超えるメッセージが正しくトリミングされ、「うぬんかんぬん」が付加されるかテストします。
         #[test]
         fn test_trimmed_message() {
             let long_text = "あ".repeat(100);
@@ -330,6 +364,120 @@ mod tests {
                         read_channel_id: None
                     })
                     .value
+            );
+        }
+
+        /// スポイラー内にURLと50文字を超える長い文字列が含まれる場合、スポイラー全体が除去され空文字列になることをテストします。
+        #[test]
+        fn test_spoiler_with_url_and_long_text_exceeding_limit() {
+            let long_spoiler_text = "あ".repeat(60);
+            let message_content = format!("||{long_spoiler_text} https://example.com||");
+            let message = message_factory(&message_content);
+            assert_eq!(
+                "",
+                message
+                    .to_speech_message(SpeechOptions {
+                        read_channel_id: None
+                    })
+                    .value,
+                "スポイラー内のURLと長い文字列は除去され、空文字列になるべき"
+            );
+        }
+
+        /// スポイラー除去後にメッセージ全体が50文字を超える場合、正しくトリミングされるかテストします。
+        #[test]
+        fn test_message_with_spoiler_exceeding_limit_after_spoiler_removal() {
+            let text_around_spoiler = "あ".repeat(60);
+            let message_content =
+                format!("先頭のテキスト||ネタバレ||{text_around_spoiler}末尾のテキスト");
+            let message = message_factory(&message_content);
+            // let expected_trimmed_text = format!("先頭のテキスト{}末尾のテキスト", "あ".repeat(34)); // "先頭のテキスト" (7) + "あ"*34 + "末尾のテキスト" (7) = 48. "あ"*35だと49. "あ"*36だと50.
+            // "先頭のテキストあ...あ末尾のテキスト" (7 + 36 + 7 = 50) うぬんかんぬん となるように調整
+            // let expected_message = format!(
+            //     "{}うぬんかんぬん",
+            //     "先頭のテキストあ"
+            //         .repeat(50)
+            //         .chars()
+            //         .take(50)
+            //         .collect::<String>()
+            // );
+
+            // 正確な期待値を計算
+            // スポイラー除去後: "先頭のテキスト" + text_around_spoiler + "末尾のテキスト"
+            // "先頭のテキスト" (7文字)
+            // text_around_spoiler (60文字)
+            // "末尾のテキスト" (7文字)
+            // 合計: 7 + 60 + 7 = 74文字
+            // 期待値: "先頭のテキスト" + "あ"*36 + "うぬんかんぬん"
+            // "先頭のテキストああああああああああああああああああああああああああああああああああああうぬんかんぬん"
+            let mut expected = String::new();
+            expected.push_str("先頭のテキスト");
+            expected.push_str(&("あ".repeat(60)));
+            expected.push_str("末尾のテキスト");
+            let trimmed_expected = expected.chars().take(50).collect::<String>();
+
+            assert_eq!(
+                format!("{trimmed_expected}うぬんかんぬん"),
+                message
+                    .to_speech_message(SpeechOptions {
+                        read_channel_id: None
+                    })
+                    .value,
+                "スポイラー除去後、残りのメッセージが50文字にトリムされ、「うぬんかんぬん」が付加されるべき"
+            );
+        }
+
+        /// メッセージ中間のスポイラーが除去され、残りのテキストが50文字以内である場合に正しく結合されるかテストします。
+        #[test]
+        fn test_spoiler_in_middle_within_limit_after_removal() {
+            let message_content = "メッセージの始まり||これは秘密です||メッセージの終わり";
+            let message = message_factory(message_content);
+            assert_eq!(
+                "メッセージの始まりメッセージの終わり",
+                message
+                    .to_speech_message(SpeechOptions {
+                        read_channel_id: None
+                    })
+                    .value,
+                "スポイラーのみが除去され、前後のテキストが結合されるべき"
+            );
+        }
+
+        /// スポイラー内にURLとテキストが含まれ、スポイラー除去後のメッセージが50文字を超える場合に正しくトリミングされるかテストします。
+        #[test]
+        fn test_spoiler_containing_url_and_text_then_trimmed() {
+            let very_long_text_after_spoiler = "あ".repeat(60);
+            let message_content = format!("prefix||spoiler https://example.com spoiler||suffix {very_long_text_after_spoiler}");
+            let message = message_factory(&message_content);
+
+            // スポイラーとURL除去後の期待されるベース文字列
+            // convert_discord_string("prefix||spoiler https://example.com spoiler||suffix あああ...")
+            // -> "prefixsuffix あああ..."
+            let expected_base_after_conversion_and_url_removal =
+                format!("prefixsuffix {very_long_text_after_spoiler}");
+
+            let expected_final_message = if expected_base_after_conversion_and_url_removal
+                .chars()
+                .count()
+                > 50
+            {
+                let trimmed = expected_base_after_conversion_and_url_removal
+                    .chars()
+                    .take(50)
+                    .collect::<String>();
+                format!("{trimmed}うぬんかんぬん")
+            } else {
+                expected_base_after_conversion_and_url_removal
+            };
+
+            assert_eq!(
+                expected_final_message,
+                message
+                    .to_speech_message(SpeechOptions {
+                        read_channel_id: None
+                    })
+                    .value,
+                "スポイラー除去後、URLも除去され、残りが長ければトリムされるべき"
             );
         }
     }
