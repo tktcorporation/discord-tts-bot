@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Docstring Generation Rule
+
+When creating or editing code, please ensure that comprehensive docstrings are included for all functions, classes, and methods.
+
+Docstrings should clearly explain:
+- The purpose of the code block.
+- The arguments it takes (if any), including their types and what they represent.
+- What the code block returns (if anything), including its type and meaning.
+- Any exceptions that might be raised.
+
+This practice is crucial for maintaining code readability and facilitating collaboration.
+
+Additionally, if during the process of editing a file, the purpose of other functions or structs (even in different files) becomes clear, proactively add docstrings to them as well.
