@@ -4,6 +4,12 @@ pub use crate::model::Message;
 use regex::Regex;
 
 impl Message {
+    /// Discordのメッセージを読み上げ用のメッセージに変換します。
+    ///
+    /// 主な処理は以下の通りです。
+    /// - URLを読み上げ対象から除外します。
+    /// - Discord特有の文字列（メンション、絵文字など）を適切な形に変換します。
+    /// - メッセージが50文字を超える場合は、50文字にトリムし、「うぬんかんぬん」を末尾に追加します。
     pub fn to_speech_message(&self, _options: SpeechOptions) -> SpeechMessage {
         let content = self.get_content();
 
@@ -29,6 +35,7 @@ impl Message {
     }
 }
 
+/// Discord特有の文字列の種類を表す列挙型。
 #[derive(Debug)]
 enum DiscordStringType {
     Channel,
@@ -39,6 +46,7 @@ enum DiscordStringType {
     Spoiler,
 }
 impl DiscordStringType {
+    /// 各Discord文字列の種類に対応する正規表現を返します。
     fn to_regex(&self) -> Regex {
         match self {
             DiscordStringType::Channel => Regex::new(r"<#[0-9]+?>").unwrap(),
@@ -49,6 +57,7 @@ impl DiscordStringType {
             DiscordStringType::Spoiler => Regex::new(r"\|\|.+?\|\|").unwrap(),
         }
     }
+    /// 各Discord文字列の種類に対応する変換方法を返します。
     fn to_convert_type(&self) -> ConvertType {
         match self {
             DiscordStringType::Channel => ConvertType::Empty,
@@ -59,6 +68,7 @@ impl DiscordStringType {
             DiscordStringType::Spoiler => ConvertType::Empty,
         }
     }
+    /// 文字列がどのDiscord文字列の種類に一致するかを判定します。
     fn from_str(s: &str) -> Option<DiscordStringType> {
         let type_ = DiscordStringType::Channel;
         if type_.to_regex().is_match(s) {
@@ -88,11 +98,16 @@ impl DiscordStringType {
     }
 }
 
+/// Discord特有の文字列の変換方法を表す列挙型。
 enum ConvertType {
     Empty,
     MatchString,
 }
 impl ConvertType {
+    /// 指定された正規表現と変換方法に基づいて文字列を変換します。
+    ///
+    /// `Empty`の場合は、マッチした部分を空文字列に置換します。
+    /// `MatchString`の場合は、正規表現の最初のキャプチャグループの内容に置換します。
     fn convert(&self, regex: &Regex, str: &str) -> String {
         match self {
             ConvertType::Empty => regex.replace_all(str, "").to_string(),
@@ -104,13 +119,30 @@ impl ConvertType {
     }
 }
 
+/// Discord特유の文字列（メンション、絵文字、チャンネルリンクなど）を
+/// 読み上げに適した形に再帰的に変換します。
+/// スポイラー（||...||）は最優先で処理され、その中身は読み上げられません。
 fn convert_discord_string(str: &str) -> String {
-    let (re, convert_type) = if let Some(type_) = DiscordStringType::from_str(str) {
-        (type_.to_regex(), type_.to_convert_type())
-    } else {
-        return str.to_string();
-    };
-    convert_discord_string(&convert_type.convert(&re, str))
+    // まずスポイラーを処理する
+    let spoiler_regex = DiscordStringType::Spoiler.to_regex();
+    let after_spoiler_conversion = spoiler_regex.replace_all(str, "").to_string();
+
+    // スポイラー処理後の文字列に対して、他のDiscord特有文字列の処理を行う
+    let (re, convert_type) =
+        if let Some(type_) = DiscordStringType::from_str(&after_spoiler_conversion) {
+            // スポイラーは既に処理済みなので、ここではスキップする
+            if matches!(type_, DiscordStringType::Spoiler) {
+                return after_spoiler_conversion;
+            }
+            (type_.to_regex(), type_.to_convert_type())
+        } else {
+            return after_spoiler_conversion; // 他に変換対象がなければそのまま返す
+        };
+
+    // スポイラー以外の変換処理
+    // ここで再帰呼び出しを行うのは、一つの文字列に複数の異なるタイプの要素が含まれる場合に対応するため
+    // 例: "<@mention> <:emoji:>"
+    convert_discord_string(&convert_type.convert(&re, &after_spoiler_conversion))
 }
 
 #[cfg(test)]
@@ -195,6 +227,41 @@ mod tests {
             let result = convert_discord_string(str);
             assert_eq!("これはとです", result);
         }
+
+        #[test]
+        fn test_spoiler_with_url_and_text() {
+            let str = "これは||https://example.com ネタバレ内容||です";
+            let result = convert_discord_string(str);
+            assert_eq!("これはです", result);
+        }
+
+        #[test]
+        fn test_spoiler_with_url_only() {
+            let str = "これは||https://example.com||です";
+            let result = convert_discord_string(str);
+            assert_eq!("これはです", result);
+        }
+
+        #[test]
+        fn test_spoiler_with_text_and_url() {
+            let str = "これは||ネタバレ内容 https://example.com||です";
+            let result = convert_discord_string(str);
+            assert_eq!("これはです", result);
+        }
+
+        #[test]
+        fn test_spoiler_at_beginning_with_url_and_text() {
+            let str = "||https://example.com ネタバレ内容||です";
+            let result = convert_discord_string(str);
+            assert_eq!("です", result);
+        }
+
+        #[test]
+        fn test_spoiler_at_end_with_url_and_text() {
+            let str = "これは||https://example.com ネタバレ内容||";
+            let result = convert_discord_string(str);
+            assert_eq!("これは", result);
+        }
     }
 
     #[cfg(test)]
@@ -275,6 +342,9 @@ mod tests {
         assert_eq!("message", m.msg.content);
     }
 
+    /// テスト用の`Message`オブジェクトを生成します。
+    ///
+    /// 指定された`content`を持つ`Message`をJSON文字列から作成します。
     fn message_factory(content: &str) -> Message {
         let message_json = r#"{
         "id":881482961801842698,
