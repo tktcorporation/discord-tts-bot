@@ -48,7 +48,7 @@ RUN cargo build --release --features "tts"
 
 CMD [ "/bin/sh",  "-c", "cargo run" ]
 
-FROM debian:bookworm-20241223-slim
+FROM debian:bookworm-20250520-slim
 
 RUN apt-get update && \
     apt-get install -y \
