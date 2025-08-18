@@ -18,6 +18,6 @@ jobs:
       name: heroku_production
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl apps restart utako-discord-bot
