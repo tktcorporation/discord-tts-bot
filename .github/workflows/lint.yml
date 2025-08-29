@@ -36,17 +36,17 @@ jobs:
         components: clippy
     # caching
     - name: Cache cargo registry
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: ~/.cargo/registry
         key: ${{ runner.os }}-v1-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
     - name: Cache cargo index
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: ~/.cargo/git
         key: ${{ runner.os }}-v1-cargo-index-${{ hashFiles('**/Cargo.lock') }}
     - name: Cache cargo target dir
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: target
         key: ${{ runner.os }}-v1-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
@@ -74,17 +74,17 @@ jobs:
         profile: minimal
     # caching
     - name: Cache cargo registry
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: ~/.cargo/registry
         key: ${{ runner.os }}-v1-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
     - name: Cache cargo index
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: ~/.cargo/git
         key: ${{ runner.os }}-v1-cargo-index-${{ hashFiles('**/Cargo.lock') }}
     - name: Cache cargo target dir
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: target
         key: ${{ runner.os }}-v1-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
@@ -107,17 +107,17 @@ jobs:
         profile: minimal
     # caching
     - name: Cache cargo registry
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: ~/.cargo/registry
         key: ${{ runner.os }}-v1-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
     - name: Cache cargo index
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: ~/.cargo/git
         key: ${{ runner.os }}-v1-cargo-index-${{ hashFiles('**/Cargo.lock') }}
     - name: Cache cargo target dir
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: target
         key: ${{ runner.os }}-v1-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
@@ -148,17 +148,17 @@ jobs:
         profile: minimal
     # caching
     - name: Cache cargo registry
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: ~/.cargo/registry
         key: ${{ runner.os }}-v1-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
     - name: Cache cargo index
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: ~/.cargo/git
         key: ${{ runner.os }}-v1-cargo-index-${{ hashFiles('**/Cargo.lock') }}
     - name: Cache cargo target dir
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.2.4
       with:
         path: target
         key: ${{ runner.os }}-v1-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
