@@ -37,7 +37,7 @@ To set up your `discord-tts-bot`, configure the following environment variables:
 ### Running the Bot
 1. Invite the bot to your Discord server.
 2. Start the bot with `docker-compose run app /bin/bash -c "make run"`.
-3. In Discord, type `/join` to have the bot join a voice channel.
+3. In Discord, type `/join` to have the bot join a voice channel. Alternatively, `/join_select` joins and selects the current text channel in one step.
 4. Start typing in discord chat and hear your messages read aloud!
 
 ### Development and Contributions

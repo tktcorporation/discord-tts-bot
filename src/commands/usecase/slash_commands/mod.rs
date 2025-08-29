@@ -4,6 +4,7 @@ use std::str::FromStr;
 mod clear;
 mod invite;
 mod join;
+mod join_select;
 mod leave;
 mod ping;
 mod play;
@@ -40,6 +41,7 @@ pub enum SlashCommands {
     Queue,
     Repeat,
     SelectChannel,
+    JoinSelect,
 }
 
 impl SlashCommands {
@@ -55,6 +57,7 @@ impl SlashCommands {
             Self::Queue.register(),
             Self::Repeat.register(),
             Self::SelectChannel.register(),
+            Self::JoinSelect.register(),
         ]
     }
 
@@ -70,6 +73,7 @@ impl SlashCommands {
             Self::Queue => queue::Queue::run(ctx, command).await,
             Self::Repeat => repeat::Repeat::run(ctx, command).await,
             Self::SelectChannel => select_channel::SelectChannel::run(ctx, command).await,
+            Self::JoinSelect => join_select::JoinSelect::run(ctx, command).await,
         }
     }
 
@@ -86,6 +90,9 @@ impl SlashCommands {
             Self::Repeat => repeat::Repeat::register(CreateCommand::new("repeat")),
             Self::SelectChannel => {
                 select_channel::SelectChannel::register(CreateCommand::new("select_channel"))
+            }
+            Self::JoinSelect => {
+                join_select::JoinSelect::register(CreateCommand::new("join_select"))
             }
         }
     }
@@ -106,6 +113,7 @@ impl FromStr for SlashCommands {
             "queue" => Ok(Self::Queue),
             "repeat" => Ok(Self::Repeat),
             "select_channel" => Ok(Self::SelectChannel),
+            "join_select" => Ok(Self::JoinSelect),
             _ => Err(()),
         }
     }
