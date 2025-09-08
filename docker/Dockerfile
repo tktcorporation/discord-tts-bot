@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/rust:1-bookworm AS dev-env
+FROM mcr.microsoft.com/devcontainers/rust:2-bookworm AS dev-env
 
 RUN apt-get update && \
     apt-get install -y \
