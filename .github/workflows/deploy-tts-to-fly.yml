@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: superfly/flyctl-actions/setup-flyctl@v1.5
+      - uses: superfly/flyctl-actions/setup-flyctl@1.5
       - run: |
           flyctl secrets set -c fly-tts.toml \
           DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN_TTS_II }} \

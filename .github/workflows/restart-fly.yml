@@ -19,5 +19,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: superfly/flyctl-actions/setup-flyctl@v1.5
+      - uses: superfly/flyctl-actions/setup-flyctl@1.5
       - run: flyctl apps restart utako-discord-bot
