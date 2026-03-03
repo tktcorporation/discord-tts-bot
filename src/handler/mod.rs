@@ -30,6 +30,7 @@ use usecase::{speech_welcome_see_you::speech_greeting, text_to_speech::text_to_s
 
 use crate::infrastructure::tmp_path;
 use std::fs;
+use std::time::SystemTime;
 use tokio::time::{interval, Duration};
 
 pub struct Handler;
@@ -103,6 +104,7 @@ impl EventHandler for Handler {
                     let activity = format!("{guild_count} サーバーで稼働中 | /help");
                     set_help_message_to_activity(&ctx_clone, &activity).await;
                 }
+                cleanup_old_audio_files();
             }
         });
 
@@ -164,6 +166,39 @@ impl EventHandler for Handler {
         }
         if let Err(e) = leave_if_alone(&ctx, &voice).await {
             report_error(&format_err("Failed to check/handle leave if alone", e));
+        }
+    }
+}
+
+/// Delete audio files older than 10 minutes to prevent memory/disk accumulation.
+fn cleanup_old_audio_files() {
+    let max_age = std::time::Duration::from_secs(600);
+    let now = SystemTime::now();
+
+    let Ok(guild_dirs) = fs::read_dir(tmp_path()) else {
+        return;
+    };
+    for guild_entry in guild_dirs.flatten() {
+        let sounds_dir = guild_entry.path().join("sounds");
+        let Ok(files) = fs::read_dir(&sounds_dir) else {
+            continue;
+        };
+        for file_entry in files.flatten() {
+            let path = file_entry.path();
+            if !path.is_file() {
+                continue;
+            }
+            let Ok(metadata) = fs::metadata(&path) else {
+                continue;
+            };
+            let is_old = metadata
+                .modified()
+                .ok()
+                .and_then(|modified| now.duration_since(modified).ok())
+                .is_some_and(|age| age > max_age);
+            if is_old {
+                let _ = fs::remove_file(&path);
+            }
         }
     }
 }
