@@ -89,12 +89,9 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Setup | Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@1.93.0
         with:
-          toolchain: stable
-          override: true
-          profile: minimal
-          target: ${{ matrix.target }}
+          targets: ${{ matrix.target }}
 
       - name: Install musl tools
         if: matrix.target == 'x86_64-unknown-linux-musl'
@@ -102,14 +99,7 @@ jobs:
         run: sudo apt-get install -y musl-tools libssl-dev libopus-dev build-essential libssl-dev pkg-config autoconf automake libtool m4 ffmpeg curl python3
 
       - name: Build | Build
-        uses: actions-rs/cargo@v1
-        # TODO: Remove this once it's the default
-        # env:
-        #   SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
-        with:
-          command: build
-          args: --release --target ${{ matrix.target }}
-          # use-cross: ${{ matrix.os == 'ubuntu-latest' }}
+        run: cargo build --release --target ${{ matrix.target }}
 
       # - name: Post Build | Prepare artifacts [Windows]
       #   if: matrix.os == 'windows-latest'
@@ -156,7 +146,7 @@ jobs:
 
       - name: Setup | Release notes
         run: |
-          go install github.com/git-chglog/git-chglog/cmd/git-chglog@latest
+          go install github.com/git-chglog/git-chglog/cmd/git-chglog@v0.15.4
           git-chglog -c .github/chglog/release.yml $(git describe --tags) > RELEASE.md
       - name: Build | Publish
         uses: softprops/action-gh-release@v2

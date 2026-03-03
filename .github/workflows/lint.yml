@@ -28,12 +28,9 @@ jobs:
     timeout-minutes: 5
     steps:
     - uses: actions/checkout@v5
-    - uses: actions-rs/toolchain@v1
+    - uses: dtolnay/rust-toolchain@1.93.0
       with:
-        toolchain: stable
-        override: true
-        profile: minimal
-        components: clippy
+        components: clippy, rustfmt
     # caching
     - name: Cache cargo registry
       uses: actions/cache@v4.2.4
@@ -52,26 +49,16 @@ jobs:
         key: ${{ runner.os }}-v1-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
     # /caching
     - name: Check
-      uses: actions-rs/cargo@v1
-      with:
-        command: clippy
-        args: --all --all-targets --all-features
+      run: cargo clippy --all --all-targets --all-features
     - name: rustfmt
-      uses: actions-rs/cargo@v1
-      with:
-        command: fmt
-        args: --all -- --check
+      run: cargo fmt --all -- --check
 
   check-docs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
     - uses: actions/checkout@v5
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
-        profile: minimal
+    - uses: dtolnay/rust-toolchain@1.93.0
     # caching
     - name: Cache cargo registry
       uses: actions/cache@v4.2.4
@@ -100,11 +87,7 @@ jobs:
     timeout-minutes: 5
     steps:
     - uses: actions/checkout@v5
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
-        profile: minimal
+    - uses: dtolnay/rust-toolchain@1.93.0
     # caching
     - name: Cache cargo registry
       uses: actions/cache@v4.2.4
@@ -124,28 +107,19 @@ jobs:
     # /caching
     - name: Install cargo-hack
       run: |
-        curl -LsSf https://github.com/taiki-e/cargo-hack/releases/latest/download/cargo-hack-x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C ~/.cargo/bin
+        curl -LsSf https://github.com/taiki-e/cargo-hack/releases/download/v0.6.42/cargo-hack-x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C ~/.cargo/bin
     - name: cargo hack check
       working-directory: ${{ matrix.subcrate }}
       run: cargo hack check --each-feature --no-dev-deps --all
 
   test-versions:
-    # Test against the stable, beta, and nightly Rust toolchains on ubuntu-latest.
+    # Test against pinned Rust toolchain on ubuntu-latest.
     needs: check
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    strategy:
-      matrix:
-        rust:
-          - stable
-        os: [ubuntu-latest]
     steps:
     - uses: actions/checkout@v5
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: ${{ matrix.rust }}
-        override: true
-        profile: minimal
+    - uses: dtolnay/rust-toolchain@1.93.0
     # caching
     - name: Cache cargo registry
       uses: actions/cache@v4.2.4
@@ -179,15 +153,12 @@ jobs:
         python3 \
         git
 
-        sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
+        sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/download/2026.02.21/yt-dlp -o /usr/bin/yt-dlp && \
           sudo chmod a+rx /usr/bin/yt-dlp
 
     # /caching
     - name: Run tests
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
-        args: --all --all-features --all-targets
+      run: cargo test --all --all-features --all-targets
 
   renovate:
     runs-on: ubuntu-latest

@@ -23,7 +23,7 @@ jobs:
 
       - name: set tagname
         id: tag_name
-        run: echo ::set-output name=tag_name::v$(cat Cargo.toml | grep -m1 "version" | cut -d " " -f 3 | tr -d '"')
+        run: echo "tag_name=v$(cat Cargo.toml | grep -m1 "version" | cut -d " " -f 3 | tr -d '"')" >> $GITHUB_OUTPUT
 
       - name: "Get Previous tag"
         id: previoustag
@@ -35,9 +35,9 @@ jobs:
         id: check_push
         run: |
           if [ ${{ steps.previoustag.outputs.tag }} != ${{ steps.tag_name.outputs.tag_name }} ] ; then
-            echo ::set-output name=is_push::true
+            echo "is_push=true" >> $GITHUB_OUTPUT
           else
-            echo ::set-output name=is_push::false
+            echo "is_push=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Push Tag

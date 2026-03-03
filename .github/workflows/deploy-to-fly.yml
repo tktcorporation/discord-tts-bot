@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: superfly/flyctl-actions/setup-flyctl@v1.5
       - run: |
           flyctl secrets set DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN_MUSIC }} \
           AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
