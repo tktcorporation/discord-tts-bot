@@ -24,9 +24,15 @@ pub async fn join(
         .await
         .expect("Songbird Voice client placed in at initialisation.");
 
-    let has_handler = manager.get(guild.id).is_some();
-    if has_handler {
-        return Err(Error::AlreadyJoined);
+    if let Some(call) = manager.get(guild.id) {
+        let handler = call.lock().await;
+        if handler.current_connection().is_some() {
+            return Err(Error::AlreadyJoined);
+        }
+        // Handler exists but no active connection — stale state from a previous
+        // failed join.  Remove it so we can start fresh.
+        drop(handler);
+        let _ = manager.remove(guild.id).await;
     }
 
     // voice settings
@@ -45,22 +51,29 @@ pub async fn join(
         }
     };
 
-    if let Ok(handle_lock) = manager.join(guild.id, connect_to).await {
-        println!("join success to channel: {}", connect_to);
-        _clear(&handle_lock).await;
+    match manager.join(guild.id, connect_to).await {
+        Ok(handle_lock) => {
+            println!("join success to channel: {}", connect_to);
+            _clear(&handle_lock).await;
 
-        let mut handler = handle_lock.lock().await;
-        if let Err(e) = handler.deafen(false).await {
-            eprintln!("Error unmuting bot: {:?}", e);
-        } else {
-            println!("Successfully unmuted bot.");
+            let mut handler = handle_lock.lock().await;
+            if let Err(e) = handler.deafen(false).await {
+                eprintln!("Error unmuting bot: {:?}", e);
+            } else {
+                println!("Successfully unmuted bot.");
+            }
+
+            _queue_join_message(&mut handler, ctx.http.clone(), called_channnel_id).await;
+
+            Ok(format!("Joined {}", Mention::from(connect_to)))
         }
-
-        _queue_join_message(&mut handler, ctx.http.clone(), called_channnel_id).await;
-
-        Ok(format!("Joined {}", Mention::from(connect_to)))
-    } else {
-        Err(Error::JoinError(songbird::error::JoinError::NoCall))
+        Err(e) => {
+            eprintln!("Failed to join voice channel: {e:?}");
+            // Clean up the Call that songbird created internally to prevent
+            // stale state from blocking future join attempts.
+            let _ = manager.remove(guild.id).await;
+            Err(Error::JoinError(e))
+        }
     }
 }
 
