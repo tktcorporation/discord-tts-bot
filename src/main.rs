@@ -7,12 +7,6 @@ use songbird::SerenityInit;
 use discord_tts_bot::handler::Handler;
 use discord_tts_bot::model::HttpKey;
 
-mod commands;
-mod constants;
-mod handler;
-mod infrastructure;
-mod model;
-
 #[tokio::main]
 async fn main() {
     let _guard = sentry::init(sentry::ClientOptions {
