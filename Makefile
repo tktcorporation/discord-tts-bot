@@ -1,12 +1,13 @@
 # デフォルトターゲット
+RUST_VERSION = 1.93.0
+
 .PHONY: install
 install:
-	# Rustupの更新とインストール
-	rustup update
-	rustup install stable
+	# Rustupのインストール（バージョン固定）
+	rustup install $(RUST_VERSION)
+	rustup default $(RUST_VERSION)
 	# 必要なコンポーネントの追加
-	rustup component add clippy rustfmt rust-analysis rust-src rls
-	rustup component add clippy
+	rustup component add clippy rustfmt rust-src
 	# cargo-binstallのインストール
 	cargo install cargo-binstall
 	# sccacheのインストールと環境変数の設定
