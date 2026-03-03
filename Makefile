@@ -5,7 +5,7 @@ install:
 	rustup update
 	rustup install stable
 	# 必要なコンポーネントの追加
-	rustup component add clippy rustfmt rust-analysis rust-src rls
+	rustup component add clippy rustfmt rust-src
 	rustup component add clippy
 	# cargo-binstallのインストール
 	cargo install cargo-binstall
