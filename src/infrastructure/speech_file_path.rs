@@ -46,7 +46,7 @@ impl SpeechFilePath {
     ///
     /// 新しい SpeechFilePath
     pub fn new(sound_path: SoundPath) -> SpeechFilePath {
-        use rand::Rng;
+        use rand::RngExt;
 
         // guild ごとに最大5ファイル持つ
         let rand_num: i32 = rand::rng().random_range(0..4);

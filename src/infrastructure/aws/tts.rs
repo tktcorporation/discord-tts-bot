@@ -39,7 +39,7 @@ pub async fn generate_speech_file(
     let region = Region::new(
         env::var("AWS_REGION").expect("AWS_REGION must be set in environment variables"),
     );
-    let config = aws_config::defaults(BehaviorVersion::v2024_03_28())
+    let config = aws_config::defaults(BehaviorVersion::v2026_01_12())
         .region(region.clone())
         .load()
         .await;
