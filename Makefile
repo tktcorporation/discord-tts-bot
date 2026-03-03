@@ -1,19 +1,20 @@
 # デフォルトターゲット
+RUST_VERSION = 1.93.0
+
 .PHONY: install
 install:
-	# Rustupの更新とインストール
-	rustup update
-	rustup install stable
+	# Rustupのインストール（バージョン固定）
+	rustup install $(RUST_VERSION)
+	rustup default $(RUST_VERSION)
 	# 必要なコンポーネントの追加
 	rustup component add clippy rustfmt rust-src
-	rustup component add clippy
 	# cargo-binstallのインストール
-	cargo install cargo-binstall
+	cargo install cargo-binstall --locked
 	# sccacheのインストールと環境変数の設定
 	cargo binstall sccache --locked && export RUSTC_WRAPPER=$$(which sccache)
 	# その他ツールのインストール
-	cargo binstall cargo-watch cargo-edit cargo-hack
-	cargo install cargo-audit --features=fix
+	cargo binstall cargo-watch cargo-edit cargo-hack --locked
+	cargo install cargo-audit --features=fix --locked
 
 # 環境変数のエクスポート（必要に応じて使用）
 .PHONY: setup-env
