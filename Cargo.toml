@@ -18,21 +18,21 @@ mock = []
 default = ["tts"]
 
 [dependencies]
-hyper = "1.6.0"
-polly = { version = "1.15.0", package = "aws-sdk-polly" }
-aws-config = "1.3.3"
-aws-types = { version = "1.3.3", package = "aws-types" }
+hyper = "1.8.1"
+polly = { version = "1.100.0", package = "aws-sdk-polly" }
+aws-config = "1.8.14"
+aws-types = { version = "1.3.13", package = "aws-types" }
 tracing = "0.1"
-tracing-subscriber = { version = "0.3.19", features = ["fmt"] }
+tracing-subscriber = { version = "0.3.22", features = ["fmt"] }
 tiger = "0.2.1"
-rand = "0.9.1"
-serde_json = "1.0.143"
-regex = "1.11.0"
+rand = "0.10.0"
+serde_json = "1.0.149"
+regex = "1.12.3"
 html-escape = "0.2.13"
-mockall = "0.13.0"
-mockall_double = "0.3.0"
-serde = "1.0.219"
-sentry = { version = "0.38.1", features = ["tracing"] }
+mockall = "0.14.0"
+mockall_double = "0.3.1"
+serde = "1.0.228"
+sentry = { version = "0.46.2", features = ["tracing"] }
 futures = "0.3"
 
 [dependencies.reqwest]
@@ -44,13 +44,13 @@ version = "0.5.0"
 features = ["builtin-queue", "driver", "gateway"]
 
 [dependencies.symphonia]
-version = "0.5.2"
+version = "0.5.5"
 features = ["aac", "mp3", "isomp4", "alac"]
 
 [dependencies.serenity]
-version = "0.12.4"
+version = "0.12.5"
 features = ["client", "gateway", "cache", "standard_framework", "voice", "rustls_backend", "http"]
 
 [dependencies.tokio]
-version = "1.45.0"
+version = "1.49.0"
 features = ["macros", "rt-multi-thread"]
