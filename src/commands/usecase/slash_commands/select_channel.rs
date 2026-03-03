@@ -21,7 +21,10 @@ impl SlashCommand for SelectChannel {
             _ => return SlashCommandResult::Simple(Some("Invalid channel provided".to_string())),
         };
 
-        let guild_id = command.guild_id.unwrap();
+        let guild_id = match command.guild_id {
+            Some(id) => id,
+            None => return SlashCommandResult::Simple(Some("This command can only be used in a server.".to_string())),
+        };
         services::select_channel(&guild_id, channel_id).await;
         SlashCommandResult::Simple(Some(format!("Channel selected <#{channel_id}>")))
     }

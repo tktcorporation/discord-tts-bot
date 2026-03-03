@@ -43,10 +43,9 @@ impl Voice {
         &self,
         ctx: &Context,
     ) -> std::result::Result<std::vec::Vec<serenity::model::guild::Member>, Error> {
-        match self.guild_id_and_channel_id().await {
-            Ok((guild_id, channel_id)) => Ok(_members(ctx, &guild_id, &channel_id.unwrap()).await),
-            Err(e) => Err(e),
-        }
+        let (guild_id, channel_id) = self.guild_id_and_channel_id().await?;
+        let channel_id = channel_id.ok_or(Error::NotInVoiceChannel)?;
+        _members(ctx, &guild_id, &channel_id).await
     }
 
     pub async fn is_alone(&self, ctx: &Context) -> Result<bool, Error> {
@@ -87,12 +86,19 @@ async fn _members(
     ctx: &Context,
     guild_id: &songbird::id::GuildId,
     channel_id: &songbird::id::ChannelId,
-) -> std::vec::Vec<serenity::model::guild::Member> {
+) -> Result<std::vec::Vec<serenity::model::guild::Member>, Error> {
     let guild_id = id::GuildId::from(guild_id.0);
     let channel_id = id::ChannelId::from(channel_id.0);
-    let channels = guild_id.channels(&ctx.http.as_ref()).await.unwrap();
-    let guild_channel = channels.get(&channel_id).unwrap();
-    guild_channel.members(&ctx.cache).unwrap()
+    let channels = guild_id
+        .channels(&ctx.http.as_ref())
+        .await
+        .map_err(|_| Error::ConnectionNotFound)?;
+    let guild_channel = channels
+        .get(&channel_id)
+        .ok_or(Error::NotInVoiceChannel)?;
+    guild_channel
+        .members(&ctx.cache)
+        .map_err(|_| Error::ConnectionNotFound)
 }
 
 async fn get_guild_id_and_channel_id(

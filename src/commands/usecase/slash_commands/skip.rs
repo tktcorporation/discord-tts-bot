@@ -10,7 +10,11 @@ pub struct Skip {}
 #[async_trait]
 impl SlashCommand for Skip {
     async fn run(ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
-        match services::skip(ctx, command.guild_id.unwrap()).await {
+        let guild_id = match command.guild_id {
+            Some(id) => id,
+            None => return SlashCommandResult::Simple(Some("This command can only be used in a server.".to_string())),
+        };
+        match services::skip(ctx, guild_id).await {
             Ok(s) => SlashCommandResult::Simple(Some(s)),
             Err(e) => SlashCommandResult::Simple(Some(e.to_string())),
         }

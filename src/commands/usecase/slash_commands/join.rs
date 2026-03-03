@@ -10,12 +10,14 @@ pub struct Join {}
 #[async_trait]
 impl SlashCommand for Join {
     async fn run(ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
-        let guild = command
-            .guild_id
-            .unwrap()
-            .to_guild_cached(ctx)
-            .unwrap()
-            .clone();
+        let guild_id = match command.guild_id {
+            Some(id) => id,
+            None => return SlashCommandResult::Simple(Some("This command can only be used in a server.".to_string())),
+        };
+        let guild = match guild_id.to_guild_cached(ctx) {
+            Some(g) => g.clone(),
+            None => return SlashCommandResult::Simple(Some("Failed to find server info.".to_string())),
+        };
         use crate::handler::usecase::text_to_speech::speech_options;
         match services::join(
             ctx,

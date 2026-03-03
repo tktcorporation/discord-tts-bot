@@ -10,7 +10,11 @@ pub struct Repeat {}
 #[async_trait]
 impl SlashCommand for Repeat {
     async fn run(ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
-        match services::repeat(ctx, command.guild_id.unwrap()).await {
+        let guild_id = match command.guild_id {
+            Some(id) => id,
+            None => return SlashCommandResult::Simple(Some("This command can only be used in a server.".to_string())),
+        };
+        match services::repeat(ctx, guild_id).await {
             Ok(is_looping) => SlashCommandResult::Simple(Some(format!(
                 "Repeat is now {}",
                 if is_looping { "on" } else { "off" }

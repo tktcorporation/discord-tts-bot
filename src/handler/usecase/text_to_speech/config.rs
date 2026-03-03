@@ -29,7 +29,10 @@ pub mod client {
                 Ok(config_str) => config_str,
                 Err(err) => return Err(format!("fail to read config: {err}")),
             };
-            Ok(serde_json::from_str(&config_str).expect("fail to deserialize config"))
+            match serde_json::from_str(&config_str) {
+                Ok(config) => Ok(Some(config)),
+                Err(err) => Err(format!("fail to deserialize config: {err}")),
+            }
         }
     }
 }

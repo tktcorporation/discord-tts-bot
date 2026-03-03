@@ -10,7 +10,11 @@ pub struct Queue {}
 #[async_trait]
 impl SlashCommand for Queue {
     async fn run(ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
-        match services::queue::queue(ctx, command.guild_id.unwrap()).await {
+        let guild_id = match command.guild_id {
+            Some(id) => id,
+            None => return SlashCommandResult::Simple(Some("This command can only be used in a server.".to_string())),
+        };
+        match services::queue::queue(ctx, guild_id).await {
             Ok(queue) => {
                 SlashCommandResult::Embed(Box::new(services::queue::create_queue_embed(&queue, 0)))
             }

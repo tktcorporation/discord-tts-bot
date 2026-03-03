@@ -30,12 +30,14 @@ impl CurrentVoiceState {
     }
 
     pub async fn voice_member(self) -> Result<VoiceMember, String> {
-        let guild_id = if let Some(guild_id) = self.state.guild_id {
-            guild_id
-        } else {
-            return Err("The guild_id is None".to_string());
+        let guild_id = match self.state.guild_id {
+            Some(guild_id) => guild_id,
+            None => return Err("The guild_id is None".to_string()),
         };
-        let user = self.state.member.unwrap().user;
+        let user = match self.state.member {
+            Some(member) => member.user,
+            None => return Err("The member is None".to_string()),
+        };
 
         Ok(VoiceMember { guild_id, user })
     }

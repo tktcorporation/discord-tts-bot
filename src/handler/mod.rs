@@ -40,7 +40,7 @@ impl EventHandler for Handler {
         if let Interaction::Command(command) = interaction {
             println!("Received command interaction: {}", command.data.name);
 
-            command
+            if let Err(e) = command
                 .create_response(
                     &ctx,
                     CreateInteractionResponse::Message(
@@ -48,25 +48,30 @@ impl EventHandler for Handler {
                     ),
                 )
                 .await
-                .unwrap();
+            {
+                report_error(&format_err("Failed to create interaction response", e));
+                return;
+            }
 
             let command_result = match command.data.name.as_str().parse::<SlashCommands>() {
                 Ok(slash_command) => slash_command.run(&ctx, &command).await,
                 Err(_) => {
-                    command
+                    if let Err(e) = command
                         .edit_response(
                             &ctx.http,
                             EditInteractionResponse::default().content("Unknown command"),
                         )
                         .await
-                        .unwrap();
+                    {
+                        report_error(&format_err("Failed to edit response for unknown command", e));
+                    }
                     return;
                 }
             };
 
-            match command_result {
+            let edit_result = match command_result {
                 SlashCommandResult::Simple(None) => {
-                    command.delete_response(&ctx.http).await.unwrap();
+                    command.delete_response(&ctx.http).await
                 }
                 SlashCommandResult::Simple(Some(message)) => {
                     command
@@ -75,14 +80,17 @@ impl EventHandler for Handler {
                             EditInteractionResponse::default().content(message),
                         )
                         .await
-                        .unwrap();
+                        .map(|_| ())
                 }
                 SlashCommandResult::Embed(embed) => {
                     command
                         .edit_response(&ctx.http, EditInteractionResponse::default().embed(*embed))
                         .await
-                        .unwrap();
+                        .map(|_| ())
                 }
+            };
+            if let Err(e) = edit_result {
+                report_error(&format_err("Failed to update interaction response", e));
             }
         }
     }
@@ -97,8 +105,8 @@ impl EventHandler for Handler {
                 interval.tick().await;
                 if let Ok(entries) = fs::read_dir(tmp_path()) {
                     let guild_count = entries
-                        .filter(|e| e.is_ok())
-                        .filter(|e| e.as_ref().unwrap().path().is_dir())
+                        .filter_map(|e| e.ok())
+                        .filter(|e| e.path().is_dir())
                         .count();
                     let activity = format!("{guild_count} サーバーで稼働中 | /help");
                     set_help_message_to_activity(&ctx_clone, &activity).await;
@@ -114,7 +122,10 @@ impl EventHandler for Handler {
 
     #[cfg(feature = "tts")]
     async fn message(&self, ctx: Context, msg: SerenityMessage) {
-        let guild_id = msg.guild(&ctx.cache).unwrap().id;
+        let guild_id = match msg.guild(&ctx.cache) {
+            Some(guild) => guild.id,
+            None => return, // DM messages are ignored
+        };
         let voice = Voice::from(&ctx, guild_id).await;
         let tts_msg = crate::model::Message::new(msg);
         text_to_speech(Box::new(voice), tts_msg).await

@@ -13,18 +13,21 @@ impl SlashCommand for Play {
     async fn run(ctx: &Context, command: &CommandInteraction) -> SlashCommandResult {
         // Extract and clone necessary data to avoid holding non-Send references across awaits
         let resolved_options = command.data.options();
-        let url = match resolved_options.first().unwrap() {
-            ResolvedOption {
+        let url = match resolved_options.first() {
+            Some(ResolvedOption {
                 value: ResolvedValue::String(url),
                 ..
-            } => url,
+            }) => url,
             _ => {
                 return SlashCommandResult::Simple(Some(
                     "Must provide a URL to a video or audio".to_string(),
                 ))
             }
         };
-        let guild_id = command.guild_id.unwrap();
+        let guild_id = match command.guild_id {
+            Some(id) => id,
+            None => return SlashCommandResult::Simple(Some("This command can only be used in a server.".to_string())),
+        };
 
         match services::play(ctx, guild_id, command.channel_id, url).await {
             Ok(_) => SlashCommandResult::Simple(Some(format!("Queue {url}"))),
@@ -32,7 +35,10 @@ impl SlashCommand for Play {
                 services::error::Error::NotInVoiceChannel => {
                     use crate::handler::usecase::text_to_speech::speech_options;
                     // Clone the Guild to avoid holding a reference across await
-                    let guild = ctx.cache.guild(guild_id).unwrap().clone();
+                    let guild = match ctx.cache.guild(guild_id) {
+                        Some(g) => g.clone(),
+                        None => return SlashCommandResult::Simple(Some("Failed to find server info.".to_string())),
+                    };
 
                     let joined_message = match services::join(
                         ctx,

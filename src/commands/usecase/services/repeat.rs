@@ -16,9 +16,15 @@ pub async fn repeat(ctx: &Context, guild_id: model::id::GuildId) -> Result<bool,
     };
 
     let handler = handler_lock.lock().await;
-    let track = handler.queue().current().unwrap();
+    let track = match handler.queue().current() {
+        Some(track) => track,
+        None => return Err(Error::NotInVoiceChannel),
+    };
 
-    let was_looping = track.get_info().await.unwrap().loops == LoopState::Infinite;
+    let was_looping = match track.get_info().await {
+        Ok(info) => info.loops == LoopState::Infinite,
+        Err(_) => false,
+    };
     let toggler = if was_looping {
         TrackHandle::disable_loop
     } else {

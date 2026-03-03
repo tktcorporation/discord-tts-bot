@@ -49,7 +49,7 @@ impl SpeechFilePath {
         use rand::Rng;
 
         // guild ごとに最大5ファイル持つ
-        let rand_num: i32 = rand::rng().random_range(0..4);
+        let rand_num: i32 = rand::rng().random_range(0..5);
         std::path::PathBuf::from(sound_path)
             .join(rand_num.to_string())
             .into()
@@ -77,10 +77,9 @@ impl SpeechFilePath {
     ///
     /// ファイル名
     pub fn file_name(&self) -> String {
-        let parts: Vec<&str> = self.value.to_str().unwrap().split('.').collect();
-        let mut file_name_builder = String::from(parts[0]);
-        file_name_builder.push_str(".mp3");
-        file_name_builder
+        let mut path = self.value.clone();
+        path.set_extension("mp3");
+        path.to_string_lossy().into_owned()
     }
 }
 

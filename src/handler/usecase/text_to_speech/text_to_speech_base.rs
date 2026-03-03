@@ -20,12 +20,14 @@ pub async fn text_to_speech(speaker: Box<dyn Speaker + Sync + Send>, msg: Messag
     if msg.is_from_bot() {
         return;
     };
-    let config = config::client::new(GuildPath::new(&speaker.guild_id()))
-        .read()
-        .unwrap();
-    let speech_options = config
-        .map(|config| config.speech_options)
-        .unwrap_or_default();
+    let speech_options = match config::client::new(GuildPath::new(&speaker.guild_id())).read() {
+        Ok(Some(config)) => config.speech_options,
+        Ok(None) => Default::default(),
+        Err(e) => {
+            report_error(&format_err("Failed to read config, using defaults", e));
+            Default::default()
+        }
+    };
     if is_ignore_channel(speech_options.read_channel_id, &msg) {
         return;
     }
