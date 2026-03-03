@@ -12,6 +12,11 @@ processes = []
   allowed_public_ports = []
   auto_rollback = true
 
+[vm]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
+
 [[services]]
   http_checks = []
   processes = ["app"]

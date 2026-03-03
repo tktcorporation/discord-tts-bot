@@ -1,6 +1,7 @@
 use std::env;
 
 use reqwest::Client as HttpClient;
+use serenity::cache::Settings as CacheSettings;
 use serenity::{client::Client, prelude::GatewayIntents};
 use songbird::SerenityInit;
 
@@ -21,7 +22,11 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
-    let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
+    // Only request intents the bot actually needs to reduce cached data
+    let intents = GatewayIntents::GUILDS
+        | GatewayIntents::GUILD_VOICE_STATES
+        | GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::MESSAGE_CONTENT;
 
     let mut client = build_client(&token, intents)
         .await
@@ -37,7 +42,13 @@ async fn build_client(
     token: &str,
     intents: GatewayIntents,
 ) -> Result<serenity::Client, serenity::Error> {
+    let mut cache_settings = CacheSettings::default();
+    cache_settings.max_messages = 0;
+    cache_settings.cache_users = false;
+    cache_settings.time_to_live = std::time::Duration::from_secs(600);
+
     Client::builder(token, intents)
+        .cache_settings(cache_settings)
         .event_handler(Handler)
         .register_songbird()
         .type_map_insert::<HttpKey>(HttpClient::new())
