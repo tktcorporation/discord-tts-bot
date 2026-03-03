@@ -30,9 +30,16 @@ pub async fn join(
             return Err(Error::AlreadyJoined);
         }
         // Handler exists but no active connection — stale state from a previous
-        // failed join.  Remove it so we can start fresh.
+        // failed join or disconnect.  Don't call manager.remove() here because
+        // it sends a "leave" voice-state-update through the gateway, which
+        // races with the subsequent manager.join(): the voice_state_update
+        // handler sees the bot leaving and removes the *new* Call that join()
+        // just created, causing JoinError::NoCall.
+        //
+        // Instead, let manager.join() reuse the existing Call via
+        // get_or_insert().  Songbird's Call::join() handles stale internal
+        // state correctly through should_actually_join().
         drop(handler);
-        let _ = manager.remove(guild.id).await;
     }
 
     // voice settings
