@@ -146,7 +146,7 @@ jobs:
 
       - name: Setup | Release notes
         run: |
-          go install github.com/git-chglog/git-chglog/cmd/git-chglog@v0.15.4
+          go install github.com/git-chglog/git-chglog/cmd/git-chglog@latest
           git-chglog -c .github/chglog/release.yml $(git describe --tags) > RELEASE.md
       - name: Build | Publish
         uses: softprops/action-gh-release@v2

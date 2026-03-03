@@ -16,8 +16,8 @@ RUN apt-get update && \
     python3 \
     git
 
-# install yt-dlp (version pinned)
-RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/download/2026.02.21/yt-dlp -o /usr/bin/yt-dlp && \
+# install yt-dlp
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
     chmod a+rx /usr/bin/yt-dlp
 
 # install flyctl

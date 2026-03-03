@@ -9,12 +9,12 @@ install:
 	# 必要なコンポーネントの追加
 	rustup component add clippy rustfmt rust-src
 	# cargo-binstallのインストール
-	cargo install cargo-binstall --locked
+	cargo install cargo-binstall
 	# sccacheのインストールと環境変数の設定
 	cargo binstall sccache --locked && export RUSTC_WRAPPER=$$(which sccache)
 	# その他ツールのインストール
-	cargo binstall cargo-watch cargo-edit cargo-hack --locked
-	cargo install cargo-audit --features=fix --locked
+	cargo binstall cargo-watch cargo-edit cargo-hack
+	cargo install cargo-audit --features=fix
 
 # 環境変数のエクスポート（必要に応じて使用）
 .PHONY: setup-env

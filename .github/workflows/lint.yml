@@ -107,7 +107,7 @@ jobs:
     # /caching
     - name: Install cargo-hack
       run: |
-        curl -LsSf https://github.com/taiki-e/cargo-hack/releases/download/v0.6.42/cargo-hack-x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C ~/.cargo/bin
+        curl -LsSf https://github.com/taiki-e/cargo-hack/releases/latest/download/cargo-hack-x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C ~/.cargo/bin
     - name: cargo hack check
       working-directory: ${{ matrix.subcrate }}
       run: cargo hack check --each-feature --no-dev-deps --all
@@ -153,7 +153,7 @@ jobs:
         python3 \
         git
 
-        sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/download/2026.02.21/yt-dlp -o /usr/bin/yt-dlp && \
+        sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
           sudo chmod a+rx /usr/bin/yt-dlp
 
     # /caching
