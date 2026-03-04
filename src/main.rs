@@ -10,6 +10,9 @@ use discord_tts_bot::model::HttpKey;
 
 #[tokio::main]
 async fn main() {
+    rustls::crypto::ring::default_provider()
+        .install_default()
+        .expect("Failed to install rustls crypto provider");
     let _guard = sentry::init(sentry::ClientOptions {
         dsn: env::var("SENTRY_DSN").ok().and_then(|dsn| dsn.parse().ok()),
         release: sentry::release_name!(),

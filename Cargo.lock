@@ -1200,7 +1200,7 @@ dependencies = [
 
 [[package]]
 name = "discord-tts-bot"
-version = "2.5.0"
+version = "2.5.1"
 dependencies = [
  "aws-config",
  "aws-sdk-polly",
@@ -1213,6 +1213,7 @@ dependencies = [
  "rand 0.10.0",
  "regex",
  "reqwest",
+ "rustls 0.23.37",
  "sentry",
  "serde",
  "serde_json",
